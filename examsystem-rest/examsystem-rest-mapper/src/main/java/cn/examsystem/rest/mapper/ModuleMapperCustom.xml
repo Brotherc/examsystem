@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.examsystem.rest.mapper.ModuleMapperCustom" >
+
+  <resultMap id="menu" type="cn.examsystem.rest.pojo.dto.Menu">
+    <id property="id" column="one_menu_id" />
+    <result property="name" column="one_menu_name" />
+    <result property="icon" column="icon" />
+    <collection property="menus" ofType="cn.examsystem.rest.pojo.dto.Menu">
+      <result column="two_menu_id" property="id" />
+      <result column="two_menu_name" property="name" />
+      <result column="url" property="url" />
+    </collection>
+  </resultMap>
+
+  <select id="listMenuByRoleIds" resultMap="menu">
+    SELECT m1.id      one_menu_id,
+           m1.name    one_menu_name,
+           m1.icon,
+           m2.id      two_menu_id,
+           m2.name    two_menu_name,
+           m2.url
+        FROM module m1, module m2
+            WHERE m2.parent_id = m1.id
+                AND m1.parent_id = '0' AND m1.is_disabled='0' AND m2.parent_id != '0' AND m2.is_disabled='0'
+                AND m2.id IN(
+
+                    SELECT module_id FROM role_module_relation
+                        WHERE role_id IN
+
+                          <foreach item="roleId" index="index" collection="list"
+                                   open="(" separator="," close=")">
+                            #{roleId}
+                          </foreach>
+
+
+                )
+                ORDER BY m1.show_order,m2.show_order
+  </select>
+</mapper>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.examsystem.rest.mapper.FillInBlankQuestionMapperCustom" >
+  <resultMap id="fillInBlankQuestionMap" type="cn.examsystem.rest.pojo.dto.FillInBlankQuestionDto" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="difficulty" property="difficulty" jdbcType="INTEGER" />
+    <result column="course_id" property="courseId" jdbcType="VARCHAR" />
+    <result column="created_teacher_id" property="createdTeacherId" jdbcType="VARCHAR" />
+    <result column="is_checked" property="isChecked" jdbcType="BIT" />
+    <result column="blank_num" property="blankNum" jdbcType="INTEGER" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="answer" property="answer" jdbcType="LONGVARCHAR" />
+
+    <collection property="knowledgePoints" ofType="string">
+      <constructor>
+        <arg column="knowledge_point_id"/>
+      </constructor>
+    </collection>
+    <collection property="matcherCodes" ofType="string">
+      <constructor>
+        <arg column="matcher_code"/>
+      </constructor>
+    </collection>
+  </resultMap>
+
+  <sql id="list_question_where">
+    <if test="(difficulty!=null and difficulty!='') or difficulty==0">
+      and FILL_IN_BLANK_QUESTION.difficulty = #{difficulty}
+    </if>
+    <if test="courseId!=null and courseId!=''">
+      and FILL_IN_BLANK_QUESTION.course_id = #{courseId}
+    </if>
+    <if test="(isChecked!=null and isChecked!='') or isChecked==0">
+      and FILL_IN_BLANK_QUESTION.is_checked = #{isChecked}
+    </if>
+    <if test="knowledgePointId!=null and knowledgePointId!=''">
+      and FILL_IN_BLANK_QUESTION.knowledge_point_id = #{knowledgePointId}
+    </if>
+  </sql>
+
+  <select id="listFillInBlankQuestion" parameterType="cn.examsystem.rest.pojo.vo.FillInBlankQuestionVo" resultMap="fillInBlankQuestionMap">
+      SELECT *FROM(
+        SELECT fill_in_blank_question.*,question_knowledgepoint_relation.knowledge_point_id knowledge_point_id,question_matcher_relation.matcher_code
+          FROM fill_in_blank_question
+            LEFT OUTER JOIN question_knowledgepoint_relation ON fill_in_blank_question.id=question_knowledgepoint_relation.question_id
+            LEFT OUTER JOIN question_matcher_relation ON fill_in_blank_question.id=question_matcher_relation.question_id
+      ) FILL_IN_BLANK_QUESTION
+    <where>
+      <include refid="list_question_where"></include>
+    </where>
+  </select>
+</mapper>

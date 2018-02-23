@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.examsystem.rest.mapper.SysuserMapperCustom" >
+  <resultMap id="sysuserMap" type="cn.examsystem.rest.pojo.dto.SysuserDto" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="sysuser_id" property="sysuserId" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="department_id" property="departmentId" jdbcType="VARCHAR" />
+    <result column="last_login_time" property="lastLoginTime" jdbcType="TIMESTAMP" />
+    <result column="last_login_ip" property="lastLoginIp" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+    <result column="department_name" property="departmentName" jdbcType="VARCHAR" />
+    <result column="status_name" property="statusName" jdbcType="VARCHAR" />
+
+    <collection property="roles" ofType="cn.examsystem.rest.pojo.po.Role">
+      <id column="role_id" property="id"/>
+      <result column="role_name" property="name"/>
+    </collection>
+  </resultMap>
+
+  <sql id="list_sysuser_where">
+    <if test="roleId!=null and roleId!=''">
+      and SYSUSER.role_id = #{roleId}
+    </if>
+    <if test="(status!=null and status!='') or status==0">
+      and SYSUSER.status = #{status}
+    </if>
+    <if test="sysuserId!=null and sysuserId!=''" >
+      and SYSUSER.sysuser_id = #{sysuserId}
+    </if>
+    <if test="name!=null and name!=''">
+      and SYSUSER.name = #{name}
+    </if>
+    <if test="departmentId!=null and departmentId!=''">
+      and SYSUSER.department_id = #{departmentId}
+    </if>
+  </sql>
+
+  <select id="listSysuser" parameterType="cn.examsystem.rest.pojo.vo.SysuserVo" resultMap="sysuserMap">
+    SELECT *FROM (
+      SELECT sysuser.*,department.name department_name,role.id role_id,role.name role_name,
+        (SELECT NAME FROM dict_info WHERE dict_info.dict_type_id='001' AND sysuser.status=dict_info.code)status_name
+          FROM sysuser
+            LEFT OUTER JOIN department ON department_id=department.id
+              INNER JOIN user_role_relation ON sysuser.id=user_role_relation.user_id
+                INNER JOIN role ON user_role_relation.role_id=role.id
+    ) SYSUSER
+    <where>
+      <include refid="list_sysuser_where"/>
+    </where>
+  </select>
+</mapper>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.examsystem.rest.mapper.SingleChoiceQuestionMapperCustom" >
+  <resultMap id="singleChoiceQuestionMap" type="cn.examsystem.rest.pojo.dto.SingleChoiceQuestionDto" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="option_a" property="optionA" jdbcType="VARCHAR" />
+    <result column="option_b" property="optionB" jdbcType="VARCHAR" />
+    <result column="option_c" property="optionC" jdbcType="VARCHAR" />
+    <result column="option_d" property="optionD" jdbcType="VARCHAR" />
+    <result column="answer" property="answer" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="difficulty" property="difficulty" jdbcType="INTEGER" />
+    <result column="course_id" property="courseId" jdbcType="VARCHAR" />
+    <result column="created_teacher_id" property="createdTeacherId" jdbcType="VARCHAR" />
+    <result column="is_checked" property="isChecked" jdbcType="TINYINT" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+
+    <collection property="knowledgePoints" ofType="string">
+      <constructor>
+        <arg column="knowledge_point_id"/>
+      </constructor>
+    </collection>
+  </resultMap>
+
+  <sql id="list_question_where">
+    <if test="(difficulty!=null and difficulty!='') or difficulty==0">
+      and SINGLE_CHOICE_QUESTION.difficulty = #{difficulty}
+    </if>
+    <if test="courseId!=null and courseId!=''">
+      and SINGLE_CHOICE_QUESTION.course_id = #{courseId}
+    </if>
+    <if test="(isChecked!=null and isChecked!='') or isChecked==0">
+      and SINGLE_CHOICE_QUESTION.is_checked = #{isChecked}
+    </if>
+    <if test="knowledgePointId!=null and knowledgePointId!=''">
+      and SINGLE_CHOICE_QUESTION.knowledge_point_id = #{knowledgePointId}
+    </if>
+  </sql>
+
+  <select id="listSingleChoiceQuestion" parameterType="cn.examsystem.rest.pojo.vo.SingleChoiceQuestionVo" resultMap="singleChoiceQuestionMap">
+      SELECT *FROM(
+          SELECT single_choice_question.*,question_knowledgepoint_relation.knowledge_point_id knowledge_point_id
+              FROM single_choice_question
+                  LEFT OUTER JOIN question_knowledgepoint_relation
+                      ON single_choice_question.id=question_knowledgepoint_relation.question_id
+      ) SINGLE_CHOICE_QUESTION
+    <where>
+      <include refid="list_question_where"></include>
+    </where>
+  </select>
+</mapper>

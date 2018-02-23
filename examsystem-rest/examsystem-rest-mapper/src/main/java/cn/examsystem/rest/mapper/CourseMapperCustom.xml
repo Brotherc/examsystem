@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.examsystem.rest.mapper.CourseMapperCustom" >
+  <resultMap id="courseMap" type="cn.examsystem.rest.pojo.dto.CourseDto" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="knowledge_point_id" property="knowledgePointId" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+
+    <collection property="majors" ofType="cn.examsystem.rest.pojo.po.Major">
+      <id column="major_id" property="id"/>
+      <result column="major_name" property="name"/>
+    </collection>
+
+    <collection property="teachers" ofType="cn.examsystem.rest.pojo.po.Sysuser">
+      <id column="sysuser_id" property="id"/>
+      <result column="teacher_id" property="sysuserId"/>
+      <result column="teacher_name" property="name"/>
+    </collection>
+  </resultMap>
+
+  <sql id="list_course_where">
+    <if test="name!=null and name!=''">
+      and COURSE.name = #{name}
+    </if>
+    <if test="majorId!=null and majorId!=''">
+      and COURSE.major_id = #{majorId}
+    </if>
+    <if test="sysuserId!=null and sysuserId!=''">
+      and COURSE.sysuser_id = #{sysuserId}
+    </if>
+  </sql>
+
+  <select id="listCourse" parameterType="cn.examsystem.rest.pojo.vo.CourseVo" resultMap="courseMap">
+    SELECT *FROM(
+      SELECT course.*,major.id major_id,major.name major_name,sysuser.id sysuser_id,sysuser.sysuser_id teacher_id,sysuser.name teacher_name
+        FROM course
+          LEFT OUTER JOIN course_major_relation ON course.id=course_major_relation.course_id
+            LEFT OUTER JOIN major ON course_major_relation.major_id=major.id
+              LEFT OUTER JOIN course_teacher_relation ON course.id=course_teacher_relation.course_id
+                LEFT OUTER JOIN sysuser ON (course_teacher_relation.teacher_id=sysuser.id AND sysuser.status='1')
+    ) COURSE
+    <where>
+      <include refid="list_course_where"></include>
+    </where>
+  </select>
+</mapper>

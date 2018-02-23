@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.examsystem.rest.mapper.MajorMapperCustom">
+
+  <sql id="list_major_where">
+      <if test="name!=null and name!=''">
+        and MAJOR.name = #{name}
+      </if>
+      <if test="departmentId!=null and departmentId!=''">
+        and MAJOR.departmentId = #{departmentId}
+      </if>
+  </sql>
+
+  <select id="listMajor" parameterType="cn.examsystem.rest.pojo.vo.MajorVo" resultType="cn.examsystem.rest.pojo.dto.MajorDto">
+      SELECT  *FROM(
+          SELECT major.id,major.name,major.department_id departmentId,major.created_time createdTime,major.updated_time updatedTime,department.name departmentName
+              FROM major,department
+                  WHERE major.department_id=department.id
+      )MAJOR
+    <where>
+      <include refid="list_major_where"></include>
+    </where>
+  </select>
+</mapper>

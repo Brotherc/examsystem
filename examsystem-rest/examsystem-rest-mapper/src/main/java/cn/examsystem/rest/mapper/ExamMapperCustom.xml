@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.examsystem.rest.mapper.ExamMapperCustom" >
+  <resultMap id="examMap" type="cn.examsystem.rest.pojo.dto.ExamDto" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="course_id" property="courseId" jdbcType="VARCHAR" />
+    <result column="test_paper_id" property="testPaperId" jdbcType="VARCHAR" />
+    <result column="school_year_id" property="schoolYearId" jdbcType="VARCHAR" />
+    <result column="term" property="term" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="created_teacher_id" property="createdTeacherId" jdbcType="VARCHAR" />
+    <result column="part_num" property="partNum" jdbcType="INTEGER" />
+    <result column="interval_time" property="intervalTime" jdbcType="INTEGER" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="time" property="time" jdbcType="INTEGER" />
+    <result column="exam_pwd" property="examPwd" jdbcType="VARCHAR" />
+    <result column="invigilate_pwd" property="invigilatePwd" jdbcType="VARCHAR" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+
+    <result column="course_name" property="courseName" jdbcType="VARCHAR" />
+    <result column="school_year_name" property="schoolYearName" jdbcType="VARCHAR" />
+    <result column="statusName" property="statusName" jdbcType="VARCHAR" />
+    <result column="created_teacher_name" property="createdTeacherName" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="list_exam_where">
+    <if test="courseId!=null and courseId!=''">
+      and EXAM.course_id = #{courseId}
+    </if>
+    <if test="schoolYearId!=null and schoolYearId!=''">
+      and EXAM.school_year_id = #{schoolYearId}
+    </if>
+    <if test="(term!=null and term!='') or term==0">
+      and EXAM.term = #{term}
+    </if>
+    <if test="(status!=null and status!='') or status==0">
+      and EXAM.status = #{status}
+    </if>
+  </sql>
+
+  <select id="listExam" parameterType="cn.examsystem.rest.pojo.po.Exam" resultMap="examMap">
+    SELECT *FROM (
+        SELECT exam.*,course.name course_name,school_year.name school_year_name,sysuser.name created_teacher_name,
+              (SELECT NAME FROM dict_info WHERE dict_info.dict_type_id='005' AND exam.status=dict_info.code)statusName
+            FROM exam,course,school_year,sysuser
+                WHERE course_id=course.id AND school_year_id=school_year.id AND created_teacher_id=sysuser.id
+    ) EXAM
+    <where>
+      <include refid="list_exam_where"></include>
+    </where>
+  </select>
+</mapper>

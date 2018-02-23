@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.examsystem.rest.mapper.ClassMapperCustom" >
+
+  <sql id="list_class_where">
+    <if test="name!=null and name!=''">
+      and CLASS.name = #{name}
+    </if>
+    <if test="gradeId!=null and gradeId!=''">
+      and CLASS.gradeId = #{gradeId}
+    </if>
+    <if test="majorId!=null and majorId!=''">
+      and CLASS.majorId = #{majorId}
+    </if>
+    <if test="departmentId!=null and departmentId!=''">
+      and CLASS.departmentId = #{departmentId}
+    </if>
+  </sql>
+
+  <select id="listClass" parameterType="cn.examsystem.rest.pojo.vo.ClassVo" resultType="cn.examsystem.rest.pojo.dto.ClassDto">
+    SELECT *FROM(
+      SELECT class.id,class.name,class.major_id majorId,class.grade_id gradeId,class.created_time createdTime,class.updated_time updatedTime,major.name majorName,grade.name gradeName,department.id departmentId,department.name departmentName
+        FROM class,major,grade,department
+          WHERE class.major_id=major.id AND class.grade_id=grade.id AND major.department_id=department.id
+            ORDER BY department.name,grade.name,class.name
+    )CLASS
+    <where>
+      <include refid="list_class_where"></include>
+    </where>
+  </select>
+
+</mapper>

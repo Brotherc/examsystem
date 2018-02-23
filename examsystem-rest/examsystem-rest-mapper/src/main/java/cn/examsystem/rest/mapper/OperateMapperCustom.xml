@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.examsystem.rest.mapper.OperateMapperCustom" >
+  <resultMap id="OperateDto" type="cn.examsystem.rest.pojo.dto.OperateDto" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result property="url" column="url"></result>
+    <result property="method" column="method"></result>
+    <collection property="roleCodes" ofType="string">
+      <constructor>
+        <arg column="role_code"/>
+      </constructor>
+    </collection>
+  </resultMap>
+
+  <select id="listOperateIncludeRole" resultMap="OperateDto">
+    SELECT  operate.id , operate.url,operate.method,role.role_code  FROM
+	operate,rolemodule_operate_relation,role_module_relation,role
+		WHERE operate.id=rolemodule_operate_relation.operate_id AND rolemodule_operate_relation.role_module_id=role_module_relation.id AND role_module_relation.role_id=role.id
+  </select>
+</mapper>
