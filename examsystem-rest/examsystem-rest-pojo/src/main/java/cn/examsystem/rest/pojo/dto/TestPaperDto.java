@@ -3,6 +3,8 @@ package cn.examsystem.rest.pojo.dto;
 import cn.examsystem.rest.pojo.po.TestPaper;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2018/2/6.
@@ -25,6 +27,14 @@ public class TestPaperDto extends TestPaper{
 
     private String fillInBlankQuestionIds;
     private BigDecimal fillInBlankQuestionScore;
+
+    private List<TestPaperSingleChoiceQuestion> singleChoiceQuestions;
+    private List<TestPaperTrueOrFalseQuestion> trueOrFalseQuestions;
+    private List<TestPaperFillInBlankQuestion> fillInBlankQuestions;
+
+    private Map<Integer,String> singleChoiceQuestionAnswer;
+    private Map<Integer,String> trueOrFalseQuestionAnswer;
+    private Map<Integer,String> fillInBlankQuestionAnswer;
 
     public String getSingleChoiceQuestionIds() {
         return singleChoiceQuestionIds;
@@ -112,5 +122,53 @@ public class TestPaperDto extends TestPaper{
 
     public void setFillInBlankQuestionNum(Integer fillInBlankQuestionNum) {
         this.fillInBlankQuestionNum = fillInBlankQuestionNum;
+    }
+
+    public List<TestPaperSingleChoiceQuestion> getSingleChoiceQuestions() {
+        return singleChoiceQuestions;
+    }
+
+    public void setSingleChoiceQuestions(List<TestPaperSingleChoiceQuestion> singleChoiceQuestions) {
+        this.singleChoiceQuestions = singleChoiceQuestions;
+    }
+
+    public List<TestPaperTrueOrFalseQuestion> getTrueOrFalseQuestions() {
+        return trueOrFalseQuestions;
+    }
+
+    public void setTrueOrFalseQuestions(List<TestPaperTrueOrFalseQuestion> trueOrFalseQuestions) {
+        this.trueOrFalseQuestions = trueOrFalseQuestions;
+    }
+
+    public List<TestPaperFillInBlankQuestion> getFillInBlankQuestions() {
+        return fillInBlankQuestions;
+    }
+
+    public void setFillInBlankQuestions(List<TestPaperFillInBlankQuestion> fillInBlankQuestions) {
+        this.fillInBlankQuestions = fillInBlankQuestions;
+    }
+
+    public Map<Integer, String> getSingleChoiceQuestionAnswer() {
+        return singleChoiceQuestionAnswer;
+    }
+
+    public void setSingleChoiceQuestionAnswer(Map<Integer, String> singleChoiceQuestionAnswer) {
+        this.singleChoiceQuestionAnswer = singleChoiceQuestionAnswer;
+    }
+
+    public Map<Integer, String> getTrueOrFalseQuestionAnswer() {
+        return trueOrFalseQuestionAnswer;
+    }
+
+    public void setTrueOrFalseQuestionAnswer(Map<Integer, String> trueOrFalseQuestionAnswer) {
+        this.trueOrFalseQuestionAnswer = trueOrFalseQuestionAnswer;
+    }
+
+    public Map<Integer, String> getFillInBlankQuestionAnswer() {
+        return fillInBlankQuestionAnswer;
+    }
+
+    public void setFillInBlankQuestionAnswer(Map<Integer, String> fillInBlankQuestionAnswer) {
+        this.fillInBlankQuestionAnswer = fillInBlankQuestionAnswer;
     }
 }
