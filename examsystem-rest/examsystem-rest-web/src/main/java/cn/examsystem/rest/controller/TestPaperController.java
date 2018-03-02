@@ -52,4 +52,12 @@ public class TestPaperController {
     public ResultInfo updateTestPaper(@PathVariable String id,@RequestBody TestPaperDto testPaperDto) throws Exception{
         return testPaperService.updateTestPaper(id,testPaperDto);
     }
+
+    @GetMapping("/v1/test/testPaper/{testPaperId}")
+    public ResultInfo getTestPaperAndQuestionsByIdForLoginStudent(@PathVariable String testPaperId,String examStudentId) throws Exception{
+        System.out.println("------------------------------------------");
+        TestPaperDto testPaperDto = testPaperService.getTestPaperAndQuestionsByIdForLoginStudent(testPaperId,examStudentId);
+        ResultInfo resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,testPaperDto);
+        return resultInfo;
+    }
 }
