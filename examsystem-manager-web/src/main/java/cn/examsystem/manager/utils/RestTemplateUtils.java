@@ -13,6 +13,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.reflect.Field;
 import java.net.URI;
@@ -105,6 +106,32 @@ public class RestTemplateUtils {
             }
 
             return restTemplate.exchange(url, method, requestEntity, responseType, uriVariables).getBody();
+    }
+    public static <T> T exchangeForFile(String url, HttpMethod method,MultipartFile resource, Class<T> responseType, Object... uriVariables) throws Exception {
+
+        MultiValueMap<String,Object> param=new LinkedMultiValueMap<>();
+        param.add("uploadFile",resource);
+
+        HttpEntity<MultiValueMap<String,Object>> httpEntity=new HttpEntity(param);
+
+        RestTemplate restTemplate = RestTemplateUtils.getInstance();
+
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory() {
+            @Override
+            protected HttpUriRequest createHttpUriRequest(HttpMethod httpMethod, URI uri) {
+                if (HttpMethod.DELETE == httpMethod) {
+                    return new HttpEntityEnclosingDeleteRequest(uri);
+                }
+                return super.createHttpUriRequest(httpMethod, uri);
+            }
+        });
+
+        if (uriVariables.length == 1 && uriVariables[0] instanceof Map) {
+            Map<String, ?> _uriVariables = (Map<String, ?>) uriVariables[0];
+            return restTemplate.exchange(url, method, httpEntity, responseType, _uriVariables).getBody();
+        }
+
+        return restTemplate.exchange(url, method, httpEntity, responseType, uriVariables).getBody();
     }
 
     /**
