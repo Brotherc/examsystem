@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+                        http://www.springframework.org/schema/security
+                        http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <!--配置静态资源不被拦截-->
+    <security:http pattern="/css/**" security="none"/>
+    <security:http pattern="/fonts/**" security="none"/>
+    <security:http pattern="/img/**" security="none"/>
+    <security:http pattern="/js/**" security="none"/>
+    <security:http pattern="/plugins/**" security="none"/>
+    <security:http pattern="/*.ico" security="none"/>
+
+    <!--配置相应url访问权限-->
+    <security:http use-expressions="false">
+        <security:csrf disabled="true"></security:csrf>
+        <security:intercept-url pattern="/login.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/code/image" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/403.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/500.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/404.html" access="IS_AUTHENTICATED_ANONYMOUSLY"/>
+        <security:intercept-url pattern="/**" access="ROLE_USER" />
+
+        <!--支持在iframe中显示-->
+        <security:headers>
+            <security:frame-options policy="SAMEORIGIN"/>
+        </security:headers>
+
+        <!--配置登录相关信息-->
+        <security:form-login
+                login-page="/login.html"
+                login-processing-url="/login"
+                username-parameter="username"
+                password-parameter="password"
+                default-target-url="/index.html"
+                always-use-default-target="true"
+                authentication-failure-handler-ref="sysuserAuthenticationFailureHandler"
+        />
+        <!--认证通过的用户访问没权限时显示的页面-->
+        <security:access-denied-handler error-page="/403.html"/>
+
+        <!--自定义过滤器-->
+        <security:custom-filter ref="validateCodeFilter" before="FORM_LOGIN_FILTER"/>
+        <security:custom-filter ref="securityInterceptor" before="FILTER_SECURITY_INTERCEPTOR"/>
+
+        <!--退出配置-->
+        <security:logout logout-url="/logout" logout-success-url="/login.html" delete-cookies="JSESSIONID"/>
+    </security:http>
+
+    <!--校验失败处理器-->
+    <bean id="sysuserAuthenticationFailureHandler" class="cn.examsystem.security.handle.SysuserAuthenticationFailureHandler"/>
+
+    <!--自定义验证码拦截器-->
+    <bean id="validateCodeFilter" class="cn.examsystem.security.filter.ValidateCodeFilter"/>
+
+    <!--自定义权限拦截器-->
+    <bean id="securityInterceptor" class="cn.examsystem.security.filter.SecurityInterceptor">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="accessDecisionManager" ref="mesecurityAccessDecisionManager"/>
+        <property name="securityMetadataSource" ref="secureResourceFilterInvocationDefinitionSource" />
+    </bean>
+
+    <security:authentication-manager alias="authenticationManager">
+        <security:authentication-provider user-service-ref="sysuserDetailService">
+            <security:password-encoder ref="encoder"/>
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+    <!--自定义获取认证用户-->
+    <bean id="sysuserDetailService" class="cn.examsystem.security.service.StudentDetailService"/>
+
+    <!--使用springscurity自带的密码加密-->
+    <bean id="encoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+
+    <!--     获取访问url对应的所有权限 -->
+    <bean id="secureResourceFilterInvocationDefinitionSource" class="cn.examsystem.security.metadatasource.SecureResourceFilterInvocationDefinitionSource" />
+    <!--     校验用户的权限是否足够 -->
+    <bean id="mesecurityAccessDecisionManager" class="cn.examsystem.security.manager.SecurityAccessDecisionManager" />
+
+</beans>
