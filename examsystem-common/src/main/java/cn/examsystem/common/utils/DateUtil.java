@@ -26,7 +26,16 @@ public class DateUtil {
 		SimpleDateFormat df = new SimpleDateFormat(DATETIME_FORMAT);
 		return df.format(new Date(time));
 	}
-	
+
+	/**
+	 * Parse date like "yyyy-MM-dd HH:mm:ss".
+	 */
+	public static Date getDateAfterSeconds(Date date,Long seconds){
+		long millionSeconds=date.getTime()+seconds*1000;
+		Calendar c = Calendar.getInstance();
+		c.setTimeInMillis(millionSeconds);
+		return c.getTime();
+	}
 	
 	/**
 	 * 返回年份
