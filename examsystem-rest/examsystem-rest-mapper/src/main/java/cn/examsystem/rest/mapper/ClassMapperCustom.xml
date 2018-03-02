@@ -3,6 +3,9 @@
 <mapper namespace="cn.examsystem.rest.mapper.ClassMapperCustom" >
 
   <sql id="list_class_where">
+    <if test="id!=null and id!=''">
+      and CLASS.id = #{id}
+    </if>
     <if test="name!=null and name!=''">
       and CLASS.name = #{name}
     </if>
