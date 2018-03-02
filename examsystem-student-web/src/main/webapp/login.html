@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <title>吉林大学珠海学院学习平台</title>
+    <meta name="keywords" content="在线考试系统,吉林大学珠海学院考试">
+    <meta name="description" content="在线考试系统是一个服务于教师与学生的学习平台">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="/css/animate.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/login.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <script>
+        if (window.top !== window.self) {
+            window.top.location = window.location;
+        }
+    </script>
+
+</head>
+
+<body class="signin">
+    <div class="signinpanel">
+        <div class="row">
+            <div class="col-sm-7">
+                <div class="signin-info">
+                    <div class="logopanel m-b">
+                        <h1>Jz</h1>
+                    </div>
+                    <div class="m-b"></div>
+                    <h4>欢迎使用 <strong>吉林大学珠海学院学习平台</strong></h4>
+                    <ul class="m-b">
+                        <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> 在线考试</li>
+                        <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> 模拟练习</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-5">
+<!--                <form method="post" action="/login" id="formlogin" role="form">
+                    <h4 class="no-margins">登录：</h4>
+                    <p class="m-t-md">登录到H+后台主题UI框架</p>
+                    <input type="text" class="form-control uname" placeholder="用户名" name="username" id="loginname"/>
+                    <input type="password" class="form-control pword m-b" placeholder="密码" name="password" id="loginpwd"/>
+                    <div class="form-group row">
+                        <div class="col-lg-6">
+                            <input type="text" class="form-control imageCode" name="imageCode" placeholder="验证码" required="">
+                        </div>
+                        <div class="col-lg-5 pull-right">
+                            <img src="/code/image" id="imageCode" class="img-rounded form-control" onclick="javascript:this.src=this.src+'?rnd=' + Math.random();" title="看不清,点击刷新">
+                        </div>
+                    </div>
+                    <button class="btn btn-success btn-block" id="loginsubmit">登录</button>
+                </form>-->
+
+                <form role="form" id="formlogin" action="/login" method="post">
+                    <h4 class="no-margins">登录：</h4>
+                    <p class="m-t-md">登录到平台学生端</p>
+                    <div class="form-group">
+                        <input type="text" class="form-control uname" name="username" id="loginname" placeholder="学号" required="">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control pword m-b" name="password" id="loginpwd" placeholder="密码" required="">
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-lg-6">
+                            <input type="text" class="form-control imageCode" name="imageCode" placeholder="验证码" required="">
+                        </div>
+                        <div class="col-lg-5 pull-right">
+                            <img src="/code/image" id="imageCode" class="img-rounded form-control" onclick="javascript:this.src=this.src+'?rnd=' + Math.random();" title="看不清,点击刷新">
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-success block full-width m-b" id="loginsubmit">登 录</button>
+
+                </form>
+            </div>
+        </div>
+        <div class="signup-footer">
+            <div class="pull-left">
+                &copy; 2018-2019 All Rights Reserved. JZ
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局js -->
+    <script src="/js/jquery.min.js?v=2.1.4"></script>
+    <script src="/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="/js/plugins/layer/layer.min.js"></script>
+
+
+    <script type="text/javascript">
+        var LOGIN = {
+            checkInput:function() {
+                if ($("#loginname").val() == "") {
+                    layer.msg("用户名不允许为空");
+                    $("#loginname").focus();
+                    return false;
+                }
+                if ($("#loginpwd").val() == "") {
+                    layer.msg("密码不允许为空");
+                    $("#loginpwd").focus();
+                    return false;
+                }
+                return true;
+            },
+            doLogin:function() {
+                $.post("/login", $("#formlogin").serialize(),function(data){
+                    if (data.status == 401) {
+                        layer.msg(data.message);
+                        $("#imageCode").trigger("click");
+                    } else {
+                        location.href = "http://localhost:8082";
+                    }
+                });
+            },
+            login:function() {
+                if (this.checkInput()) {
+                    this.doLogin();
+                }
+            }
+
+        };
+        $(function(){
+            $("#loginsubmit").click(function(){
+                LOGIN.login();
+            });
+        });
+    </script>
+</body>
+
+</html>

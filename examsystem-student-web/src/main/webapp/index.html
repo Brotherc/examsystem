@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>吉林大学珠海学院学习平台-首页</title>
+    <meta name="keywords" content="在线考试系统,吉林大学珠海学院考试">
+    <meta name="description" content="在线考试系统是一个服务于教师与学生的学习平台">
+
+    <link rel="shortcut icon" href="favicon.ico"> <link href="css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="css/font-awesome.css?v=4.4.0" rel="stylesheet">
+
+    <link href="css/animate.css" rel="stylesheet">
+    <link href="css/style.css?v=4.1.0" rel="stylesheet">
+
+    <!-- Sweet Alert -->
+    <link href="/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+</head>
+
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight" style="width: 750px;margin: 10% auto 0 auto;">
+        <div class="row">
+            <div class="col-sm-6" >
+                <div class="contact-box" style="height: 200px;">
+                        <div class="col-sm-4">
+                            <div class="text-center">
+                                <img alt="image" class="img-circle m-t-xs img-responsive" src="img/practice.png">
+                            </div>
+                        </div>
+                        <div class="col-sm-8">
+                            <h3><strong>练习</strong></h3>
+                            <p><i class="fa fa-tag"></i> 模拟练习</p>
+                            <button class="btn btn-outline btn-success  dim" type="button"><i class="fa fa-pencil"></i><span class="bold m-l-md">进入</span>
+                            </button>
+                        </div>
+                        <div class="clearfix"></div>
+                </div>
+            </div>
+            <div class="col-sm-6" >
+                <div class="contact-box" style="height: 200px;">
+                        <div class="col-sm-4">
+                            <div class="text-center">
+                                <img alt="image" class="img-circle m-t-xs img-responsive" src="img/exam.png">
+                            </div>
+                        </div>
+                        <div class="col-sm-8">
+                            <h3><strong>考试</strong></h3>
+                            <p><i class="fa fa-tag"></i> 在线考试</p>
+                            <button class="btn btn-outline btn-success  dim" type="button" onclick="getExam()"><i class="fa fa-hourglass-2"></i><span class="bold m-l-md" >进入</span>
+                            </button>
+                        </div>
+                        <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 学生考试详情modal -->
+    <div id="modal-form-details" class="modal fade" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row">
+                        <form class="form-horizontal" id="examStudent-details-form">
+                            <input type="hidden" name="id" value="" id="id">
+                            <input type="hidden" name="examId" value="" id="examId">
+                            <input type="hidden" id="testPaperId">
+                            <input type="hidden" name="isProceeded" value="" id="isProceeded">
+                            <input type="hidden" name="isLocal" value="" id="isLocal">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">学年：</label>
+                                <div class="col-sm-6">
+                                    <p class="form-control-static" id="schoolYear_details"></p>
+                                </div>
+                            </div>
+                            <div class="form-group " >
+                                <label class="col-sm-3 control-label">科目：</label>
+                                <div class=" col-sm-6">
+                                    <p class="form-control-static" id="course_details"></p>
+                                </div>
+                            </div>
+                            <div class="form-group " >
+                                <label class="col-sm-3 control-label">场次：</label>
+                                <div class=" col-sm-6">
+                                    <p class="form-control-static" id="partOrder_details"></p>
+                                </div>
+                            </div>
+                            <div class="form-group " >
+                                <label class="col-sm-3 control-label">该场次开考时间：</label>
+                                <div class=" col-sm-6">
+                                    <p class="form-control-static" id="startTime_details"></p>
+                                </div>
+                            </div>
+                            <div class="form-group " >
+                                <label class="col-sm-3 control-label">班级：</label>
+                                <div class=" col-sm-6">
+                                    <p class="form-control-static" id="class_details"></p>
+                                </div>
+                            </div>
+                            <div class="form-group " >
+                                <label class="col-sm-3 control-label">学生：</label>
+                                <div class=" col-sm-6">
+                                    <p class="form-control-static" id="student_details"></p>
+                                </div>
+                            </div>
+                            <div class="form-group" id="examPwd">
+                                <label class="col-sm-3 control-label">考试密码：</label>
+                                <div class="col-sm-6">
+                                    <input type="text" placeholder="考试密码" class="form-control"  name="examPwd">
+                                </div>
+                            </div>
+                            <div class="form-group" id="invigilatePwd">
+                                <label class="col-sm-3 control-label">监考密码：</label>
+                                <div class="col-sm-6">
+                                    <input type="text" placeholder="监考密码" class="form-control"  name="invigilatePwd">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-6">
+                                    <button data-toggle="button" class="btn btn-primary btn-outline" type="button" onclick="startExam()">开始</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全局js -->
+    <script src="/js/jquery.min.js?v=2.1.4"></script>
+    <script src="/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="/js/plugins/layer/layer.min.js"></script>
+
+    <!-- 自定义js -->
+    <script src="/js/examsystem/common.js"></script>
+
+    <!-- Sweet alert -->
+    <script src="/js/plugins/sweetalert/sweetalert.min.js"></script>
+
+    <!--jQuery session-->
+    <script src="/js/plugins/jquery-session/jquery.session.js"></script>
+
+    <script>
+        function getExam() {
+            $.ajax({
+                type: "GET",
+                url: "/v1/exam/loginStudent",
+                success: function(data){
+                    if(data.status == 200){
+                        var examStudent=data.data;
+                        if(examStudent==null){
+                            layer.msg("考试未开启");
+                            return;
+                        }
+                        else{
+
+                            var term;
+                            if(examStudent.term==1)
+                                term="上";
+                            else
+                                term="下";
+
+                            var now = new Date(examStudent.partOrderStartTime);
+
+                            $("#schoolYear_details").text(examStudent.schoolYearName+" "+term);
+                            $("#course_details").text(examStudent.courseName);
+                            $("#partOrder_details").text(examStudent.partOrder);
+                            $("#startTime_details").text(now.format("yyyy-MM-dd hh:mm:ss"));
+                            $("#class_details").text(examStudent.departmentName+"-"+examStudent.gradeName+"-"+examStudent.majorName+"-"+examStudent.className);
+                            $("#student_details").text(examStudent.studentStudentId+"-"+examStudent.studentName);
+                            $("#id").val(examStudent.id);
+                            $("#examId").val(examStudent.examId);
+                            $("#testPaperId").val(examStudent.testPaperId);
+
+                            $("#isProceeded").val(exam.isProceeded);
+                            $("#isLocal").val(exam.isLocal);
+
+                            if(!examStudent.isProceeded){//没进行过考试
+                                $("#examPwd").show();
+                                $("#invigilatePwd").hide();
+                            }else{
+                                if(examStudent.isLocal){
+                                    $("#examPwd").show();
+                                    $("#invigilatePwd").hide();
+                                }else{
+                                    $("#examPwd").hide();
+                                    $("#invigilatePwd").show();
+                                }
+                            }
+
+                            $("#modal-form-details").modal('show');
+                        }
+                    }
+                    else{
+                        swal(data.message, "无法进入。", "error");
+                    }
+                },
+                error:function(XMLHttpRequest, textStatus, errorThrown){
+                    var status=XMLHttpRequest.status;
+                    if(status==403){
+                        to403();
+                    }else if(status==500){
+                        to500();
+                    }
+                }
+            });
+        }
+
+        function startExam() {
+            var examPwd=$("#examStudent-details-form [name=examPwd]").val();
+            var invigilatePwd=$("#examStudent-details-form [name=invigilatePwd]").val();
+
+
+            var isProceeded=$("#isProceeded").val();
+            var isLocal=$("#isLocal").val();
+
+            if(!isProceeded){//没进行过考试
+                if(examPwd.trim()==""){
+                    layer.msg("考试密码不能为空");
+                    return;
+                }
+            }else{
+                if(isLocal){
+                    if(examPwd.trim()==""){
+                        layer.msg("考试密码不能为空");
+                        return;
+                    }
+                }else{
+                    if(invigilatePwd.trim()==""){
+                        layer.msg("监考密码不能为空");
+                        return;
+                    }
+                }
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/v1/test",
+                data: decodeURIComponent($("#examStudent-details-form").serialize().replace(/\+/g,"")),
+                success: function(data){
+                    if(data.status == 201){
+                        $.session.set('examStudentId', $("#id").val());
+                        location.href = "http://localhost:8082/v1/test/testPaper/"+$("#testPaperId").val();
+                    }
+                    else{
+                        swal(data.message, "无法开始。", "error");
+                    }
+                },
+                error:function(XMLHttpRequest, textStatus, errorThrown){
+                    var status=XMLHttpRequest.status;
+                    if(status==403){
+                        to403();
+                    }else if(status==500){
+                        to500();
+                    }
+                }
+            });
+
+        }
+    </script>
+
+    <script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
+    <!--统计代码，可删除-->
+
+</body>
+
+</html>
