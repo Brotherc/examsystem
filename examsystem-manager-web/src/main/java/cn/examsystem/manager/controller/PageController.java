@@ -3,6 +3,7 @@ package cn.examsystem.manager.controller;
 import cn.examsystem.common.pojo.ResultInfo;
 import cn.examsystem.common.utils.DateUtil;
 import cn.examsystem.manager.utils.RestTemplateUtils;
+import cn.examsystem.rest.pojo.dto.ClassDto;
 import cn.examsystem.rest.pojo.po.*;
 import cn.examsystem.rest.pojo.vo.GradeVo;
 import cn.examsystem.rest.pojo.vo.SchoolYearVo;
@@ -54,7 +55,8 @@ public class PageController {
     private String SCHOOL_YEAR_URL;
     @Value("${TESTPAPER_URL}")
     private String TESTPAPER_URL;
-
+    @Value("${CLASS_URL}")
+    private String CLASS_URL;
 
     @Value("${ROLE_TEACHER_ID}")
     private String ROLE_TEACHER_ID;
@@ -97,6 +99,9 @@ public class PageController {
     private String MODEL_KEY_STATUSES;
     @Value("${MODEL_KEY_TESTPAPERS}")
     private String MODEL_KEY_TESTPAPERS;
+    @Value("${MODEL_KEY_CLASSES}")
+    private String MODEL_KEY_CLASSES;
+
 
     @RequestMapping("/v1/department/list")
     public String toDepartmentPage() throws Exception{
@@ -620,6 +625,16 @@ public class PageController {
             e.printStackTrace();
         }
 
+        //前台添加考试学生用到的数据（班级）
+        List<ClassDto> classList=null;
+        try {
+            //调用rest服务
+            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+CLASS_URL, HttpMethod.GET, ResultInfo.class,new Object[]{});
+            classList=(List<ClassDto>) resultInfo.getData();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
 
         //保存到前台
         model.addAttribute(MODEL_KEY_COURSES,courseList);
@@ -627,6 +642,7 @@ public class PageController {
         model.addAttribute(MODEL_KEY_SCHOOLYEARS,schoolYearList);
         model.addAttribute(MODEL_KEY_STATUSES,statusList);
         model.addAttribute(MODEL_KEY_TESTPAPERS,testPaperList);
+        model.addAttribute(MODEL_KEY_CLASSES,classList);
 
         return "exam/list";
     }
