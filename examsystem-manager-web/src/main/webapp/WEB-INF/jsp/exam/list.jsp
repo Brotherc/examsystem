@@ -22,6 +22,7 @@
     <link href="/css/plugins/spinner/bootstrap-spinner.css" rel="stylesheet">
     <link href="/css/plugins/datetimepicker/bootstrap-datetimepicker.min.css" rel="stylesheet">
     <link href="/css/animate.css" rel="stylesheet">
+    <link href="/css/plugins/webuploader/webuploader.css" rel="stylesheet">
     <link href="/css/style.css?v=4.1.0" rel="stylesheet">
 
     <!-- Sweet Alert -->
@@ -85,7 +86,7 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <button class="btn btn-primary m-t-xs btn-lg" type="button" onclick="searchMajor()"><i class="fa fa-search"></i>&nbsp;&nbsp;搜索</button>
+                                        <button class="btn btn-primary m-t-xs btn-lg" type="button" onclick="searchExam()"><i class="fa fa-search"></i>&nbsp;&nbsp;搜索</button>
                                     </form>
                                 </div>
                                 <div class=" float-e-margins ">
@@ -129,11 +130,35 @@
                                             <i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
                                         </button>
                                     </div>
-                                    <table id="exampleTableEvents" data-height="400" data-mobile-responsive="true">
-                                    </table>
+
                                 </div>
                             </div>
                             <!-- End Example Events -->
+                        </div>
+                    </div>
+                    <div class="row row-lg">
+                        <div  class="col-sm-2 m-t-sm" style="overflow-x: auto">
+                            <a class="btn btn-block btn-primary compose-mail" href="#">考试人员分配</a>
+                            <div class="space-25"></div>
+                            <ul class="folder-list m-b-md" style="padding: 0">
+                                <li>
+                                    <a href="#" onclick="openCustomAddStudentModal()"> <i class="fa fa-plus-square "></i> 自定义添加
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" onclick="openAddStudentModal()"> <i class="fa fa-hand-pointer-o"></i> 选择添加</a>
+                                </li>
+                                <li>
+                                    <a href="#" onclick="openExcelAddStudentModal()"> <i class="fa fa-file-excel-o"></i> Excel添加</a>
+                                </li>
+                                <li>
+                                    <a href="#" onclick="openStudentDetailsModal()"> <i class="fa fa-users"></i> 考试人员详情</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-10 ">
+                            <table id="exampleTableEvents" data-height="400" data-mobile-responsive="true">
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -285,6 +310,286 @@
         </div>
     </div>
 
+    <!-- 自定义添加考试学生modal -->
+    <div id="modal-form-customAddStudent" class="modal fade" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row">
+                        <form class="form-horizontal" id="custom-addStudent-form">
+                            <p>欢迎添加学生(⊙o⊙)</p>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">学号：</label>
+                                <div class="col-sm-6">
+                                    <input type="text" placeholder="学号" class="form-control" name="studentId">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">姓名：</label>
+                                <div class="col-sm-6">
+                                    <input type="text" placeholder="姓名" class="form-control" name="name">
+                                </div>
+                            </div>
+                            <div class="form-group " >
+                                <label class="col-sm-3 control-label">班级名称：</label>
+                                <div class=" col-sm-6">
+                                    <select data-placeholder="选择班级..." class="form-control chosen-select "  style="width:270px;" tabindex="4" id="class_add"  name="classId">
+                                        <c:forEach items="${classes}" var="aClass">
+                                            <option value="${aClass.id}" hassubinfo="true">${aClass.gradeName}-${aClass.majorName}-${aClass.name}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">场次：</label>
+                                <div class="col-sm-6 " >
+                                    <div class="input-group spinner" data-trigger="spinner" id="partOrder">
+                                        <input type="text" class="form-control" value="1" data-max="20" data-min="1" data-step="1" name="partOrder" id="partOrder_add">
+                                        <span class="input-group-addon">
+                                                <a href="javascript:;" class="spin-up" data-spin="up"><i class="fa fa-caret-up"></i></a>
+                                                <a href="javascript:;" class="spin-down" data-spin="down"><i class="fa fa-caret-down"></i></a>
+                                            </span>
+                                    </div>
+                                    <span class="help-block m-b-none"><i class="fa fa-info-circle" id="max_partNum">最大场次：</i></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-6">
+                                    <button data-toggle="button" class="btn btn-primary btn-outline" type="button" onclick="customAddStudent()">提交</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- excel添加考试学生modal -->
+    <div class="modal inmodal fade" id="modal-form-excelAddStudent" tabindex="-1" role="dialog"  aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">Excel导入</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="uploader" class="wu-example">
+                        <!--用来存放文件信息-->
+                        <div id="thelist" class="uploader-list"></div>
+                        <div id="picker">选择文件</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" id="excelAddButton" >导入</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 考试学生详情modal -->
+    <div class="modal inmodal fade" id="modal-form-studentDetails" tabindex="-1" role="dialog"  aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h5 class="modal-title">考试学生</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="ibox-content">
+                        <div class="row row-lg">
+
+                            <div class="col-sm-12">
+                                <!-- Example Events -->
+                                <div class="example-wrap">
+                                    <h4 class="example-title">查询</h4>
+                                    <div class="ibox float-e-margins ">
+                                        <form role="form" class="form-inline ">
+                                            <div class="form-group m-l-none" >
+                                                <label for="studentId" class="sr-only">学号</label>
+                                                <input type="text" placeholder="请输入学号" id="studentId" class="form-control" style="width: 100px">
+                                            </div>
+                                            <div class="form-group m-l-none" >
+                                                <label for="studentName" class="sr-only">名字</label>
+                                                <input type="text" placeholder="请输入名字" id="studentName" class="form-control" style="width: 100px">
+                                            </div>
+                                            <div class="form-group " >
+                                                <div class="input-group ">
+                                                    <select data-placeholder="选择班级..." class="form-control chosen-select " style="width:200px;" tabindex="2" id="class_search" name="classId">
+                                                        <option value="">请选择班级</option>
+                                                        <c:forEach items="${classes}" var="aClass">
+                                                            <option value="${aClass.id}" hassubinfo="true">${aClass.gradeName}-${aClass.majorName}-${aClass.name}</option>
+                                                        </c:forEach>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group m-l-none" >
+                                                <label for="partOrder_search" class="sr-only">场次</label>
+                                                <input type="text" placeholder="请输入场次" id="partOrder_search" class="form-control" style="width: 100px">
+                                            </div>
+                                            <button class="btn btn-primary m-t-xs btn-lg" type="button" onclick="searchStudent()"><i class="fa fa-search"></i>&nbsp;&nbsp;搜索</button>
+                                        </form>
+                                    </div>
+                                    <div class="example">
+                                        <table id="examStudentTableEvents" data-height="400" data-mobile-responsive="true">
+                                        </table>
+                                    </div>
+                                </div>
+                                <!-- End Example Events -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 未添加的考试学生modal -->
+    <div class="modal inmodal fade" id="modal-form-addStudent" tabindex="-1" role="dialog"  aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h5 class="modal-title">学生</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="ibox-content">
+                        <div class="row row-lg">
+
+                            <div class="col-sm-12">
+                                <!-- Example Events -->
+                                <div class="example-wrap">
+                                    <h4 class="example-title">查询</h4>
+                                    <div class="ibox float-e-margins ">
+                                        <form role="form" class="form-inline ">
+                                            <div class="form-group m-l-none" >
+                                                <label for="studentId" class="sr-only">学号</label>
+                                                <input type="text" placeholder="请输入学号" id="studentId_add" class="form-control" style="width: 100px">
+                                            </div>
+                                            <div class="form-group m-l-none" >
+                                                <label for="studentName" class="sr-only">名字</label>
+                                                <input type="text" placeholder="请输入名字" id="studentName_add" class="form-control" style="width: 100px">
+                                            </div>
+                                            <div class="form-group " >
+                                                <div class="input-group ">
+                                                    <select data-placeholder="选择班级..." class="form-control chosen-select " style="width:200px;" tabindex="2" id="class_add_search" name="classId">
+                                                        <option value="">请选择班级</option>
+                                                        <c:forEach items="${classes}" var="aClass">
+                                                            <option value="${aClass.id}" hassubinfo="true">${aClass.gradeName}-${aClass.majorName}-${aClass.name}</option>
+                                                        </c:forEach>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <button class="btn btn-primary m-t-xs btn-lg" type="button" onclick="searchNotAddStudent()"><i class="fa fa-search"></i>&nbsp;&nbsp;搜索</button>
+                                        </form>
+                                    </div>
+                                    <div class="example">
+                                        <div class="btn-group hidden-xs" id="studentTableEventsToolbar" role="group">
+                                            <button type="button" class="btn btn-outline btn-default" onclick="addStudent()">
+                                                <i class="glyphicon glyphicon-plus" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                        <table id="studentTableEvents" data-height="400" data-mobile-responsive="true">
+                                        </table>
+                                    </div>
+                                </div>
+                                <!-- End Example Events -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改场次modal -->
+    <div id="modal-form-updatePartOrder" class="modal fade" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row">
+                        <form class="form-horizontal" id="partOrder-update-form">
+                            <input type="hidden" name="id" id="examStudent">
+                            <input type="hidden" name="_method" value="put">
+                            <p>欢迎修改场次(⊙o⊙)</p>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">场次：</label>
+                                <div class="col-sm-6 " >
+                                    <div class="input-group spinner" data-trigger="spinner" >
+                                        <input type="text" class="form-control" value="1" data-max="20" data-min="1" data-step="1" name="partOrder">
+                                        <span class="input-group-addon">
+                                                <a href="javascript:;" class="spin-up" data-spin="up"><i class="fa fa-caret-up"></i></a>
+                                                <a href="javascript:;" class="spin-down" data-spin="down"><i class="fa fa-caret-down"></i></a>
+                                        </span>
+                                    </div>
+                                    <span class="help-block m-b-none"><i class="fa fa-info-circle" id="maxPartOrder"></i></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-6">
+                                    <button data-toggle="button" class="btn btn-primary btn-outline" type="button" onclick="updatePartOrder()">修改</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改学生modal -->
+    <div id="modal-form-updateStudent" class="modal fade" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row">
+                        <form class="form-horizontal" id="student-update-form">
+                            <input type="hidden" id="studentId_update" >
+                            <input type="hidden" name="_method" value="put">
+                            <p>欢迎修改学生(⊙o⊙)</p>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">学号：</label>
+                                <div class="col-sm-6">
+                                    <input type="text" placeholder="学号" class="form-control" name="studentId">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">姓名：</label>
+                                <div class="col-sm-6">
+                                    <input type="text" placeholder="姓名" class="form-control" name="name">
+                                </div>
+                            </div>
+                            <div class="form-group " >
+                                <label class="col-sm-3 control-label">班级名称：</label>
+                                <div class=" col-sm-6">
+                                    <select data-placeholder="选择班级..." class="form-control chosen-select "  style="width:270px;" tabindex="4" id="studentClassId_update"  name="classId">
+                                        <c:forEach items="${classes}" var="aClass">
+                                            <option value="${aClass.id}" hassubinfo="true">${aClass.gradeName}-${aClass.majorName}-${aClass.name}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-6">
+                                    <button data-toggle="button" class="btn btn-primary btn-outline" type="button" onclick="updateStudent()">提交</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 全局js -->
     <script src="/js/jquery.min.js?v=2.1.4"></script>
     <script src="/js/bootstrap.min.js?v=3.3.6"></script>
@@ -296,6 +601,8 @@
 
     <!-- 自定义js -->
     <script src="/js/examsystem/common.js"></script>
+
+    <script src="/js/plugins/webuploader/webuploader.min.js"></script>
 
     <!-- Spinner -->
     <script src="/js/plugins/spinner/jquery.spinner.min.js"></script>
@@ -318,7 +625,6 @@
 
     <script type="text/javascript">
 
-
         $('.i-checks').iCheck({
             checkboxClass: 'icheckbox_square-green',
             radioClass: 'iradio_square-green',
@@ -333,19 +639,34 @@
 
         //获取选中行的id
         function getSelectionsIds(sels){
-            return $.map($('#exampleTableEvents').bootstrapTable('getSelections'), function (row) {
+            return $.map($('#studentTableEvents').bootstrapTable('getSelections'), function (row) {
                 return row.id
             });
         }
 
         //清空表单
         function clearForm(){
-            $(':input',"#major-add-form").not(':button,:submit,:reset,:hidden').val('').removeAttr('checked').removeAttr('selected');
-            $("#major_add").val("").trigger("chosen:updated");
+            $(':input',"#modal-form-customAddStudent").not(':button,:submit,:reset,:hidden').val('').removeAttr('checked').removeAttr('selected');
+            $("#class_add").val("").trigger("chosen:updated");
         }
 
-        function searchMajor() {
+        function searchExam() {
             $("#exampleTableEvents").bootstrapTable('refresh');
+        }
+        function searchStudent() {
+            var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
+
+            //设置url
+            var newUrl="/v1/exam/"+sels[0].id+"/student";
+            $("#examStudentTableEvents").bootstrapTable('refresh',{url:newUrl});
+        }
+
+        function searchNotAddStudent() {
+            var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
+
+            //设置url
+            var newUrl="/v1/examStudent/exam/"+sels[0].id;
+            $("#studentTableEvents").bootstrapTable('refresh',{url:newUrl});
         }
 
         function btchDeleteMajor(){
@@ -399,6 +720,122 @@
                     });
         }
 
+        function openCustomAddStudentModal() {
+            var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
+            if(sels.length == 0){
+                layer.msg("必须选择一门考试才能分配!");
+                return ;
+            }else if(sels.length >1){
+                layer.msg("只能选择一门考试!");
+                return ;
+            }
+            $("#max_partNum").text("最大场次："+sels[0].partNum);
+
+            $("#modal-form-customAddStudent").modal('show');
+
+        }
+        function customAddStudent() {
+            //表单校验
+            if($("#custom-addStudent-form [name=studentId]").val().trim()==''){
+                layer.msg("学号不能为空!");
+                return ;
+            }
+            if($("#custom-addStudent-form [name=name]").val().trim()==''){
+                layer.msg("名字不能为空!");
+                return ;
+            }
+            if($("#custom-addStudent-form [name=classId]").val()==null){
+                layer.msg("班级不能为空!");
+                return ;
+            }
+            var partOrder=$("#custom-addStudent-form [name=partOrder]").val();
+            if(partOrder==null){
+                layer.msg("场次不能为空!");
+                return ;
+            }
+            //不能超过最大场次
+            var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
+            if(partOrder>sels[0].partNum){
+                layer.msg("超出最大场次");
+                return ;
+            }
+
+
+            var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
+            var examId=sels[0].id;
+
+            $.ajax({
+                type: "POST",
+                url: "/v1/exam/"+examId+"/student",
+                data: decodeURIComponent($("#custom-addStudent-form").serialize().replace(/\+/g,"")),
+                success: function(data){
+                    if(data.status == 201){
+                        $("#modal-form-customAddStudent").modal('hide');
+                        clearForm();
+                        swal(data.message, "您已经永久将该学生分配至对应考试。", "success");
+                        $("#exampleTableEvents").bootstrapTable('refresh');
+                    }
+                    else{
+                        swal("分配失败",data.message, "error");
+                    }
+                },
+                error:function(XMLHttpRequest, textStatus, errorThrown){
+                    var status=XMLHttpRequest.status;
+                    if(status==403){
+                        to403();
+                    }else if(status==500){
+                        to500();
+                    }
+                }
+            });
+        }
+
+        function openExcelAddStudentModal() {
+            var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
+            if(sels.length == 0){
+                layer.msg("必须选择一门考试才能分配!");
+                return ;
+            }else if(sels.length >1){
+                layer.msg("只能选择一门考试!");
+                return ;
+            }
+
+            $("#modal-form-excelAddStudent").modal('show');
+        }
+        function openStudentDetailsModal() {
+            var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
+            if(sels.length == 0){
+                layer.msg("必须选择一门考试才能查看考试人员详情!");
+                return ;
+            }else if(sels.length >1){
+                layer.msg("只能选择一门考试!");
+                return ;
+            }
+
+            //设置url
+            var newUrl="/v1/exam/"+sels[0].id+"/student";
+            $("#examStudentTableEvents").bootstrapTable('refresh',{url:newUrl});
+
+            $("#modal-form-studentDetails").modal('show');
+        }
+
+        function openAddStudentModal() {
+            var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
+            if(sels.length == 0){
+                layer.msg("必须选择一门考试才能分配!");
+                return ;
+            }else if(sels.length >1){
+                layer.msg("只能选择一门考试!");
+                return ;
+            }
+
+            //设置url
+            var newUrl="/v1/examStudent/exam/"+sels[0].id;
+            $("#studentTableEvents").bootstrapTable('refresh',{url:newUrl});
+
+            $("#modal-form-addStudent").modal('show');
+        }
+
         function saveExam(){
             //表单校验
             var startTime=$("#exam-add-form [name=startTime]").val();
@@ -445,6 +882,59 @@
                     }
                 }
             });
+        }
+
+        function addStudent(){
+            var sels = $('#studentTableEvents').bootstrapTable('getSelections');
+            if(sels.length == 0){
+                layer.msg("必须至少选择一个学生才能分配!");
+                return ;
+            }
+
+            var exam = $('#exampleTableEvents').bootstrapTable('getSelections');
+
+            var ids = getSelectionsIds(sels);
+            swal({
+                    title: "确定将所选学生分配至对应考试吗",
+                    text: "系统将随机为学生分配场次！",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "是的，我要分配！",
+                    cancelButtonText: "让我再考虑一下…",
+                    closeOnConfirm: false,
+                    closeOnCancel: false
+                },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        var params = {"studentIds":ids};
+                        $.ajax({
+                            type: "POST",
+                            url: "/v1/exam/"+exam[0].id+"/students",
+                            data: params,
+                            success: function(data){
+                                if(data.status == 201){
+                                    swal(data.message, "您已经将所选学生分配至对应考试。", "success");
+                                    $("#studentTableEvents").bootstrapTable('refresh');
+                                }
+                                else{
+                                    swal(data.message, "无法分配。", "error");
+                                }
+                            },
+                            error:function(XMLHttpRequest, textStatus, errorThrown){
+                                var status=XMLHttpRequest.status;
+                                if(status==403){
+                                    to403();
+                                }else if(status==500){
+                                    to500();
+                                }
+                            }
+                        });
+
+                    } else {
+                        swal("已取消", "您取消了分配操作！", "error");
+                    }
+                });
         }
 
         function updateMajor(){
@@ -523,7 +1013,198 @@
             return temp;
         }
 
+        function examStudentQueryParams(params) {
+            var temp={
+                pageSize:params.pageSize,
+                pageNumber:params.pageNumber,
+                studentStudentId:$("#studentId").val().trim(),
+                studentName:$("#studentName").val(),
+                studentClassId:$("#class_search").val().trim(),
+                partOrder:$("#partOrder_search").val().trim()
+            };
+            return temp;
+        }
+
+        function examNotAddStudentQueryParams(params) {
+            var temp={
+                pageSize:params.pageSize,
+                pageNumber:params.pageNumber,
+                studentId:$("#studentId_add").val().trim(),
+                name:$("#studentName_add").val(),
+                classId:$("#class_add_search").val().trim(),
+            };
+            return temp;
+        }
+
+
+        function addDetailsButton(value,row,index){
+
+            if(row.status==0){
+                return ['<button class="btn btn-outline btn-info" type="button" id="examDetails">查看</button>',
+                    '<button class="btn btn-outline btn-success m-l-xs" type="button" id="startExam">启动</button>'].join("");
+            }else{
+                return ['<button class="btn btn-outline btn-info" type="button" id="examDetails">查看</button>',
+                    '<button class="btn btn-outline btn-success m-l-xs" disabled="" type="button" id="startExam">启动</button>'].join("");
+            }
+
+
+        }
+
+        function addDetailsButtonExamStudent(value,row,index){
+            return ['<button class="btn btn-outline btn-info" type="button" id="openUpdateStudentModal">编辑</button>',
+                '<button class="btn btn-outline btn-success m-l-xs" type="button" id="openUpdatePartOrderModal">场次</button>',
+                '<button class="btn btn-outline btn-warning m-l-xs" type="button" id="removeStudent">移除</button>'].join("");
+        }
+
+        function updatePartOrder(){
+            //不能超过最大场次
+            var exam = $('#exampleTableEvents').bootstrapTable('getSelections');
+            var partOrder=$("#modal-form-updatePartOrder [name=partOrder]").val();
+            if(partOrder>exam[0].partNum){
+                layer.msg("超出最大场次");
+                return ;
+            }
+            var examStudentId=$("#examStudent").val();
+            $.ajax({
+                type: "POST",
+                url: "/v1/exam/student/"+examStudentId,
+                data: {partOrder:partOrder,_method:"put"},
+                success: function(data){
+                    if(data.status == 201){
+                        swal(data.message, "您已经成功将该学生的场次修改。", "success");
+                        $("#modal-form-updatePartOrder").modal('hide');
+                        $("#examStudentTableEvents").bootstrapTable('refresh');
+                    }else
+                        swal("修改失败",data.message, "error");
+                },
+                error:function(XMLHttpRequest, textStatus, errorThrown){
+                    var status=XMLHttpRequest.status;
+                    if(status==403){
+                        to403();
+                    }else if(status==500){
+                        to500();
+                    }
+                }
+            });
+        }
+
+        function updateStudent(){
+            //表单校验
+            if($("#student-update-form [name=studentId]").val().trim()==''){
+                layer.msg("学号不能为空!");
+                return ;
+            }
+            if($("#student-update-form [name=name]").val().trim()==''){
+                layer.msg("名字不能为空!");
+                return ;
+            }
+
+            var studentId=$("#studentId_update").val();
+
+            $.ajax({
+                type: "POST",
+                url: "/v1/examStudent/"+studentId,
+                data: decodeURIComponent($("#student-update-form").serialize().replace(/\+/g,"")),
+                success: function(data){
+                    if(data.status == 201){
+                        $("#modal-form-updateStudent").modal('hide');
+                        swal(data.message, "您已经成功修改了该学生信息。", "success");
+                        $("#examStudentTableEvents").bootstrapTable('refresh');
+                    }
+                    else{
+                        swal("修改失败",data.message, "error");
+                    }
+                },
+                error:function(XMLHttpRequest, textStatus, errorThrown){
+                    var status=XMLHttpRequest.status;
+                    if(status==403){
+                        to403();
+                    }else if(status==500){
+                        to500();
+                    }
+                }
+            });
+        }
+
+        window.operateEvents={
+            "click #examDetails":function (e,value,row,index) {
+                alert("详情");
+
+            },
+            "click #startExam":function (e,value,row,index) {
+                $.ajax({
+                    type: "POST",
+                    url: "/v1/exam/"+row.id+"/status",
+                    data: {_method:"put"},
+                    success: function(data){
+                        if(data.status == 201){
+                            swal(data.message, "您已经成功启动该考试", "success");
+                            $("#exampleTableEvents").bootstrapTable('refresh');
+                        }
+                        else{
+                            swal("启动失败",data.message, "error");
+                        }
+                    },
+                    error:function(XMLHttpRequest, textStatus, errorThrown){
+                        var status=XMLHttpRequest.status;
+                        if(status==403){
+                            to403();
+                        }else if(status==500){
+                            to500();
+                        }
+                    }
+                });
+            },
+            "click #openUpdateStudentModal":function (e,value,row,index) {
+                var studentId=row.studentStudentId;
+                var studentName=row.studentName;
+                var studentClassId=row.studentClassId;
+                $("#modal-form-updateStudent [name=studentId]").val(studentId);
+                $("#modal-form-updateStudent [name=name]").val(studentName);
+                $("#studentClassId_update").val(studentClassId).trigger("chosen:updated");
+                $("#studentClassId_update_chosen").width(270);
+                $("#studentId_update").val(row.studentId);
+                $("#modal-form-updateStudent").modal('show');
+            },
+            "click #openUpdatePartOrderModal":function (e,value,row,index) {
+                var exam = $('#exampleTableEvents').bootstrapTable('getSelections');
+                var examPartNum=exam[0].partNum;
+                if(examPartNum==1){
+                    layer.msg("该门考试只有一个场次");
+                }else{
+                    $("#modal-form-updatePartOrder [name=partOrder]").val(row.partOrder);
+                    $("#maxPartOrder").text("最大场次："+examPartNum);
+                    $("#examStudent").val(row.id);
+                    $("#modal-form-updatePartOrder").modal('show');
+                }
+            },
+            "click #removeStudent":function (e,value,row,index) {
+                $.ajax({
+                    type: "POST",
+                    url: "/v1/exam/student/"+row.id,
+                    data: {_method:"delete"},
+                    success: function(data){
+                        if(data.status == 204){
+                            swal(data.message, "您已经成功将该学生从对应考试你中移除。", "success");
+                            $("#examStudentTableEvents").bootstrapTable('refresh');
+                        }else
+                            swal("移除失败",data.message, "error");
+                    },
+                    error:function(XMLHttpRequest, textStatus, errorThrown){
+                        var status=XMLHttpRequest.status;
+                        if(status==403){
+                            to403();
+                        }else if(status==500){
+                            to500();
+                        }
+                    }
+                });
+            }
+        };
+
         (function () {
+
+
             $('.input-group.date').datetimepicker({
                 showSecond:true,
                 showHoues:true,
@@ -589,9 +1270,90 @@
                         field: 'endTime',
                         title: '结束时间',
                         formatter: ES.formatDateTime //自定义方法，格式化时间
+                    }, {
+                        field: 'detailds',
+                        title: '详情',
+                        events:operateEvents,
+                        formatter:addDetailsButton
                     }
                 ]
             });
+
+            $('#examStudentTableEvents').bootstrapTable({
+                url: "",
+                search: false,
+                pagination: true,
+                showRefresh: true,
+                showToggle: true,
+                showColumns: true,
+                iconSize: 'outline',
+                idField:'id',
+                queryParams:examStudentQueryParams,
+                icons: {
+                    refresh: 'glyphicon-repeat',
+                    toggle: 'glyphicon-list-alt',
+                    columns: 'glyphicon-list'
+                },
+                columns: [
+                    {
+                        field: 'id',
+                        visible:false
+                    },{
+                        field : 'num',
+                        title : '序号',
+                        formatter : ES.showNumber
+                    },{
+                        field: 'studentStudentId',
+                        title: '学号'
+                    },{
+                        field: 'studentName',
+                        title: '名字'
+                    }, {
+                        field: 'detailds',
+                        title: '详情',
+                        events:operateEvents,
+                        formatter:addDetailsButtonExamStudent
+                    }
+                ]
+            });
+
+            $('#studentTableEvents').bootstrapTable({
+                url: "",
+                search: false,
+                pagination: true,
+                showRefresh: true,
+                showToggle: true,
+                showColumns: true,
+                iconSize: 'outline',
+                idField:'id',
+                toolbar: '#studentTableEventsToolbar',
+                queryParams:examNotAddStudentQueryParams,
+                icons: {
+                    refresh: 'glyphicon-repeat',
+                    toggle: 'glyphicon-list-alt',
+                    columns: 'glyphicon-list'
+                },
+                columns: [
+                    {
+                        field: 'id',
+                        visible:false
+                    }, {
+                        field: 'state',
+                        checkbox:true
+                    },{
+                        field : 'num',
+                        title : '序号',
+                        formatter : ES.showNumber
+                    },{
+                        field: 'studentId',
+                        title: '学号'
+                    },{
+                        field: 'name',
+                        title: '名字'
+                    }
+                ]
+            });
+
 
         })();
 
@@ -639,6 +1401,92 @@
         });
         $("#modal-form-update").on('shown.bs.modal',function () {
             $("#major_update_chosen").width(270);
+        });
+        $("#modal-form-customAddStudent").on('shown.bs.modal',function () {
+            $("#class_add_chosen").width(270);
+        });
+
+        $("#modal-form-studentDetails").on('shown.bs.modal',function () {
+            $("#class_search_chosen").width(200);
+        });
+
+        $("#modal-form-addStudent").on('shown.bs.modal',function () {
+            $("#class_add_search_chosen").width(200);
+        });
+
+        var uploader;
+        //在点击弹出模态框的时候再初始化WebUploader，解决点击上传无反应问题
+        $("#modal-form-excelAddStudent").on("shown.bs.modal",function(){
+            uploader = WebUploader.create({
+
+                // swf文件路径
+                swf: 'http://localhost:8081/js/plugins/webuploader/Uploader.swf',
+
+                // 文件接收服务端。
+                server: '',
+
+                // 选择文件的按钮。可选。
+                // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+                pick: {
+                    "id":'#picker',
+                    "multiple":false   //禁止多选。
+                },
+                //去重
+                duplicate:true,
+                //上传文件个数限制
+                fileNumLimit:1,
+                //重要参数:跟后台文件组件的对接参数，后台文件组件叫做upload。
+                fileVal:"upload"
+            });
+
+            // 当有文件被添加进队列的时候
+            uploader.on( 'fileQueued', function( file ) {
+                $("#thelist").append( '<div id="' + file.id + '" class="item">' +
+                    '<h4 class="info">' + file.name + '</h4>' +
+                    '<p class="state">等待上传...</p>' +
+                    '</div>' );
+            });
+
+            uploader.on( 'uploadSuccess',function(file,response){
+                if(response.status == 201){
+                    $("#modal-form-excelAddStudent").modal('hide');
+                    var length=response.details.length;
+                    var detailMessage="";
+                    $.each(response.details,function (index,resultInfo) {
+                        if(index!=length-1){
+                            detailMessage+=resultInfo.message+"   ";
+                        }
+                        else{
+                            detailMessage+=resultInfo.message;
+                        }
+                    });
+                    swal(response.message+":"+response.data+"条", detailMessage, "success");
+                    $("#exampleTableEvents").bootstrapTable('refresh');
+                }
+                else{
+                    if(response.status!=null)
+                        swal("添加失败",response.message, "error");
+                    else
+                        to500();
+                }
+            });
+
+            uploader.on('uploadError', function(file,response) {
+                to500();
+            });
+        });
+
+        $("#excelAddButton").on('click', function() {
+            var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
+            uploader.options.server="/v1/exam/"+sels[0].id+"/student/file";
+            uploader.upload();
+        });
+
+        //关闭模态框销毁WebUploader，解决再次打开模态框时按钮越变越大问题
+        $('#modal-form-excelAddStudent').on('hide.bs.modal', function () {
+
+            $("#thelist").children().remove();
+            uploader.destroy();
         });
     </script>
 
