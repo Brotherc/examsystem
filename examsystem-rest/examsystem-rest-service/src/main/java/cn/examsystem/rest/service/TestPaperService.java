@@ -24,4 +24,8 @@ public interface TestPaperService {
 
     //更新试卷
     public ResultInfo updateTestPaper(String id, TestPaperDto testPaperDto) throws Exception;
+
+
+    //根据试卷id查询试卷信息及该试卷题目信息（正在考试学生）
+    public TestPaperDto getTestPaperAndQuestionsByIdForLoginStudent(String id,String examStudentId) throws Exception;
 }
