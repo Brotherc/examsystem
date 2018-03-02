@@ -25,6 +25,22 @@
     <result column="created_teacher_name" property="createdTeacherName" jdbcType="VARCHAR" />
   </resultMap>
 
+  <resultMap id="examStudentMap" type="cn.examsystem.rest.pojo.dto.ExamStudentRelationDto" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="exam_id" property="examId" jdbcType="VARCHAR" />
+    <result column="student_id" property="studentId" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="score" property="score" jdbcType="DECIMAL" />
+    <result column="is_graded" property="isGraded" jdbcType="BIT" />
+    <result column="part_order" property="partOrder" jdbcType="INTEGER" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+
+    <result column="student_student_id" property="studentStudentId" jdbcType="VARCHAR" />
+    <result column="student_name" property="studentName" jdbcType="VARCHAR" />
+    <result column="student_class_id" property="studentClassId" jdbcType="VARCHAR" />
+  </resultMap>
+
   <sql id="list_exam_where">
     <if test="courseId!=null and courseId!=''">
       and EXAM.course_id = #{courseId}
@@ -40,6 +56,24 @@
     </if>
   </sql>
 
+  <sql id="list_examStudent_where">
+    <if test="studentStudentId!=null and studentStudentId!=''">
+      and EXAM_STUDENT.student_student_id = #{studentStudentId}
+    </if>
+    <if test="studentName!=null and studentName!=''">
+      and EXAM_STUDENT.student_name = #{studentName}
+    </if>
+    <if test="studentClassId!=null and studentClassId!=''">
+      and EXAM_STUDENT.student_class_id = #{studentClassId}
+    </if>
+    <if test="partOrder!=null and partOrder!=''">
+      and EXAM_STUDENT.part_order = #{partOrder}
+    </if>
+    <if test="examId!=null and examId!=''">
+      and EXAM_STUDENT.exam_id = #{examId}
+    </if>
+  </sql>
+
   <select id="listExam" parameterType="cn.examsystem.rest.pojo.po.Exam" resultMap="examMap">
     SELECT *FROM (
         SELECT exam.*,course.name course_name,school_year.name school_year_name,sysuser.name created_teacher_name,
@@ -49,6 +83,18 @@
     ) EXAM
     <where>
       <include refid="list_exam_where"></include>
+    </where>
+  </select>
+
+
+  <select id="listExamStudent" parameterType="cn.examsystem.rest.pojo.vo.ExamStudentRelationVo" resultMap="examStudentMap">
+    SELECT *FROM(
+        SELECT exam_student_relation.*,student.student_id student_student_id,student.name student_name,student.class_id student_class_id
+            FROM exam_student_relation,student
+                WHERE exam_student_relation.student_id=student.id
+    ) EXAM_STUDENT
+    <where>
+      <include refid="list_examStudent_where"></include>
     </where>
   </select>
 </mapper>
