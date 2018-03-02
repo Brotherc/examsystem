@@ -1,9 +1,15 @@
 package cn.examsystem.rest.service.impl;
 
+import cn.examsystem.common.jedis.JedisClient;
 import cn.examsystem.common.pojo.ResultInfo;
+import cn.examsystem.common.utils.JsonUtils;
+import cn.examsystem.common.utils.RandomUtils;
 import cn.examsystem.common.utils.UUIDBuild;
 import cn.examsystem.rest.mapper.*;
 import cn.examsystem.rest.pojo.dto.TestPaperDto;
+import cn.examsystem.rest.pojo.dto.TestPaperFillInBlankQuestion;
+import cn.examsystem.rest.pojo.dto.TestPaperSingleChoiceQuestion;
+import cn.examsystem.rest.pojo.dto.TestPaperTrueOrFalseQuestion;
 import cn.examsystem.rest.pojo.po.*;
 import cn.examsystem.rest.pojo.vo.TestPaperVo;
 import cn.examsystem.rest.service.TestPaperService;
@@ -79,6 +85,22 @@ public class TestPaperImpl implements TestPaperService {
     private String DICTINFO_TRUEORFALSEQUESTION_TYPE_CODE;
     @Value("${DICTINFO_FILLINBLANKQUESTION_TYPE_CODE}")
     private String DICTINFO_FILLINBLANKQUESTION_TYPE_CODE;
+
+    @Value("${REDIS_KEY_SINGLE_CHOICE_QUESTION_ORDER}")
+    private String REDIS_KEY_SINGLE_CHOICE_QUESTION_ORDER;
+    @Value("${REDIS_KEY_TRUE_OR_FALSE_QUESTION_ORDER}")
+    private String REDIS_KEY_TRUE_OR_FALSE_QUESTION_ORDER;
+    @Value("${REDIS_KEY_FILL_IN_BLANK_QUESTION_ORDER}")
+    private String REDIS_KEY_FILL_IN_BLANK_QUESTION_ORDER;
+    @Value("${REDIS_KEY_SINGLE_CHOICE_QUESTION_ANSWER}")
+    private String REDIS_KEY_SINGLE_CHOICE_QUESTION_ANSWER;
+    @Value("${REDIS_KEY_TRUE_OR_FALSE_QUESTION_ANSWER}")
+    private String REDIS_KEY_TRUE_OR_FALSE_QUESTION_ANSWER;
+    @Value("${REDIS_KEY_FILL_IN_BLANK_QUESTION_ANSWER}")
+    private String REDIS_KEY_FILL_IN_BLANK_QUESTION_ANSWER;
+
+    @Autowired
+    private JedisClient jedisClient;
 
     @Autowired
     private TestPaperMapper testPaperMapper;
@@ -566,4 +588,203 @@ public class TestPaperImpl implements TestPaperService {
         }
     }
 
+    @Override
+    public TestPaperDto getTestPaperAndQuestionsByIdForLoginStudent(String id,String examStudentId) throws Exception {
+
+        //查询试卷信息
+        TestPaper testPaper = testPaperMapper.selectByPrimaryKey(id);
+
+        TestPaperDto testPaperDto=null;
+
+        if(testPaper!=null){
+            //构造testPaperDto
+            testPaperDto=new TestPaperDto();
+            BeanUtils.copyProperties(testPaper,testPaperDto);
+
+            //试卷中单选题信息
+            List<TestPaperSingleChoiceQuestion> singleChoiceQuestionList=new ArrayList<>();
+
+            //查询该试卷单选题信息
+            TestpaperQuestionRelationExample testPaperSingleChoiceQuestionExample=new TestpaperQuestionRelationExample();
+            TestpaperQuestionRelationExample.Criteria singleChoiceQuestionCriteria = testPaperSingleChoiceQuestionExample.createCriteria();
+            singleChoiceQuestionCriteria.andTestPaperIdEqualTo(id);
+            singleChoiceQuestionCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE));
+            testPaperSingleChoiceQuestionExample.setOrderByClause("question_order");
+            List<TestpaperQuestionRelation> testPaperSingleChoiceQuestionList = testpaperQuestionRelationMapper.selectByExample(testPaperSingleChoiceQuestionExample);
+
+            if(!CollectionUtils.isEmpty(testPaperSingleChoiceQuestionList)){
+                for(int i=0;i<testPaperSingleChoiceQuestionList.size();i++){
+                    TestpaperQuestionRelation relation=testPaperSingleChoiceQuestionList.get(i);
+
+                    //构造试卷单选题信息
+                    TestPaperSingleChoiceQuestion testPaperSingleChoiceQuestion=new TestPaperSingleChoiceQuestion();
+                    BeanUtils.copyProperties(relation,testPaperSingleChoiceQuestion);
+
+                    //查询某一条单选题信息
+                    SingleChoiceQuestion singleChoiceQuestion = singleChoiceQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
+                    if(singleChoiceQuestion!=null){
+                        testPaperSingleChoiceQuestion.setQuestionContent(singleChoiceQuestion.getContent());
+                        testPaperSingleChoiceQuestion.setOptionA(singleChoiceQuestion.getOptionA());
+                        testPaperSingleChoiceQuestion.setOptionB(singleChoiceQuestion.getOptionB());
+                        testPaperSingleChoiceQuestion.setOptionC(singleChoiceQuestion.getOptionC());
+                        testPaperSingleChoiceQuestion.setOptionD(singleChoiceQuestion.getOptionD());
+                    }
+                    singleChoiceQuestionList.add(testPaperSingleChoiceQuestion);
+                }
+            }
+
+            //为题目打乱顺序
+            List<Integer> singleChoiceQuestionOrder=new ArrayList<>();
+            //如果缓存中有直接获取顺序
+            String singleChoiceQuestionJson = jedisClient.hget(examStudentId, REDIS_KEY_SINGLE_CHOICE_QUESTION_ORDER);
+
+            if(!StringUtils.isBlank(singleChoiceQuestionJson)){
+               singleChoiceQuestionOrder= JsonUtils.jsonToList(singleChoiceQuestionJson,Integer.class);
+            }else{
+                singleChoiceQuestionOrder=RandomUtils.getDiffNO(singleChoiceQuestionList.size());
+
+                //把顺序添加至缓存中
+                jedisClient.hset(examStudentId,REDIS_KEY_SINGLE_CHOICE_QUESTION_ORDER,JsonUtils.objectToJson(singleChoiceQuestionOrder));
+            }
+
+            List<TestPaperSingleChoiceQuestion> singleChoiceQuestionListCustom=new ArrayList<>();
+
+            for(Integer order:singleChoiceQuestionOrder){
+                singleChoiceQuestionListCustom.add(singleChoiceQuestionList.get(order-1));
+            }
+
+            testPaperDto.setSingleChoiceQuestions(singleChoiceQuestionListCustom);
+
+
+
+            //试卷中判断题信息
+            List<TestPaperTrueOrFalseQuestion> trueOrFalseQuestionList=new ArrayList<>();
+
+            //查询该试卷判断题信息
+            TestpaperQuestionRelationExample testPaperTrueOrFalseQuestionExample=new TestpaperQuestionRelationExample();
+            TestpaperQuestionRelationExample.Criteria trueOrFalseQuestionCriteria = testPaperTrueOrFalseQuestionExample.createCriteria();
+            trueOrFalseQuestionCriteria.andTestPaperIdEqualTo(id);
+            trueOrFalseQuestionCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_TRUEORFALSEQUESTION_TYPE_CODE));
+            testPaperTrueOrFalseQuestionExample.setOrderByClause("question_order");
+            List<TestpaperQuestionRelation> testPaperTrueOrFalseQuestionList = testpaperQuestionRelationMapper.selectByExample(testPaperTrueOrFalseQuestionExample);
+
+
+            if(!CollectionUtils.isEmpty(testPaperTrueOrFalseQuestionList)){
+                for(int i=0;i<testPaperTrueOrFalseQuestionList.size();i++){
+                    TestpaperQuestionRelation relation=testPaperTrueOrFalseQuestionList.get(i);
+
+                    //构造试卷判断题信息
+                    TestPaperTrueOrFalseQuestion testPaperTrueOrFalseQuestion=new TestPaperTrueOrFalseQuestion();
+                    BeanUtils.copyProperties(relation,testPaperTrueOrFalseQuestion);
+
+                    //查询某一条判断题信息
+                    TrueOrFalseQuestion trueOrFalseQuestion = trueOrFalseQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
+                    if(trueOrFalseQuestion!=null){
+                        testPaperTrueOrFalseQuestion.setQuestionContent(trueOrFalseQuestion.getContent());
+                    }
+                    trueOrFalseQuestionList.add(testPaperTrueOrFalseQuestion);
+                }
+            }
+
+
+            //为题目打乱顺序
+            List<Integer> trueOrFalseQuestionOrder=new ArrayList<>();
+            //如果缓存中有直接获取顺序
+            String trueOrFalseQuestionJson = jedisClient.hget(examStudentId, REDIS_KEY_TRUE_OR_FALSE_QUESTION_ORDER);
+
+            if(!StringUtils.isBlank(trueOrFalseQuestionJson)){
+                trueOrFalseQuestionOrder= JsonUtils.jsonToList(trueOrFalseQuestionJson,Integer.class);
+            }else{
+                trueOrFalseQuestionOrder=RandomUtils.getDiffNO(trueOrFalseQuestionList.size());
+
+                //把顺序添加至缓存中
+                jedisClient.hset(examStudentId,REDIS_KEY_TRUE_OR_FALSE_QUESTION_ORDER,JsonUtils.objectToJson(trueOrFalseQuestionOrder));
+            }
+
+            List<TestPaperTrueOrFalseQuestion> trueOrFalseQuestionListCustom=new ArrayList<>();
+
+            for(Integer order:trueOrFalseQuestionOrder){
+                trueOrFalseQuestionListCustom.add(trueOrFalseQuestionList.get(order-1));
+            }
+
+            testPaperDto.setTrueOrFalseQuestions(trueOrFalseQuestionListCustom);
+
+
+
+
+            //试卷中填空题信息
+            List<TestPaperFillInBlankQuestion> fillInBlankQuestionList=new ArrayList<>();
+
+            //查询该试卷填空题信息
+            TestpaperQuestionRelationExample testPaperFillInBlankQuestionExample=new TestpaperQuestionRelationExample();
+            TestpaperQuestionRelationExample.Criteria fillInBlankQuestionCriteria = testPaperFillInBlankQuestionExample.createCriteria();
+            fillInBlankQuestionCriteria.andTestPaperIdEqualTo(id);
+            fillInBlankQuestionCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_FILLINBLANKQUESTION_TYPE_CODE));
+            testPaperFillInBlankQuestionExample.setOrderByClause("question_order");
+            List<TestpaperQuestionRelation> testPaperFillInBlankQuestionList = testpaperQuestionRelationMapper.selectByExample(testPaperFillInBlankQuestionExample);
+
+
+            if(!CollectionUtils.isEmpty(testPaperFillInBlankQuestionList)){
+                for(int i=0;i<testPaperFillInBlankQuestionList.size();i++){
+                    TestpaperQuestionRelation relation=testPaperFillInBlankQuestionList.get(i);
+
+                    //构造试卷填空题信息
+                    TestPaperFillInBlankQuestion testPaperFillInBlankQuestion=new TestPaperFillInBlankQuestion();
+                    BeanUtils.copyProperties(relation,testPaperFillInBlankQuestion);
+
+                    //查询某一条填空题信息
+                    FillInBlankQuestion fillInBlankQuestion = fillInBlankQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
+                    if(fillInBlankQuestion!=null){
+                        testPaperFillInBlankQuestion.setQuestionContent(fillInBlankQuestion.getContent());
+                        testPaperFillInBlankQuestion.setBlankNum(fillInBlankQuestion.getBlankNum());
+                    }
+                    fillInBlankQuestionList.add(testPaperFillInBlankQuestion);
+                }
+            }
+
+
+            //为题目打乱顺序
+            List<Integer> fillInBlankQuestionOrder=new ArrayList<>();
+            //如果缓存中有直接获取顺序
+            String fillInBlankQuestionJson = jedisClient.hget(examStudentId, REDIS_KEY_FILL_IN_BLANK_QUESTION_ORDER);
+
+            if(!StringUtils.isBlank(fillInBlankQuestionJson)){
+                fillInBlankQuestionOrder= JsonUtils.jsonToList(fillInBlankQuestionJson,Integer.class);
+            }else{
+                fillInBlankQuestionOrder=RandomUtils.getDiffNO(fillInBlankQuestionList.size());
+
+                //把顺序添加至缓存中
+                jedisClient.hset(examStudentId,REDIS_KEY_FILL_IN_BLANK_QUESTION_ORDER,JsonUtils.objectToJson(fillInBlankQuestionOrder));
+            }
+
+            List<TestPaperFillInBlankQuestion> fillInBlankQuestionListCustom=new ArrayList<>();
+
+            for(Integer order:fillInBlankQuestionOrder){
+                fillInBlankQuestionListCustom.add(fillInBlankQuestionList.get(order-1));
+            }
+
+            testPaperDto.setFillInBlankQuestions(fillInBlankQuestionListCustom);
+
+
+            //加载学生试卷中题目答案
+
+            //获取单选题答案
+            String singleChoiceQuestionAnswer = jedisClient.hget(examStudentId, REDIS_KEY_SINGLE_CHOICE_QUESTION_ANSWER);
+            if(!StringUtils.isBlank(singleChoiceQuestionAnswer))
+                testPaperDto.setSingleChoiceQuestionAnswer(JsonUtils.jsonToMap(singleChoiceQuestionAnswer,Integer.class,String.class));
+
+            //获取判断题答案
+            String trueOrFalseQuestionAnswer = jedisClient.hget(examStudentId, REDIS_KEY_TRUE_OR_FALSE_QUESTION_ANSWER);
+            if(!StringUtils.isBlank(trueOrFalseQuestionAnswer))
+                testPaperDto.setTrueOrFalseQuestionAnswer(JsonUtils.jsonToMap(trueOrFalseQuestionAnswer,Integer.class,String.class));
+
+            //获取单选题答案
+            String fillInBlankQuestionAnswer = jedisClient.hget(examStudentId, REDIS_KEY_FILL_IN_BLANK_QUESTION_ANSWER);
+            if(!StringUtils.isBlank(fillInBlankQuestionAnswer))
+                testPaperDto.setFillInBlankQuestionAnswer(JsonUtils.jsonToMap(fillInBlankQuestionAnswer,Integer.class,String.class));
+        }
+
+
+        return testPaperDto;
+    }
 }
