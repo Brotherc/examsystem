@@ -149,7 +149,7 @@
         function getExam() {
             $.ajax({
                 type: "GET",
-                url: "/v1/exam/loginStudent",
+                url: "/v1/test/loginStudent",
                 success: function(data){
                     if(data.status == 200){
                         var examStudent=data.data;
@@ -177,8 +177,8 @@
                             $("#examId").val(examStudent.examId);
                             $("#testPaperId").val(examStudent.testPaperId);
 
-                            $("#isProceeded").val(exam.isProceeded);
-                            $("#isLocal").val(exam.isLocal);
+                            $("#isProceeded").val(examStudent.isProceeded);
+                            $("#isLocal").val(examStudent.isLocal);
 
                             if(!examStudent.isProceeded){//没进行过考试
                                 $("#examPwd").show();
@@ -219,13 +219,17 @@
             var isProceeded=$("#isProceeded").val();
             var isLocal=$("#isLocal").val();
 
-            if(!isProceeded){//没进行过考试
+            alert(isProceeded);
+            alert(isLocal);
+
+            if(isProceeded!="true"){//没进行过考试
                 if(examPwd.trim()==""){
                     layer.msg("考试密码不能为空");
                     return;
                 }
+                alert("---");
             }else{
-                if(isLocal){
+                if(isLocal=='true'){
                     if(examPwd.trim()==""){
                         layer.msg("考试密码不能为空");
                         return;

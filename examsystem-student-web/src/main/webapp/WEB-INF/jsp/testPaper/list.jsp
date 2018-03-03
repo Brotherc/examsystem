@@ -79,148 +79,214 @@
                                 <div class="tab-content" id="content_questions">
                                     <c:if test="${not empty singleChoiceQuestions}">
                                         <div id="tab-0" class="tab-pane ">
-                                            <div class="row">
-                                                <div class="col-sm-12">
-                                                    <div class="wrapper wrapper-content">
-                                                        <div class="row animated fadeInRight">
-                                                            <div class="col-sm-12">
-                                                                <div class="ibox float-e-margins">
-                                                                    <div class="text-center float-e-margins p-md">
-                                                                        <span>预览：</span>
-                                                                        <a href="#" class="btn btn-xs btn-primary" id="lightVersion">浅色</a>
-                                                                        <a href="#" class="btn btn-xs btn-primary" id="darkVersion">深色</a>
-                                                                        <a href="#" class="btn btn-xs btn-primary" id="leftVersion">布局切换</a>
-                                                                    </div>
-                                                                    <div class="" id="ibox-content">
-
-                                                                        <div id="vertical-timeline" class="vertical-container light-timeline">
-
-                                                                            <c:forEach items="${singleChoiceQuestions}" var="question" varStatus="vs">
-                                                                                <div class="vertical-timeline-block">
-                                                                                    <div class="vertical-timeline-icon navy-bg">
-                                                                                        <i class="">${vs.count}</i>
-                                                                                    </div>
-
-                                                                                    <div class="vertical-timeline-content gray-bg">
-                                                                                        <p>${question.questionContent}
-                                                                                        </p>
-                                                                                        <div class="checkbox checkbox-success checkbox-circle">
-                                                                                            <input id="singleChoiceQuestion${vs.count}A" value="A" type="radio" name="singleChoiceQuestionAnswer[${vs.count}]">
-                                                                                            <label for="singleChoiceQuestion${vs.count}A">
-                                                                                                A:${question.optionA}
-                                                                                            </label>
-                                                                                        </div>
-                                                                                        <div class="checkbox checkbox-success checkbox-circle">
-                                                                                            <input id="singleChoiceQuestion${vs.count}B" value="B" type="radio" name="singleChoiceQuestionAnswer[${vs.count}]">
-                                                                                            <label for="singleChoiceQuestion${vs.count}B">
-                                                                                                B:${question.optionB}
-                                                                                            </label>
-                                                                                        </div>
-                                                                                        <div class="checkbox checkbox-success checkbox-circle">
-                                                                                            <input id="singleChoiceQuestion${vs.count}C" value="C" type="radio" name="singleChoiceQuestionAnswer[${vs.count}]">
-                                                                                            <label for="singleChoiceQuestion${vs.count}C">
-                                                                                                C:${question.optionC}
-                                                                                            </label>
-                                                                                        </div>
-                                                                                        <div class="checkbox checkbox-success checkbox-circle">
-                                                                                            <input id="singleChoiceQuestion${vs.count}D" value="D" type="radio" name="singleChoiceQuestionAnswer[${vs.count}]">
-                                                                                            <label for="singleChoiceQuestion${vs.count}D">
-                                                                                                D:${question.optionD}
-                                                                                            </label>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-
-                                                                            </c:forEach>
+                                            <form class="form-horizontal" id="singleChoiceQuestions-form">
+                                                <input type="hidden" name="singleChoiceQuestionNum" value="${fn:length(singleChoiceQuestions)}">
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div class="wrapper wrapper-content">
+                                                            <div class="row animated fadeInRight">
+                                                                <div class="col-sm-12">
+                                                                    <div class="ibox float-e-margins">
+                                                                        <div class="text-center float-e-margins p-md">
+                                                                            <span>预览：</span>
+                                                                            <a href="#" class="btn btn-xs btn-primary" id="lightVersion">浅色</a>
+                                                                            <a href="#" class="btn btn-xs btn-primary" id="darkVersion">深色</a>
+                                                                            <a href="#" class="btn btn-xs btn-primary" id="leftVersion">布局切换</a>
                                                                         </div>
+                                                                        <div class="" id="ibox-content">
 
+                                                                            <div id="vertical-timeline" class="vertical-container light-timeline">
+
+                                                                                <c:forEach items="${singleChoiceQuestions}" var="question" varStatus="vs">
+                                                                                    <div class="vertical-timeline-block">
+                                                                                        <div class="vertical-timeline-icon navy-bg">
+                                                                                            <i class="">${vs.count}</i>
+                                                                                        </div>
+
+                                                                                        <div class="vertical-timeline-content gray-bg">
+                                                                                            <p>${question.questionContent}
+                                                                                            </p>
+                                                                                            <div class="checkbox checkbox-success checkbox-circle">
+                                                                                                <input id="singleChoiceQuestion${vs.count}A" value="A" type="radio" name="singleChoiceQuestionAnswer[${vs.count}]">
+                                                                                                <label for="singleChoiceQuestion${vs.count}A">
+                                                                                                    A:${question.optionA}
+                                                                                                </label>
+                                                                                            </div>
+                                                                                            <div class="checkbox checkbox-success checkbox-circle">
+                                                                                                <input id="singleChoiceQuestion${vs.count}B" value="B" type="radio" name="singleChoiceQuestionAnswer[${vs.count}]">
+                                                                                                <label for="singleChoiceQuestion${vs.count}B">
+                                                                                                    B:${question.optionB}
+                                                                                                </label>
+                                                                                            </div>
+                                                                                            <div class="checkbox checkbox-success checkbox-circle">
+                                                                                                <input id="singleChoiceQuestion${vs.count}C" value="C" type="radio" name="singleChoiceQuestionAnswer[${vs.count}]">
+                                                                                                <label for="singleChoiceQuestion${vs.count}C">
+                                                                                                    C:${question.optionC}
+                                                                                                </label>
+                                                                                            </div>
+                                                                                            <div class="checkbox checkbox-success checkbox-circle">
+                                                                                                <input id="singleChoiceQuestion${vs.count}D" value="D" type="radio" name="singleChoiceQuestionAnswer[${vs.count}]">
+                                                                                                <label for="singleChoiceQuestion${vs.count}D">
+                                                                                                    D:${question.optionD}
+                                                                                                </label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                </c:forEach>
+                                                                            </div>
+
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
 
+                                                    </div>
                                                 </div>
-                                            </div>
+
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <button class="btn btn-primary center-block" type="button" onclick="saveSingleChoiceQuestion()"><i class="fa fa-check"></i>&nbsp;保存</button>
+                                                    </div>
+                                                </div>
+                                            </form>
                                         </div>
                                     </c:if>
                                     <c:if test="${not empty trueOrFalseQuestions}">
                                         <div id="tab-1" class="tab-pane ">
-                                            <div class="row">
-                                                <div class="col-sm-12">
-                                                    <div class="wrapper wrapper-content">
-                                                        <div class="row animated fadeInRight">
-                                                            <div class="col-sm-12">
-                                                                <div class="ibox float-e-margins">
-                                                                    <div class="text-center float-e-margins p-md">
-                                                                        <span>预览：</span>
-                                                                        <a href="#" class="btn btn-xs btn-primary" id="l">浅色</a>
-                                                                        <a href="#" class="btn btn-xs btn-primary" id="k">深色</a>
-                                                                        <a href="#" class="btn btn-xs btn-primary" id="i">布局切换</a>
-                                                                    </div>
-                                                                    <div class="" >
-
-                                                                        <div  class="vertical-container light-timeline">
-
-                                                                            <c:forEach items="${trueOrFalseQuestions}" var="question" varStatus="vs">
-                                                                                <div class="vertical-timeline-block">
-                                                                                    <div class="vertical-timeline-icon navy-bg">
-                                                                                        <i class="">${vs.count}</i>
-                                                                                    </div>
-
-                                                                                    <div class="vertical-timeline-content gray-bg">
-                                                                                        <p>${question.questionContent}
-                                                                                        </p>
-                                                                                        <div class="checkbox checkbox-success checkbox-circle">
-                                                                                            <input id="trueOrFalseQuestion${vs.count}-1" value="1" type="radio" name="trueOrFalseQuestionAnswer[${vs.count}]">
-                                                                                            <label for="trueOrFalseQuestion${vs.count}-1">
-                                                                                                √
-                                                                                            </label>
-                                                                                        </div>
-                                                                                        <div class="checkbox checkbox-success checkbox-circle">
-                                                                                            <input id="trueOrFalseQuestion${vs.count}-0" value="B" type="radio" name="trueOrFalseQuestionAnswer[${vs.count}]">
-                                                                                            <label for="trueOrFalseQuestion${vs.count}-0">
-                                                                                                ×
-                                                                                            </label>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-
-                                                                            </c:forEach>
+                                            <form id="trueOrFalseQuestions-form">
+                                                <input type="hidden" name="trueOrFalseQuestionNum" value="${fn:length(trueOrFalseQuestions)}">
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div class="wrapper wrapper-content">
+                                                            <div class="row animated fadeInRight">
+                                                                <div class="col-sm-12">
+                                                                    <div class="ibox float-e-margins">
+                                                                        <div class="text-center float-e-margins p-md">
+                                                                            <span>预览：</span>
+                                                                            <a href="#" class="btn btn-xs btn-primary" id="l">浅色</a>
+                                                                            <a href="#" class="btn btn-xs btn-primary" id="k">深色</a>
+                                                                            <a href="#" class="btn btn-xs btn-primary" id="i">布局切换</a>
                                                                         </div>
+                                                                        <div class="" >
 
+                                                                            <div  class="vertical-container light-timeline">
+
+                                                                                <c:forEach items="${trueOrFalseQuestions}" var="question" varStatus="vs">
+                                                                                    <div class="vertical-timeline-block">
+                                                                                        <div class="vertical-timeline-icon navy-bg">
+                                                                                            <i class="">${vs.count}</i>
+                                                                                        </div>
+
+                                                                                        <div class="vertical-timeline-content gray-bg">
+                                                                                            <p>${question.questionContent}
+                                                                                            </p>
+                                                                                            <div class="checkbox checkbox-success checkbox-circle">
+                                                                                                <input id="trueOrFalseQuestion${vs.count}-1" value="1" type="radio" name="trueOrFalseQuestionAnswer[${vs.count}]">
+                                                                                                <label for="trueOrFalseQuestion${vs.count}-1">
+                                                                                                    √
+                                                                                                </label>
+                                                                                            </div>
+                                                                                            <div class="checkbox checkbox-success checkbox-circle">
+                                                                                                <input id="trueOrFalseQuestion${vs.count}-0" value="B" type="radio" name="trueOrFalseQuestionAnswer[${vs.count}]">
+                                                                                                <label for="trueOrFalseQuestion${vs.count}-0">
+                                                                                                    ×
+                                                                                                </label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                </c:forEach>
+                                                                            </div>
+
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                    </div>
 
+                                                    </div>
                                                 </div>
-                                            </div>
+
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <button class="btn btn-primary center-block" type="button" onclick="saveTrueOrFalseQuestion()"><i class="fa fa-check"></i>&nbsp;保存</button>
+                                                    </div>
+                                                </div>
+                                            </form>
                                         </div>
                                     </c:if>
                                     <c:if test="${not empty fillInBlankQuestions}">
-                                        <div id="tab-2" class="tab-pane">
-                                            <strong>填空题</strong>
+                                        <div id="tab-2" class="tab-pane ">
+                                            <form id="fillInBlankQuestions-form">
+                                                <input type="hidden" name="fillInBlankQuestionNum" value="${fn:length(fillInBlankQuestions)}">
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div class="wrapper wrapper-content">
+                                                            <div class="row animated fadeInRight">
+                                                                <div class="col-sm-12">
+                                                                    <div class="ibox float-e-margins">
+                                                                        <div class="text-center float-e-margins p-md">
+                                                                            <span>预览：</span>
+                                                                            <a href="#" class="btn btn-xs btn-primary" id="al">浅色</a>
+                                                                            <a href="#" class="btn btn-xs btn-primary" id="kx">深色</a>
+                                                                            <a href="#" class="btn btn-xs btn-primary" id="ib">布局切换</a>
+                                                                        </div>
+                                                                        <div class="" >
 
-                                            <p>题目</p>
+                                                                            <div  class="vertical-container light-timeline">
+
+                                                                                <c:forEach items="${fillInBlankQuestions}" var="question" varStatus="vs">
+                                                                                    <div class="vertical-timeline-block">
+                                                                                        <div class="vertical-timeline-icon navy-bg">
+                                                                                            <i class="">${vs.count}</i>
+                                                                                        </div>
+
+                                                                                        <div class="vertical-timeline-content gray-bg">
+                                                                                            <p>${question.questionContent}
+                                                                                            </p>
+                                                                                            <div class="form-group">
+                                                                                                <div class="col-md-4">
+                                                                                                    <c:forEach var="i" begin="1" end="${question.blankNum }">
+                                                                                                        <input type="text" placeholder="" class="form-control  m-b" name="fillInBlankQuestionAnswer[${vs.count }][${i-1 }]" id="fillInBlankQuestion${vs.count}-${i}">
+                                                                                                    </c:forEach>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                </c:forEach>
+                                                                            </div>
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-lg-12 ">
+                                                        <button class="btn btn-primary center-block" type="button" onclick="saveFillInBlankQuestion()"><i class="fa fa-check"></i>&nbsp;保存</button>
+                                                    </div>
+                                                </div>
+                                            </form>
                                         </div>
                                     </c:if>
                                 </div>
+                                <hr>
 
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <button class="btn btn-success center-block" type="button" onclick="submitTestPaper()"><i class=" fa fa-upload"></i>&nbsp;提交试卷</button>
+                                    </div>
+                                </div>
                             </div>
 
                         </div>
-
-                        <hr>
-
-                        <div class="row">
-                            <div class="col-lg-12">
-
-                            </div>
-                        </div>
-
-
                     </div>
                 </div>
             </div>
@@ -229,36 +295,61 @@
     </div>
 
     <c:if test="${not empty singleChoiceQuestionAnswer }">
-        <c:forEach var="answer" items="${singleChoiceQuestionAnswer }">
-            <c:choose>
-                <c:when test="${answer.value eq 'A'}">
-                    <script type="text/javascript">
-                        $("#singleChoiceQuestion${answer.key }A").attr("checked","checked");
-                    </script>
-                </c:when>
-                <c:when test="${answer.value eq 'B' }">
-                    <script type="text/javascript">
-                        $("##singleChoiceQuestion${answer.key }B").attr("checked","checked");
-                    </script>
-                </c:when>
-                <c:when test="${answer.value eq 'C' }">
-                    <script type="text/javascript">
-                        $("##singleChoiceQuestion${answer.key }C").attr("checked","checked");
-                    </script>
-                </c:when>
-                <c:when test="${answer.value eq 'D' }">
-                    <script type="text/javascript">
-                        $("##singleChoiceQuestion${answer.key }D").attr("checked","checked");
-                    </script>
-                </c:when>
-            </c:choose>
-        </c:forEach>
+        <script type="text/javascript">
+            function initSingleChoiceQuestionAnswer() {
+                <c:forEach var="answer" items="${singleChoiceQuestionAnswer }">
+                    <c:choose>
+                        <c:when test="${answer.value eq 'A'}">
+                            $("#singleChoiceQuestion${answer.key }A").attr("checked","checked");
+                        </c:when>
+                        <c:when test="${answer.value eq 'B' }">
+                            $("#singleChoiceQuestion${answer.key }B").attr("checked","checked");
+                        </c:when>
+                        <c:when test="${answer.value eq 'C' }">
+                            $("#singleChoiceQuestion${answer.key }C").attr("checked","checked");
+                        </c:when>
+                        <c:when test="${answer.value eq 'D' }">
+                            $("#singleChoiceQuestion${answer.key }D").attr("checked","checked");
+                        </c:when>
+                    </c:choose>
+                </c:forEach>
+            }
+        </script>
     </c:if>
 
+    <c:if test="${not empty trueOrFalseQuestionAnswer }">
+        <script type="text/javascript">
+            function initTrueOrFalseQuestionAnswer() {
+                <c:forEach var="answer" items="${trueOrFalseQuestionAnswer }">
+                    <c:choose>
+                        <c:when test="${answer.value eq '0'}">
+                            $("#trueOrFalseQuestion${answer.key}-0").attr("checked","checked");
+                        </c:when>
+                        <c:when test="${answer.value eq '1' }">
+                            $("#trueOrFalseQuestion${answer.key}-1").attr("checked","checked");
+                        </c:when>
+                    </c:choose>
+                </c:forEach>
+            }
+        </script>
+    </c:if>
+
+    <c:if test="${not empty fillInBlankQuestionAnswer }">
+        <script type="text/javascript">
+            function initFillInBlankQuestionAnswer() {
+                <c:forEach items="${fillInBlankQuestionAnswer }" var="question">
+                    <c:forEach var="answer" items="${question.value }" varStatus="vs" >
+                        $("#fillInBlankQuestion${question.key}-${vs.count}").val("${answer}");
+                    </c:forEach>
+                </c:forEach>
+            }
+        </script>
+    </c:if>
 
     <!-- 全局js -->
     <script src="/js/jquery.min.js?v=2.1.4"></script>
     <script src="/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="/js/plugins/layer/layer.min.js"></script>
 
     <!-- 自定义js -->
     <script src="/js/examsystem/common.js"></script>
@@ -270,33 +361,116 @@
 
         $($("#nav_tabs_questions").children().get(0)).addClass("active");
         $($("#content_questions").children().get(0)).addClass("active");
+
+        if(typeof (initSingleChoiceQuestionAnswer)=="function")
+            initSingleChoiceQuestionAnswer();
+
+        if(typeof (initTrueOrFalseQuestionAnswer)=="function")
+            initTrueOrFalseQuestionAnswer();
+
+        if(typeof (initFillInBlankQuestionAnswer)=="function")
+            initFillInBlankQuestionAnswer();
     </script>
 
     <script>
-        $(document).ready(function () {
-
-            // Local script for demo purpose only
-            $('#lightVersion').click(function (event) {
-                event.preventDefault()
-                $('#ibox-content').removeClass('ibox-content');
-                $('#vertical-timeline').removeClass('dark-timeline');
-                $('#vertical-timeline').addClass('light-timeline');
+        
+        function submitTestPaper() {
+            $.ajax({
+                type: "POST",
+                url: "/v1/test/testPaper/"+"${examStudent.testPaperId}",
+                success: function(data){
+                    if(data.status == 201){
+                        layer.msg("提交成功");
+                        location.href = "http://localhost:8082";
+                    }
+                    else{
+                        layer.msg("提交失败");
+                    }
+                },
+                error:function(XMLHttpRequest, textStatus, errorThrown){
+                    var status=XMLHttpRequest.status;
+                    if(status==403){
+                        to403();
+                    }else if(status==500){
+                        to500();
+                    }
+                }
             });
-
-            $('#darkVersion').click(function (event) {
-                event.preventDefault()
-                $('#ibox-content').addClass('ibox-content');
-                $('#vertical-timeline').removeClass('light-timeline');
-                $('#vertical-timeline').addClass('dark-timeline');
+        }
+        
+        function saveSingleChoiceQuestion() {
+            $.ajax({
+                type: "POST",
+                url: "/v1/test/singleChoiceQuestion/answer",
+                data: decodeURIComponent($("#singleChoiceQuestions-form").serialize().replace(/\+/g,"")),
+                success: function(data){
+                    if(data.status == 201){
+                        layer.msg("保存成功");
+                    }
+                    else{
+                        layer.msg("保存失败");
+                    }
+                },
+                error:function(XMLHttpRequest, textStatus, errorThrown){
+                    var status=XMLHttpRequest.status;
+                    if(status==403){
+                        to403();
+                    }else if(status==500){
+                        to500();
+                    }
+                }
             });
+        }
 
-            $('#leftVersion').click(function (event) {
-                event.preventDefault()
-                $('#vertical-timeline').toggleClass('center-orientation');
+        function saveTrueOrFalseQuestion() {
+            $.ajax({
+                type: "POST",
+                url: "/v1/test/trueOrFalseQuestion/answer",
+                data: decodeURIComponent($("#trueOrFalseQuestions-form").serialize().replace(/\+/g,"")),
+                success: function(data){
+                    if(data.status == 201){
+                        layer.msg("保存成功");
+                    }
+                    else{
+                        layer.msg("保存失败");
+                    }
+                },
+                error:function(XMLHttpRequest, textStatus, errorThrown){
+                    var status=XMLHttpRequest.status;
+                    if(status==403){
+                        to403();
+                    }else if(status==500){
+                        to500();
+                    }
+                }
             });
+        }
+        
+        function saveFillInBlankQuestion() {
+            $.ajax({
+                type: "POST",
+                url: "/v1/test/fillInBlankQuestion/answer",
+                data: decodeURIComponent($("#fillInBlankQuestions-form").serialize().replace(/\+/g,"")),
+                success: function(data){
+                    if(data.status == 201){
+                        layer.msg("保存成功");
+                    }
+                    else{
+                        layer.msg("保存失败");
+                    }
+                },
+                error:function(XMLHttpRequest, textStatus, errorThrown){
+                    var status=XMLHttpRequest.status;
+                    if(status==403){
+                        to403();
+                    }else if(status==500){
+                        to500();
+                    }
+                }
+            });
+        }
+        
 
-
-        });
     </script>
 
     <script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
