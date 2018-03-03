@@ -127,6 +127,8 @@ public class ExamImpl implements ExamService {
     private String DICTINFO_STUDENT_STATUS_IS_USED_CODE;
     @Value("${DICTINFO_STUDENT_EXAM_IS_PROCEED_CODE}")
     private String DICTINFO_STUDENT_EXAM_IS_PROCEED_CODE;
+    @Value("${DICTINFO_STUDENT_EXAM_IS_END_CODE}")
+    private String DICTINFO_STUDENT_EXAM_IS_END_CODE;
 
     @Value("${REDIS_KEY_EXAM_STUDENT_IS_PROCEEDED}")
     private String REDIS_KEY_EXAM_STUDENT_IS_PROCEEDED;
@@ -142,6 +144,25 @@ public class ExamImpl implements ExamService {
     @Value("${FILE_PATH_PRE_EXAM_STUDENT_EXCEL}")
     private String FILE_PATH_PRE_EXAM_STUDENT_EXCEL;
 
+    @Value("${REDIS_KEY_SINGLE_CHOICE_QUESTION_ORDER}")
+    private String REDIS_KEY_SINGLE_CHOICE_QUESTION_ORDER;
+    @Value("${REDIS_KEY_TRUE_OR_FALSE_QUESTION_ORDER}")
+    private String REDIS_KEY_TRUE_OR_FALSE_QUESTION_ORDER;
+    @Value("${REDIS_KEY_FILL_IN_BLANK_QUESTION_ORDER}")
+    private String REDIS_KEY_FILL_IN_BLANK_QUESTION_ORDER;
+    @Value("${REDIS_KEY_SINGLE_CHOICE_QUESTION_ANSWER}")
+    private String REDIS_KEY_SINGLE_CHOICE_QUESTION_ANSWER;
+    @Value("${REDIS_KEY_TRUE_OR_FALSE_QUESTION_ANSWER}")
+    private String REDIS_KEY_TRUE_OR_FALSE_QUESTION_ANSWER;
+    @Value("${REDIS_KEY_FILL_IN_BLANK_QUESTION_ANSWER}")
+    private String REDIS_KEY_FILL_IN_BLANK_QUESTION_ANSWER;
+
+    @Value("${DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE}")
+    private String DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE;
+    @Value("${DICTINFO_TRUEORFALSEQUESTION_TYPE_CODE}")
+    private String DICTINFO_TRUEORFALSEQUESTION_TYPE_CODE;
+    @Value("${DICTINFO_FILLINBLANKQUESTION_TYPE_CODE}")
+    private String DICTINFO_FILLINBLANKQUESTION_TYPE_CODE;
 
     @Autowired
     private JedisClient jedisClient;
@@ -170,6 +191,10 @@ public class ExamImpl implements ExamService {
     private MajorMapper majorMapper;
     @Autowired
     private ClassMapperCustom classMapperCustom;
+    @Autowired
+    private TestpaperQuestionRelationMapper testpaperQuestionRelationMapper;
+    @Autowired
+    private ExamstudentAnswerMapper examstudentAnswerMapper;
 
     @Override
     public List<ExamDto> listExam(Exam exam) throws Exception {
@@ -969,7 +994,8 @@ public class ExamImpl implements ExamService {
 
             //查询该学生是否进行过考试
             Boolean exists = jedisClient.exists(examStudentRelation.getId());
-            examStudentRelation.setProceeded(exists);
+            examStudentRelation.setIsProceeded(exists);
+            System.out.println(examStudentRelation.getIsProceeded());
         }
 
         return examStudentRelation;
@@ -992,8 +1018,10 @@ public class ExamImpl implements ExamService {
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_ID_NOT_NULL,null);
 
         //学生考试
-        Boolean proceeded = examStudentRelationDto.getProceeded();
-        Boolean local = examStudentRelationDto.getLocal();
+        Boolean proceeded = examStudentRelationDto.getIsProceeded();
+        Boolean local = examStudentRelationDto.getIsLocal();
+
+        System.out.println(local);
         if(proceeded==null&&local==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_STUDENT_PROCEED_AND_LOCAL_NOT_NULL,null);
 
@@ -1064,5 +1092,196 @@ public class ExamImpl implements ExamService {
             jedisClient.hset(examStudentRelationId,REDIS_KEY_EXAM_STUDENT_IS_PROCEEDED,"1");
 
         return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_POST_SUCCESS,null);
+    }
+
+    @Override
+    public ResultInfo submitTestPape(ExamStudentRelationDto examStudentRelationDto, String testPaperId) throws Exception {
+
+        if(examStudentRelationDto==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_STUDENT_NOT_EXIST,null);
+
+        //试卷id不能为空
+        if(StringUtils.isBlank(testPaperId))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TESTPAPER_ID_NOT_NULL,null);
+
+        //考试学生关系id不允许为空
+        String examStudentRelationId = examStudentRelationDto.getId();
+        if(StringUtils.isBlank(examStudentRelationId))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_STUDENT_ID_NOT_NULL,null);
+
+        //考试学生关系id对应的考试学生必须存在
+        ExamStudentRelation examStudentRelationDb = examStudentRelationMapper.selectByPrimaryKey(examStudentRelationId);
+        if(examStudentRelationDb==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_STUDENT_NOT_EXIST,null);
+
+        //修改考试学生状态为已考
+        examStudentRelationDb.setStatus(new Integer(DICTINFO_STUDENT_EXAM_IS_END_CODE));
+        examStudentRelationDb.setUpdatedTime(new Date());
+        examStudentRelationMapper.updateByPrimaryKey(examStudentRelationDb);
+
+
+
+        //提交试卷
+/*        String key=studentUuid+"_"+ksgluuid;
+        String studentSjUuid = jedisClient.hget(key, STUDENT_SJ);*/
+        String singleChoiceQuestionOrderJson = jedisClient.hget(examStudentRelationId, REDIS_KEY_SINGLE_CHOICE_QUESTION_ORDER);
+        List<Integer> singleChoiceQuestionOrderList=null;
+        Map<Integer, String> singleChoiceQuestionAnswer=null;
+        if(!StringUtils.isBlank(singleChoiceQuestionOrderJson)){
+            singleChoiceQuestionOrderList = JsonUtils.jsonToList(singleChoiceQuestionOrderJson, Integer.class);
+            singleChoiceQuestionAnswer = JsonUtils.jsonToMap(jedisClient.hget(examStudentRelationId, REDIS_KEY_SINGLE_CHOICE_QUESTION_ANSWER), Integer.class, String.class);
+        }
+
+        String trueOrFalseQuestionOrderJson = jedisClient.hget(examStudentRelationId, REDIS_KEY_TRUE_OR_FALSE_QUESTION_ORDER);
+        List<Integer> trueOrFalseQuestionOrderList=null;
+        Map<Integer, String> trueOrFalseQuestionAnswer=null;
+        if(!StringUtils.isBlank(trueOrFalseQuestionOrderJson)){
+            trueOrFalseQuestionOrderList = JsonUtils.jsonToList(trueOrFalseQuestionOrderJson, Integer.class);
+            trueOrFalseQuestionAnswer = JsonUtils.jsonToMap(jedisClient.hget(examStudentRelationId, REDIS_KEY_TRUE_OR_FALSE_QUESTION_ANSWER), Integer.class, String.class);
+        }
+
+        String fillInBlankQuestionOrderJson = jedisClient.hget(examStudentRelationId, REDIS_KEY_FILL_IN_BLANK_QUESTION_ORDER);
+        List<Integer> fillInBlankQuestionOrderList=null;
+        Map<Integer, List> fillInBlankQuestionAnswer=null;
+        if(!StringUtils.isBlank(fillInBlankQuestionOrderJson)){
+            fillInBlankQuestionOrderList = JsonUtils.jsonToList(fillInBlankQuestionOrderJson, Integer.class);
+            fillInBlankQuestionAnswer = JsonUtils.jsonToMap(jedisClient.hget(examStudentRelationId, REDIS_KEY_FILL_IN_BLANK_QUESTION_ANSWER), Integer.class, List.class);
+        }
+
+        int index=1;
+
+        if(!CollectionUtils.isEmpty(singleChoiceQuestionOrderList))
+            for(Integer i:singleChoiceQuestionOrderList){
+                //单选题提交
+                ExamstudentAnswer examstudentAnswer=new ExamstudentAnswer();
+                //设置id
+                String studentAnswerId = UUIDBuild.getUUID();
+                examstudentAnswer.setId(studentAnswerId);
+                //设置考试学生id
+                examstudentAnswer.setExamStudentId(examStudentRelationId);
+                //设置答案
+                examstudentAnswer.setStudentAnswer(singleChoiceQuestionAnswer.get(index));
+                //设置分数初始为0分
+                examstudentAnswer.setScore(new BigDecimal(0));
+                //设置为未评分
+                examstudentAnswer.setIsGraded(false);
+                examstudentAnswer.setCreatedTime(new Date());
+                examstudentAnswer.setUpdatedTime(new Date());
+
+
+                //设置试卷题目id
+                //查询该题目对应原先试卷的哪一道题目
+                TestpaperQuestionRelationExample testpaperQuestionRelationExample=new TestpaperQuestionRelationExample();
+                TestpaperQuestionRelationExample.Criteria questionCriteria = testpaperQuestionRelationExample.createCriteria();
+                questionCriteria.andTestPaperIdEqualTo(testPaperId);
+                questionCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE));
+                questionCriteria.andQuestionOrderEqualTo(i);
+
+                List<TestpaperQuestionRelation> testpaperQuestionRelationList = testpaperQuestionRelationMapper.selectByExample(testpaperQuestionRelationExample);
+
+                if(!CollectionUtils.isEmpty(testpaperQuestionRelationList)){
+                    examstudentAnswer.setTestpaperQuestionId(testpaperQuestionRelationList.get(0).getId());
+                }
+
+                examstudentAnswerMapper.insert(examstudentAnswer);
+                index++;
+            }
+
+
+        index=1;
+
+        if(!CollectionUtils.isEmpty(trueOrFalseQuestionOrderList))
+            for(Integer i:trueOrFalseQuestionOrderList){
+
+                //判断题提交
+                ExamstudentAnswer examstudentAnswer=new ExamstudentAnswer();
+                //设置id
+                String studentAnswerId = UUIDBuild.getUUID();
+                examstudentAnswer.setId(studentAnswerId);
+                //设置考试学生id
+                examstudentAnswer.setExamStudentId(examStudentRelationId);
+                //设置答案
+                examstudentAnswer.setStudentAnswer(trueOrFalseQuestionAnswer.get(index));
+                //设置分数初始为0分
+                examstudentAnswer.setScore(new BigDecimal(0));
+                //设置为未评分
+                examstudentAnswer.setIsGraded(false);
+                examstudentAnswer.setCreatedTime(new Date());
+                examstudentAnswer.setUpdatedTime(new Date());
+
+
+                //设置试卷题目id
+                //查询该题目对应原先试卷的哪一道题目
+                TestpaperQuestionRelationExample testpaperQuestionRelationExample=new TestpaperQuestionRelationExample();
+                TestpaperQuestionRelationExample.Criteria questionCriteria = testpaperQuestionRelationExample.createCriteria();
+                questionCriteria.andTestPaperIdEqualTo(testPaperId);
+                questionCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_TRUEORFALSEQUESTION_TYPE_CODE));
+                questionCriteria.andQuestionOrderEqualTo(i);
+
+                List<TestpaperQuestionRelation> testpaperQuestionRelationList = testpaperQuestionRelationMapper.selectByExample(testpaperQuestionRelationExample);
+
+                if(!CollectionUtils.isEmpty(testpaperQuestionRelationList)){
+                    examstudentAnswer.setTestpaperQuestionId(testpaperQuestionRelationList.get(0).getId());
+                }
+
+                examstudentAnswerMapper.insert(examstudentAnswer);
+                index++;
+            }
+
+        index=1;
+
+        if(!CollectionUtils.isEmpty(fillInBlankQuestionOrderList))
+            for(Integer i:fillInBlankQuestionOrderList){
+
+                //填空题提交
+                ExamstudentAnswer examstudentAnswer=new ExamstudentAnswer();
+                //设置id
+                String studentAnswerId = UUIDBuild.getUUID();
+                examstudentAnswer.setId(studentAnswerId);
+                //设置考试学生id
+                examstudentAnswer.setExamStudentId(examStudentRelationId);
+                //设置分数初始为0分
+                examstudentAnswer.setScore(new BigDecimal(0));
+                //设置为未评分
+                examstudentAnswer.setIsGraded(false);
+                examstudentAnswer.setCreatedTime(new Date());
+                examstudentAnswer.setUpdatedTime(new Date());
+
+                //设置试卷题目id
+                //查询该题目对应原先试卷的哪一道题目
+                TestpaperQuestionRelationExample testpaperQuestionRelationExample=new TestpaperQuestionRelationExample();
+                TestpaperQuestionRelationExample.Criteria questionCriteria = testpaperQuestionRelationExample.createCriteria();
+                questionCriteria.andTestPaperIdEqualTo(testPaperId);
+                questionCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_FILLINBLANKQUESTION_TYPE_CODE));
+                questionCriteria.andQuestionOrderEqualTo(i);
+
+                List<TestpaperQuestionRelation> testpaperQuestionRelationList = testpaperQuestionRelationMapper.selectByExample(testpaperQuestionRelationExample);
+
+                if(!CollectionUtils.isEmpty(testpaperQuestionRelationList)){
+                    examstudentAnswer.setTestpaperQuestionId(testpaperQuestionRelationList.get(0).getId());
+                }
+
+
+                List<String> questionAnswerList = fillInBlankQuestionAnswer.get(index);
+                for(int j=0;j<questionAnswerList.size();j++){
+                    //去除所有空格
+                    String s=questionAnswerList.get(j).replaceAll(" ", "");
+                    questionAnswerList.set(j, s);
+                    System.out.println(s);
+                }
+
+                //设置答案
+                String json = JsonUtils.objectToJson(questionAnswerList);
+                examstudentAnswer.setStudentAnswer(json);
+
+                examstudentAnswerMapper.insert(examstudentAnswer);
+                index++;
+            }
+
+        //将缓存中该学生考试相关信息删除
+        jedisClient.del(examStudentRelationId);
+
+        return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_POST_SUCCESS,null);
+
     }
 }
