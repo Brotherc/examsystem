@@ -145,21 +145,14 @@ public class ExamStudentRelationDto extends ExamStudentRelation{
         this.testPaperId = testPaperId;
     }
 
-    public Boolean getProceeded() {
+    public Boolean getIsProceeded() {
         return isProceeded;
     }
 
-    public void setProceeded(Boolean proceeded) {
-        isProceeded = proceeded;
+    public void setIsProceeded(Boolean isProceeded) {
+        this.isProceeded = isProceeded;
     }
 
-    public Boolean getLocal() {
-        return isLocal;
-    }
-
-    public void setLocal(Boolean local) {
-        isLocal = local;
-    }
 
     public String getInvigilatePwd() {
         return invigilatePwd;
@@ -167,5 +160,13 @@ public class ExamStudentRelationDto extends ExamStudentRelation{
 
     public void setInvigilatePwd(String invigilatePwd) {
         this.invigilatePwd = invigilatePwd;
+    }
+
+    public Boolean getIsLocal() {
+        return isLocal;
+    }
+
+    public void setIsLocal(Boolean isLocal) {
+        this.isLocal = isLocal;
     }
 }
