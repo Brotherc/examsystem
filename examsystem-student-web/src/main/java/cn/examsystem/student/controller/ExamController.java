@@ -3,13 +3,17 @@ package cn.examsystem.student.controller;
 import cn.examsystem.common.pojo.ResultInfo;
 import cn.examsystem.common.utils.JsonUtils;
 import cn.examsystem.rest.pojo.dto.ExamStudentRelationDto;
+import cn.examsystem.rest.pojo.dto.TestPaperDto;
 import cn.examsystem.security.pojo.dto.StudentDto;
+import cn.examsystem.student.service.TestService;
 import cn.examsystem.student.utils.CookieUtils;
 import cn.examsystem.student.utils.RestTemplateUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,11 +38,11 @@ public class ExamController {
     private String EXAM_LOGIN_STUDENT_URL;
     @Value("${TEST_URL}")
     private String TEST_URL;
+    @Value("${TEST_TESTPAPER_URL}")
+    private String TEST_TESTPAPER_URL;
 
     @Value("${SESSION_KEY_EXAM_STUDENT}")
     private String SESSION_KEY_EXAM_STUDENT;
-
-
 
     @Value("${MESSAGE_GET_FAIL}")
     private String MESSAGE_GET_FAIL;
@@ -49,35 +53,48 @@ public class ExamController {
     @Value("${MESSAGE_UPDATE_FAIL}")
     private String MESSAGE_UPDATE_FAIL;
 
-    @GetMapping("/v1/exam/loginStudent")
+    @Autowired
+    private TestService testService;
+
+    @GetMapping("/v1/test/loginStudent")
     public ResultInfo getExam(HttpSession session, HttpServletRequest request) throws Exception{
 
         //从session中获取springsecurity认证的用户信息
         SecurityContext securityContext= (SecurityContext) session.getAttribute("SPRING_SECURITY_CONTEXT");
         StudentDto studentDto= (StudentDto) securityContext.getAuthentication().getPrincipal();
 
-        System.out.println(studentDto.getId());
-
         ResultInfo resultInfo;
         try{
 
             //调用rest服务
             resultInfo = RestTemplateUtils.exchange(REST_BASE_URL + EXAM_URL+EXAM_LOGIN_STUDENT_URL+"/{studentId}", HttpMethod.GET, ResultInfo.class,new Object[]{studentDto.getId()});
-            System.out.println("---------"+resultInfo);
 
-            LinkedHashMap examStudentMap=(LinkedHashMap)resultInfo.getData();
-            String examStudentJson = JsonUtils.objectToJson(examStudentMap);
-            ExamStudentRelationDto examStudentRelationDto = JsonUtils.jsonToPojo(examStudentJson, ExamStudentRelationDto.class);
+            if(resultInfo.getStatus()==ResultInfo.STATUS_RESULT_OK){
+                LinkedHashMap examStudentMap=(LinkedHashMap)resultInfo.getData();
+                String examStudentJson = JsonUtils.objectToJson(examStudentMap);
+                ExamStudentRelationDto examStudentRelationDto = JsonUtils.jsonToPojo(examStudentJson, ExamStudentRelationDto.class);
 
-            if(examStudentRelationDto.getProceeded()){
-                if(CookieUtils.getCookValue(request,examStudentRelationDto.getId())!=null)
-                    examStudentRelationDto.setLocal(true);
-                else
+                System.out.println(examStudentRelationDto.getIsProceeded());
+                if(examStudentRelationDto.getIsProceeded()){
+                    System.out.println("考过试");
+                    if(CookieUtils.getCookValue(request,examStudentRelationDto.getId())!=null){
+                        examStudentRelationDto.setIsLocal(true);
+System.out.println("本地");
+                    }
+                    else{
+                        System.out.println("不是本地");
+                        examStudentRelationDto.setIsLocal(false);
+                    }
+                }
+                else{
+                    System.out.println("没考过试");
+                    examStudentRelationDto.setIsLocal(false);
+                }
+System.out.println(examStudentRelationDto.getIsLocal());
+                session.setAttribute(SESSION_KEY_EXAM_STUDENT,examStudentRelationDto);
 
-                    examStudentRelationDto.setLocal(false);
+                resultInfo.setData(examStudentRelationDto);
             }
-
-            session.setAttribute(SESSION_KEY_EXAM_STUDENT,examStudentRelationDto);
 
         }catch (Exception e){
             e.printStackTrace();
@@ -117,5 +134,66 @@ public class ExamController {
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_SAVE_FAIL,null);
         }
         return resultInfo;
+    }
+
+    @PostMapping("/v1/test/singleChoiceQuestion/answer")
+    public ResultInfo saveSingleChoiceQuestionAnswer(HttpSession session, TestPaperDto testPaperDto) throws Exception{
+
+        System.out.println(testPaperDto.getSingleChoiceQuestionAnswer());
+        ExamStudentRelationDto examStudentRelationDto = (ExamStudentRelationDto)session.getAttribute(SESSION_KEY_EXAM_STUDENT);
+        System.out.println(examStudentRelationDto.getId());
+
+        return testService.saveSingleChoiceQuestionAnswer(examStudentRelationDto.getId(),testPaperDto);
+    }
+
+    @PostMapping("/v1/test/trueOrFalseQuestion/answer")
+    public ResultInfo saveTrueOrFalseQuestionAnswer(HttpSession session, TestPaperDto testPaperDto) throws Exception{
+
+        System.out.println(testPaperDto.getTrueOrFalseQuestionAnswer());
+
+        ExamStudentRelationDto examStudentRelationDto = (ExamStudentRelationDto)session.getAttribute(SESSION_KEY_EXAM_STUDENT);
+        return testService.saveTrueOrFalseQuestionAnswer(examStudentRelationDto.getId(),testPaperDto);
+    }
+
+    @PostMapping("/v1/test/fillInBlankQuestion/answer")
+    public ResultInfo saveFillInBlankQuestionAnswer(HttpSession session, TestPaperDto testPaperDto) throws Exception{
+
+        System.out.println(testPaperDto.getFillInBlankQuestionAnswer());
+
+        ExamStudentRelationDto examStudentRelationDto = (ExamStudentRelationDto)session.getAttribute(SESSION_KEY_EXAM_STUDENT);
+
+        System.out.println(examStudentRelationDto.getId());
+        return testService.saveFillInBlankQuestionAnswer(examStudentRelationDto.getId(),testPaperDto);
+
+    }
+
+    @PostMapping("/v1/test/testPaper/{testPaperId}")
+    public ResultInfo submitTestPape(HttpSession session, @PathVariable String testPaperId,HttpServletRequest request,HttpServletResponse response) throws Exception{
+
+        ExamStudentRelationDto examStudentRelationDto = (ExamStudentRelationDto)session.getAttribute(SESSION_KEY_EXAM_STUDENT);
+
+        System.out.println(examStudentRelationDto.getId());
+        ResultInfo resultInfo;
+        try {
+            //调用rest服务
+            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+TEST_URL+TEST_TESTPAPER_URL+"/{testPaperId}",HttpMethod.POST,examStudentRelationDto,ResultInfo.class,new Object[]{testPaperId});
+
+            if(resultInfo.getStatus()==ResultInfo.STATUS_RESULT_CREATED){
+                //将学生考试cookie删除
+                Cookie cookie = CookieUtils.getCook(request, examStudentRelationDto.getId());
+                if(cookie!=null){
+                    cookie.setValue(null);
+                    cookie.setMaxAge(0);
+                    cookie.setPath("/");
+                    response.addCookie(cookie);
+                }
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_SAVE_FAIL,null);
+        }
+        return resultInfo;
+
     }
 }
