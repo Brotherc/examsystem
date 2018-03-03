@@ -131,4 +131,9 @@ public class ExamController {
     public ResultInfo test(@RequestBody ExamStudentRelationDto examStudentRelationDto) throws Exception{
         return examService.test(examStudentRelationDto);
     }
+
+    @PostMapping("/v1/test/testPaper/{testPaperId}")
+    public ResultInfo submitTestPape(@RequestBody ExamStudentRelationDto examStudentRelationDto,@PathVariable String testPaperId) throws Exception{
+        return examService.submitTestPape(examStudentRelationDto,testPaperId);
+    }
 }
