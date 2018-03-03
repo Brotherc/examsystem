@@ -59,4 +59,7 @@ public interface ExamService {
     //考试
     public ResultInfo test(ExamStudentRelationDto examStudentRelationDto) throws Exception;
 
+    //提交试卷
+    public ResultInfo submitTestPape(ExamStudentRelationDto examStudentRelationDto,String testPaperId) throws Exception;
+
 }
