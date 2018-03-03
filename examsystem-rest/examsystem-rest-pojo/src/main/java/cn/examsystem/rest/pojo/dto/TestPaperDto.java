@@ -34,7 +34,7 @@ public class TestPaperDto extends TestPaper{
 
     private Map<Integer,String> singleChoiceQuestionAnswer;
     private Map<Integer,String> trueOrFalseQuestionAnswer;
-    private Map<Integer,String> fillInBlankQuestionAnswer;
+    private Map<Integer,List> fillInBlankQuestionAnswer;
 
     public String getSingleChoiceQuestionIds() {
         return singleChoiceQuestionIds;
@@ -164,11 +164,11 @@ public class TestPaperDto extends TestPaper{
         this.trueOrFalseQuestionAnswer = trueOrFalseQuestionAnswer;
     }
 
-    public Map<Integer, String> getFillInBlankQuestionAnswer() {
+    public Map<Integer, List> getFillInBlankQuestionAnswer() {
         return fillInBlankQuestionAnswer;
     }
 
-    public void setFillInBlankQuestionAnswer(Map<Integer, String> fillInBlankQuestionAnswer) {
+    public void setFillInBlankQuestionAnswer(Map<Integer, List> fillInBlankQuestionAnswer) {
         this.fillInBlankQuestionAnswer = fillInBlankQuestionAnswer;
     }
 }
