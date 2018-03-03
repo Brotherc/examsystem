@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpSession;
 import java.util.LinkedHashMap;
@@ -23,8 +23,6 @@ public class PageController {
 
     @Value("${SESSION_KEY_EXAM_STUDENT}")
     private String SESSION_KEY_EXAM_STUDENT;
-    @Value("${SESSION_KEY_EXAM_STUDENT_ID}")
-    private String SESSION_KEY_EXAM_STUDENT_ID;
 
 
     @Value("${REST_BASE_URL}")
@@ -52,7 +50,7 @@ public class PageController {
     @Value("${MODEL_KEY_TESTPAPER}")
     private String MODEL_KEY_TESTPAPER;
 
-    @RequestMapping("/v1/test/testPaper/{testPaperId}")
+    @GetMapping("/v1/test/testPaper/{testPaperId}")
     public String toTestPaperPage(@PathVariable String testPaperId, HttpSession session, Model model) throws Exception{
 
         ExamStudentRelationDto examStudentRelationDto = (ExamStudentRelationDto)session.getAttribute(SESSION_KEY_EXAM_STUDENT);
@@ -63,13 +61,11 @@ public class PageController {
         System.out.println(examStudentRelationDto.getPartOrderStartTime());
         System.out.println(examStudentRelationDto.getTime());
 
-        String examStudentId = (String) session.getAttribute(SESSION_KEY_EXAM_STUDENT_ID);
-
         //加载试卷及题目信息
         TestPaperDto testPaperDto=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+TEST_URL+TEST_TESTPAPER_URL+"/{testPaperId}"+"?examStudentId="+examStudentId, HttpMethod.GET, ResultInfo.class,new Object[]{testPaperId});
+            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+TEST_URL+TEST_TESTPAPER_URL+"/{testPaperId}"+"?examStudentId="+examStudentRelationDto.getId(), HttpMethod.GET, ResultInfo.class,new Object[]{testPaperId});
             LinkedHashMap testPaperMap=(LinkedHashMap)resultInfo.getData();
             String testPaperJson = JsonUtils.objectToJson(testPaperMap);
             testPaperDto=JsonUtils.jsonToPojo(testPaperJson,TestPaperDto.class);
