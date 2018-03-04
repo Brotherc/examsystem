@@ -72,6 +72,12 @@
     <if test="examId!=null and examId!=''">
       and EXAM_STUDENT.exam_id = #{examId}
     </if>
+    <if test="(status!=null and status!='') or status==0">
+      and EXAM_STUDENT.status = #{status}
+    </if>
+    <if test="(isGraded!=null and isGraded!='') or isGraded==0">
+      and EXAM_STUDENT.is_graded = #{isGraded}
+    </if>
   </sql>
 
   <select id="listExam" parameterType="cn.examsystem.rest.pojo.po.Exam" resultMap="examMap">
