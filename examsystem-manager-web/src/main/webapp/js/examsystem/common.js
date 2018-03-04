@@ -41,6 +41,21 @@ var ES = EXAMSYSTEM = {
 		else
 			return "上";
 	},
+    formatIsGraded:function(value, row, index){
+        if(row.isGraded)
+            return "已完成评分";
+        else
+            return "未完成评分";
+    },
+    formatExamStudentStatus:function(value, row, index){
+        if(row.status==0)
+            return "未考";
+        else if(row.status==1)
+            return "进行中";
+        else if(row.status==2)
+        	return "已考";
+    },
+
 
 	// 显示序号
 	showNumber : function(value, row, index){
