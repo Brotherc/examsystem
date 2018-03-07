@@ -700,4 +700,22 @@ public class PageController {
 
         return "score/list";
     }
+
+    @RequestMapping("/v1/student/list")
+    public String toStudentPage(Model model) throws Exception{
+
+        //前台搜索用到的条件（班级）
+        List<ClassDto> classList=null;
+        try {
+            //调用rest服务
+            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+CLASS_URL, HttpMethod.GET, ResultInfo.class,new Object[]{});
+            classList=(List<ClassDto>) resultInfo.getData();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        model.addAttribute(MODEL_KEY_CLASSES,classList);
+
+        return "student/list";
+    }
 }
