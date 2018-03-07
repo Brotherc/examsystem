@@ -281,26 +281,83 @@
                             <input type="hidden" name="id">
                             <input type="hidden" name="_method" value="put">
                             <p>欢迎修改考试(⊙o⊙)</p>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">名称：</label>
-                                <div class="col-sm-6">
-                                    <input type="text" placeholder="专业名称" class="form-control" name="name">
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label">开考时间：</label>
+                                <div class="col-sm-6 " >
+                                    <div class="input-group date"  >
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        <input type="text" class="form-control"  name="startTime" id="startTime_update">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" >
+                                <label class="col-sm-3 control-label">结束时间：</label>
+                                <div class="col-sm-6 " >
+                                    <div class="input-group date" >
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        <input type="text" class="form-control"  name="endTime" id="endTime_update">
+                                    </div>
                                 </div>
                             </div>
                             <div class="form-group " >
-                                <label class="col-sm-3 control-label">系名称：</label>
+                                <label class="col-sm-3 control-label">试卷：</label>
                                 <div class=" col-sm-6">
-                                    <select data-placeholder="选择系..." class="form-control chosen-select " style="width:50px;" tabindex="2" id="major_update"  name="departmentId">
-                                        <option value="">请选择系</option>
-                                        <c:forEach items="${departments}" var="department">
-                                            <option value="${department.id}" hassubinfo="true">${department.name}</option>
+                                    <select data-placeholder="选择试卷..." class="form-control chosen-select " style="width:50px;" tabindex="2" id="testPaper_update"  name="testPaperId">
+                                        <c:forEach items="${testPapers}" var="testPaper">
+                                            <option value="${testPaper.id}" hassubinfo="true">${testPaper.name}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group " >
+                                <label class="col-sm-3 control-label">学年：</label>
+                                <div class=" col-sm-6">
+                                    <select data-placeholder="选择学年..." class="form-control chosen-select " style="width:270px;" tabindex="2" id="schoolYear_update"  name="schoolYearId">
+                                        <option value="">请选择学年</option>
+                                        <c:forEach items="${schoolYears}" var="schoolYear">
+                                            <option value="${schoolYear.id}" hassubinfo="true">${schoolYear.name}</option>
                                         </c:forEach>
                                     </select>
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label class="col-sm-3 control-label">学期：</label>
+                                <div class=" col-sm-6">
+                                    <div class="radio i-checks">
+                                        <input type="radio" value="1" name="term" > <i></i> 上
+                                        <input type="radio"  value="0" name="term"> <i></i> 下
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">场次：</label>
+                                <div class="col-sm-6 " >
+                                    <div class="input-group spinner" data-trigger="spinner" >
+                                        <input type="text" class="form-control" value="1" data-max="20" data-min="1" data-step="1" name="partNum" id="partNum_update">
+                                        <span class="input-group-addon">
+                                                <a href="javascript:;" class="spin-up" data-spin="up"><i class="fa fa-caret-up"></i></a>
+                                                <a href="javascript:;" class="spin-down" data-spin="down"><i class="fa fa-caret-down"></i></a>
+                                        </span>
+                                    </div>
+                                    <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 如果场次大于1，则时间间隔不能为0</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">场次间隔时间：</label>
+                                <div class="col-sm-6 " >
+                                    <div class="input-group spinner" data-trigger="spinner" >
+                                        <input type="text" class="form-control" value="0" data-max="3600" data-min="0" data-step="1" name="intervalTime" id="intervalTime_update">
+                                        <span class="input-group-addon">
+                                                <a href="javascript:;" class="spin-up" data-spin="up"><i class="fa fa-caret-up"></i></a>
+                                                <a href="javascript:;" class="spin-down" data-spin="down"><i class="fa fa-caret-down"></i></a>
+                                            </span>
+                                    </div>
+                                    <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 时间间隔单位：秒；如果场次为1，则时间间隔为0</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <div class="col-sm-offset-3 col-sm-6">
-                                    <button data-toggle="button" class="btn btn-primary btn-outline" type="button" onclick="updateMajor()">修改</button>
+                                    <button data-toggle="button" class="btn btn-primary btn-outline" type="button" onclick="updateExam()">修改</button>
                                 </div>
                             </div>
                         </form>
@@ -720,6 +777,33 @@
                     });
         }
 
+        function openUpdateExamModal() {
+            var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
+            if(sels.length == 0){
+                layer.msg("必须选择一门考试才能进行修改!");
+                return ;
+            }else if(sels.length >1){
+                layer.msg("只能选择一门考试!");
+                return ;
+            }
+
+            var exam=sels[0];
+            //数据回显
+            $("#exam-update-form [name=id]").val(exam.id);
+
+            $(".i-checks").iCheck("uncheck");
+            $("#exam-update-form input[value='"+exam.term+"']").iCheck('check');
+            $("#partNum_update").val(exam.partNum);
+            $("#intervalTime_update").val(exam.intervalTime);
+            $("#startTime_update").val(ES.formatDateTime(exam.startTime));
+            $("#endTime_update").val(ES.formatDateTime(exam.endTime));
+
+            $("#schoolYear_update").val(exam.schoolYearId).trigger("chosen:updated");
+            $("#testPaper_update").val(exam.testPaperId).trigger("chosen:updated");
+
+            $("#modal-form-update").modal('show');
+        }
+
         function openCustomAddStudentModal() {
             var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
             if(sels.length == 0){
@@ -937,27 +1021,39 @@
                 });
         }
 
-        function updateMajor(){
+        function updateExam(){
             //表单校验
-            if($("#major-update-form [name=name]").val().trim()==''){
-                layer.msg("名字不能为空!");
+            var startTime=$("#exam-update-form [name=startTime]").val();
+            if(startTime.trim()==''){
+                layer.msg("开考时间不能为空!");
                 return ;
             }
-            if($("#major-update-form [name=departmentId]").val().trim()==''){
-                layer.msg("系名字不能为空!");
+            var endTime=$("#exam-update-form [name=endTime]").val();
+            if(endTime.trim()==''){
+                layer.msg("结束时间不能为空!");
                 return ;
             }
+            if($("#exam-update-form [name=schoolYearId]").val().trim()==''){
+                layer.msg("学年不能为空!");
+                return ;
+            }
+            if($("#partNum_update").val()>1&&$("#intervalTime_update").val()=="0"){
+                layer.msg("时间间隔不能为空!");
+                return ;
+            }
+            //ajax的post方式提交表单
+            //$("#itemAddForm").serialize()将表单序列号为key-value形式的字符串
 
-            var id=$("#major-update-form [name=id]").val();
+            var id=$("#exam-update-form [name=id]").val();
 
             $.ajax({
                 type: "POST",
-                url: "/v1/major/"+id,
-                data: decodeURIComponent($("#major-update-form").serialize().replace(/\+/g,"")),
+                url: "/v1/exam/"+id,
+                data: $("#exam-update-form").serialize(),
                 success: function(data){
                     if(data.status == 201){
                         $("#modal-form-update").modal('hide');
-                        swal(data.message, "您已经成功修改了该专业。", "success");
+                        swal(data.message, "您已经成功修改了该考试。", "success");
                         $("#exampleTableEvents").bootstrapTable('refresh');
                     }
                     else{
@@ -973,25 +1069,9 @@
                     }
                 }
             });
-        }
 
-        function openUpdateMajorModal(){
-            var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
-            if(sels.length == 0){
-                layer.msg("必须选择一个专业才能修改!");
-                return ;
-            }else if(sels.length >1){
-                layer.msg("只能选择一个专业!");
-                return ;
-            }
-            var name=sels[0].name;
-            var id=sels[0].id;
-            var departmentId=sels[0].departmentId;
+            var id=$("#major-update-form [name=id]").val();
 
-            $("#modal-form-update").modal('show');
-            $("#major-update-form [name=name]").val(name);
-            $("#major-update-form [name=id]").val(id);
-            $("#major_update").val(departmentId).trigger("chosen:updated");
         }
 
         function searchData(e,data){
@@ -1400,7 +1480,8 @@
             $("#schoolYear_add").val("").trigger("chosen:updated");
         });
         $("#modal-form-update").on('shown.bs.modal',function () {
-            $("#major_update_chosen").width(270);
+            $("#testPaper_update_chosen").width(270);
+            $("#schoolYear_update_chosen").width(270);
         });
         $("#modal-form-customAddStudent").on('shown.bs.modal',function () {
             $("#class_add_chosen").width(270);
