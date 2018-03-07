@@ -73,6 +73,23 @@ public class ExamController {
         return resultInfo;
     }
 
+    @GetMapping("/v1/exam/{id}")
+    public ResultInfo getExam(@PathVariable String id) throws Exception{
+
+        ResultInfo resultInfo;
+        try{
+
+            //调用rest服务
+            resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+EXAM_URL+"/{id}", HttpMethod.GET, ResultInfo.class,new Object[]{id});
+            System.out.println("---------"+resultInfo);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("---------"+"失败");
+            return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_GET_FAIL,null);
+        }
+        return resultInfo;
+    }
+
     @DeleteMapping("/v1/exam")
     public ResultInfo btchDeleteExam(@RequestParam(value = "ids[]") String[] ids) throws Exception{
 
