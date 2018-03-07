@@ -2,13 +2,13 @@ package cn.examsystem.rest.controller;
 
 import cn.examsystem.common.pojo.ResultInfo;
 import cn.examsystem.rest.pojo.po.Student;
+import cn.examsystem.rest.pojo.vo.StudentVo;
 import cn.examsystem.rest.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Created by Administrator on 2018/1/30.
@@ -25,23 +25,23 @@ public class StudentController {
     @Autowired
     private StudentService studentService;
 
-/*    @GetMapping("/v1/student")
-    public ResultInfo listStudent(Student student) throws Exception{
-        List<MajorDto> majorList = majorService.listMajor(majorVo);
-        ResultInfo resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,majorList);
+    @GetMapping("/v1/student")
+    public ResultInfo listStudent(StudentVo studentVo) throws Exception{
+        List<Student> studentList = studentService.listStudent(studentVo);
+        ResultInfo resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,studentList);
         return resultInfo;
-    }*/
+    }
 
-/*    @DeleteMapping(value = "/v1/major")
-    public ResultInfo btchDeleteMajor(@RequestBody String[] ids) throws Exception{
+    @DeleteMapping(value = "/v1/student")
+    public ResultInfo btchDeleteStudent(@RequestBody String[] ids) throws Exception{
 
         return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_DELETE_SUCCESS,null);
-    }*/
+    }
 
-/*    @PostMapping("/v1/major")
-    public ResultInfo saveMajor(@RequestBody Major major) throws Exception{
-        return majorService.saveMajor(major);
-    }*/
+    @PostMapping("/v1/student")
+    public ResultInfo saveStudent(@RequestBody Student student) throws Exception{
+        return studentService.saveStudent(student);
+    }
 
     @PutMapping("/v1/student/{id}")
     public ResultInfo updateStudent(@PathVariable String id,@RequestBody Student student) throws Exception{
