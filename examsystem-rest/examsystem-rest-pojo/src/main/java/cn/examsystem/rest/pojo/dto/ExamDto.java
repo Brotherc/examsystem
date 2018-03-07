@@ -7,6 +7,7 @@ import cn.examsystem.rest.pojo.po.Exam;
  * 班级
  */
 public class ExamDto extends Exam{
+    private String testPaperName;
     private String courseName;
     private String schoolYearName;
     private String statusName;
@@ -42,5 +43,13 @@ public class ExamDto extends Exam{
 
     public void setCreatedTeacherName(String createdTeacherName) {
         this.createdTeacherName = createdTeacherName;
+    }
+
+    public String getTestPaperName() {
+        return testPaperName;
+    }
+
+    public void setTestPaperName(String testPaperName) {
+        this.testPaperName = testPaperName;
     }
 }
