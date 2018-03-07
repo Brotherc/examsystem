@@ -4,10 +4,7 @@ import cn.examsystem.common.jedis.JedisClient;
 import cn.examsystem.common.pojo.ResultInfo;
 import cn.examsystem.common.utils.*;
 import cn.examsystem.rest.mapper.*;
-import cn.examsystem.rest.pojo.dto.ClassDto;
-import cn.examsystem.rest.pojo.dto.ExamDto;
-import cn.examsystem.rest.pojo.dto.ExamStudentRelationDto;
-import cn.examsystem.rest.pojo.dto.StudentDto;
+import cn.examsystem.rest.pojo.dto.*;
 import cn.examsystem.rest.pojo.po.Class;
 import cn.examsystem.rest.pojo.po.*;
 import cn.examsystem.rest.pojo.vo.ClassVo;
@@ -1369,5 +1366,23 @@ public class ExamImpl implements ExamService {
 
         return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_POST_SUCCESS,null);
 
+    }
+
+    @Override
+    public ExamDto getExam(String id) throws Exception {
+        Exam exam = examMapper.selectByPrimaryKey(id);
+        ExamDto examDto=null;
+        if(exam!=null) {
+            examDto = new ExamDto();
+
+            //构造fillInBlankQuestionDto
+            BeanUtils.copyProperties(exam,examDto);
+
+            //查询试卷信息
+            TestPaper testPaper = testPaperMapper.selectByPrimaryKey(exam.getTestPaperId());
+
+            examDto.setTestPaperName(testPaper.getName());
+        }
+        return examDto;
     }
 }
