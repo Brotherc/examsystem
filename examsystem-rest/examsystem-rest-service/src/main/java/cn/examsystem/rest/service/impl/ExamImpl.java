@@ -292,38 +292,124 @@ public class ExamImpl implements ExamService {
     @Override
     public ResultInfo updateExam(String id, Exam exam) throws Exception {
 
-/*        //id不允许为空
+
+        //id不允许为空
         if(StringUtils.isBlank(id))
-            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_DEPARTMENT_ID_NOT_NULL,null);
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_ID_NOT_NULL,null);
 
-        //名字不允许为空
-        String departmentName=department.getName();
-        if(StringUtils.isBlank(departmentName))
-            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_DEPARTMENT_NAME_NOT_NULL,null);
+        //id对应专业必须存在
+        Exam examDb = examMapper.selectByPrimaryKey(id);
+        if(examDb==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_NOT_EXIST,null);
 
-        //id对应系必须存在
-        Department departmentDb = departmentMapper.selectByPrimaryKey(id);
+        //只能修改状态为未启动的考试
+        if(!examDb.getStatus().equals(new Integer(DICTINFO_EXAM_NOT_START_CODE)))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_IS_STARTED,null);
 
-        if(departmentDb==null)
-            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_DEPARTMENT_NOT_EXIST,null);
+        Date startTime = exam.getStartTime();
+        if(startTime==null){
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_START_TIME_NOT_NULL,null);
+        }
 
-        departmentName=departmentName.trim();
-        //若对系信息进行了修改
-        if(!StringUtils.equals(departmentName,departmentDb.getName())){
-            //则不允许与已存在的系信息重复
-            DepartmentExample departmentExample=new DepartmentExample();
-            DepartmentExample.Criteria departmentCriteria = departmentExample.createCriteria();
-            departmentCriteria.andNameEqualTo(departmentName);
-            List<Department> departmentList = departmentMapper.selectByExample(departmentExample);
-            if(!CollectionUtils.isEmpty(departmentList)){
-                return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_DEPARTMENT_NAME_NOT_REPEAT,null);
+        System.out.println(startTime);
+        Date endTime = exam.getEndTime();
+        if(endTime==null){
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_END_TIME_NOT_NULL,null);
+        }
+
+        //试卷id不能为空
+        String testPaperId = exam.getTestPaperId();
+        if(StringUtils.isBlank(testPaperId)){
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TESTPAPER_ID_NOT_NULL,null);
+        }
+        //学年id不能为空
+        String examSchoolYearId=exam.getSchoolYearId();
+        if(StringUtils.isBlank(examSchoolYearId))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_SCHOOLYEAR_ID_NOT_NULL,null);
+
+        //学期不能为空
+        Integer term = exam.getTerm();
+        if(term==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TERM_NOT_NULL,null);
+
+        //场次不能为空
+        Integer partNum = exam.getPartNum();
+        if(partNum==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_PART_NUM_NOT_NULL,null);
+
+        //如果场次大于1，则间隔时间不能为空
+        Integer intervalTime = exam.getIntervalTime();
+        if(partNum>1&&intervalTime==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_INTERVAL_TIME_NOT_NULL,null);
+
+        //修改的考试所属的试卷必须存在
+        TestPaper testPaperDb = testPaperMapper.selectByPrimaryKey(testPaperId);
+        if(testPaperDb==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TESTPAPER_NOT_EXIST,null);
+
+        //修改的考试的学年必须存在
+        SchoolYear schoolYear = schoolYearMapper.selectByPrimaryKey(examSchoolYearId);
+        if(schoolYear==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_SCHOOLYEAR_NOT_EXIST,null);
+
+        examDb.setTestPaperId(testPaperId);
+        examDb.setSchoolYearId(examSchoolYearId);
+        examDb.setTerm(term);
+        examDb.setPartNum(partNum);
+        examDb.setIntervalTime(intervalTime);
+
+        long time = (endTime.getTime() - startTime.getTime()) / 1000;
+        examDb.setTime((int)time);
+        examDb.setStartTime(startTime);
+        examDb.setEndTime(endTime);
+        //补全创建时间，更新时间
+        examDb.setUpdatedTime(new Date());
+
+        //更新考试
+        examMapper.updateByPrimaryKey(examDb);
+
+        //如果场次不为1，重新为该门考试的学生分配场次
+        if(partNum!=1){
+            ExamStudentRelationExample examStudentRelationExample=new ExamStudentRelationExample();
+            ExamStudentRelationExample.Criteria examStudentRelationCriteria = examStudentRelationExample.createCriteria();
+            examStudentRelationCriteria.andExamIdEqualTo(id);
+            List<ExamStudentRelation> examStudentRelationList = examStudentRelationMapper.selectByExample(examStudentRelationExample);
+            if(!CollectionUtils.isEmpty(examStudentRelationList)){//该门考试存在学生
+                //该门考试学生总人数
+                int studentNum=examStudentRelationList.size();
+                //平均每场次学生人数
+                int avgStudentNum=studentNum/partNum;
+
+                int index=0;//初始化分配场次
+                int remainStudent=studentNum%partNum;//无法整数分配剩余学生人数
+
+                for(int i=0;i<examStudentRelationList.size()-remainStudent;i++){
+                    if(i%avgStudentNum==0)
+                        index++;
+                    //更新考试学生场次信息
+                    ExamStudentRelation examStudentRelation = examStudentRelationList.get(i);
+                    examStudentRelation.setPartOrder(index);
+                    examStudentRelation.setUpdatedTime(new Date());
+                    examStudentRelationMapper.updateByPrimaryKey(examStudentRelation);
+                }
+
+                //重新分配剩余人数
+                index=1;
+                if(remainStudent!=0){
+                    for(int i=examStudentRelationList.size()-remainStudent;i<examStudentRelationList.size();i++){
+                        //更新考试学生场次信息
+                        ExamStudentRelation examStudentRelation = examStudentRelationList.get(i);
+                        examStudentRelation.setPartOrder(index);
+                        examStudentRelation.setUpdatedTime(new Date());
+                        examStudentRelationMapper.updateByPrimaryKey(examStudentRelation);
+                        index++;
+                    }
+                }
+
+
             }
+        }
 
-            //更新系
-            departmentDb.setName(departmentName);
-            departmentDb.setUpdatedTime(new Date());
-            departmentMapper.updateByPrimaryKey(departmentDb);
-        }*/
 
         return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_PUT_SUCCESS,null);
     }
