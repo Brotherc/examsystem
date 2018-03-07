@@ -20,6 +20,9 @@ public interface ExamService {
     //根据条件查询考试
     public List<ExamDto>listExam(Exam exam) throws Exception;
 
+    //根据id查询考试
+    public ExamDto getExam(String id) throws Exception;
+
     //添加考试
     public ResultInfo saveExam(Exam exam) throws Exception;
 
