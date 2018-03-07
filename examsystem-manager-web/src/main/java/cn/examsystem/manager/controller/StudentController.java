@@ -3,11 +3,13 @@ package cn.examsystem.manager.controller;
 import cn.examsystem.common.pojo.ResultInfo;
 import cn.examsystem.manager.utils.RestTemplateUtils;
 import cn.examsystem.rest.pojo.po.Student;
+import cn.examsystem.rest.pojo.vo.StudentVo;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import static cn.examsystem.common.utils.UrlUtils.expandURL;
 
 /**
  * Created by Administrator on 2018/1/28.
@@ -30,14 +32,14 @@ public class StudentController {
     @Value("${MESSAGE_UPDATE_FAIL}")
     private String MESSAGE_UPDATE_FAIL;
 
-/*    @GetMapping("/v1/major")
-    public ResultInfo listMajor(MajorVo majorVo) throws Exception{
+    @GetMapping("/v1/student")
+    public ResultInfo listStudent(StudentVo studentVo) throws Exception{
 
         ResultInfo resultInfo;
         try{
             //将查询参数构建在url后面
-            JSONObject obj=new JSONObject(majorVo);
-            String url = expandURL(REST_BASE_URL + MAJOR_URL+"?", obj);
+            JSONObject obj=new JSONObject(studentVo);
+            String url = expandURL(REST_BASE_URL + STUDENT_URL+"?", obj);
 
             System.out.print(url);
 
@@ -50,36 +52,35 @@ public class StudentController {
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_GET_FAIL,null);
         }
         return resultInfo;
-    }*/
+    }
 
-/*    @DeleteMapping("/v1/major")
-    public ResultInfo btchDeleteMajor(@RequestParam(value = "ids[]") String[] ids) throws Exception{
+    @DeleteMapping("/v1/student")
+    public ResultInfo btchDeleteStudent(@RequestParam(value = "ids[]") String[] ids) throws Exception{
 
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+MAJOR_URL,HttpMethod.DELETE,ids,ResultInfo.class,new Object[]{});
+            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+STUDENT_URL,HttpMethod.DELETE,ids,ResultInfo.class,new Object[]{});
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_DELETE_FAIL,null);
         }
         return resultInfo;
-    }*/
-/*
-    @PostMapping("/v1/major")
-    public ResultInfo saveMajor(Major major) throws Exception{
+    }
+
+    @PostMapping("/v1/student")
+    public ResultInfo saveStudent(Student student) throws Exception{
 
         ResultInfo resultInfo;
-        System.out.println(major);
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+MAJOR_URL,HttpMethod.POST,major,ResultInfo.class,new Object[]{});
+            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+STUDENT_URL,HttpMethod.POST,student,ResultInfo.class,new Object[]{});
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_SAVE_FAIL,null);
         }
         return resultInfo;
-    }*/
+    }
 
     @PutMapping("/v1/student/{id}")
     public ResultInfo updateStudent(@PathVariable String id, Student student) throws Exception{
