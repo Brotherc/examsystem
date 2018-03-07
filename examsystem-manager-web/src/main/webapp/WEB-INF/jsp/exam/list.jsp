@@ -367,6 +367,39 @@
         </div>
     </div>
 
+    <!-- 查看详情考试modal -->
+    <div id="modal-form-details" class="modal fade" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row">
+                        <form class="form-horizontal" id="question-details-form">
+                            <p>欢迎查看该考试(⊙o⊙)</p>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">试卷：</label>
+                                <div class="col-sm-6">
+                                    <p class="form-control-static" id="testPaper_details"></p>
+                                </div>
+                            </div>
+                            <div class="form-group " >
+                                <label class="col-sm-3 control-label">场次：</label>
+                                <div class=" col-sm-6">
+                                    <p class="form-control-static" id="partNum_details"></p>
+                                </div>
+                            </div>
+                            <div class="form-group " >
+                                <label class="col-sm-3 control-label">场次间隔时间：</label>
+                                <div class=" col-sm-6">
+                                    <p class="form-control-static" id="intervalTime_details"></p>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 自定义添加考试学生modal -->
     <div id="modal-form-customAddStudent" class="modal fade" aria-hidden="true">
         <div class="modal-dialog">
@@ -1208,7 +1241,37 @@
 
         window.operateEvents={
             "click #examDetails":function (e,value,row,index) {
-                alert("详情");
+                console.log(row);
+                //发送ajax请求题目详情
+                $.ajax({
+                    type: "GET",
+                    url: "/v1/exam/"+row.id,
+                    data: null,
+                    success: function(data){
+                        if(data.status == 200){
+
+                            //赋值
+                            var examDetails=data.data;
+
+                            $("#testPaper_details").text(examDetails.testPaperName);
+                            $("#partNum_details").text(examDetails.partNum);
+                            $("#intervalTime_details").text(examDetails.intervalTime);
+
+                            $("#modal-form-details").modal('show');
+                        }
+                        else{
+                            swal("查看失败",data.message, "error");
+                        }
+                    },
+                    error:function(XMLHttpRequest, textStatus, errorThrown){
+                        var status=XMLHttpRequest.status;
+                        if(status==403){
+                            to403();
+                        }else if(status==500){
+                            to500();
+                        }
+                    }
+                });
 
             },
             "click #startExam":function (e,value,row,index) {
