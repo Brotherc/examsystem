@@ -42,6 +42,14 @@ public class ExamController {
 
         return resultInfo;
     }
+    @GetMapping("/v1/exam/{id}")
+    public ResultInfo getExam(@PathVariable String id) throws Exception{
+        ExamDto exam = examService.getExam(id);
+        ResultInfo resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,exam);
+        System.out.println("rest调用成功，返回manager");
+
+        return resultInfo;
+    }
 
     @DeleteMapping(value = "/v1/exam")
     public ResultInfo btchDeleteExam(@RequestBody String[] ids) throws Exception{
