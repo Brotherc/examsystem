@@ -71,13 +71,13 @@ public class TestPaperImpl implements TestPaperService {
     private String MESSAGE_TESTPAPER_NOT_EXIST;
     @Value("${MESSAGE_TESTPAPER_NOT_AUTHO}")
     private String MESSAGE_TESTPAPER_NOT_AUTHO;
-
+    @Value("${MESSAGE_TESTPAPER_IS_IN_EXAM}")
+    private String MESSAGE_TESTPAPER_IS_IN_EXAM;
 
     @Value("${MESSAGE_POST_SUCCESS}")
     private String MESSAGE_POST_SUCCESS;
     @Value("${MESSAGE_PUT_SUCCESS}")
     private String MESSAGE_PUT_SUCCESS;
-
 
     @Value("${DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE}")
     private String DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE;
@@ -85,6 +85,10 @@ public class TestPaperImpl implements TestPaperService {
     private String DICTINFO_TRUEORFALSEQUESTION_TYPE_CODE;
     @Value("${DICTINFO_FILLINBLANKQUESTION_TYPE_CODE}")
     private String DICTINFO_FILLINBLANKQUESTION_TYPE_CODE;
+    @Value("${DICTINFO_EXAM_IS_END_CODE}")
+    private String DICTINFO_EXAM_IS_END_CODE;
+    @Value("${DICTINFO_EXAM_IS_PROCEED_CODE}")
+    private String DICTINFO_EXAM_IS_PROCEED_CODE;
 
     @Value("${REDIS_KEY_SINGLE_CHOICE_QUESTION_ORDER}")
     private String REDIS_KEY_SINGLE_CHOICE_QUESTION_ORDER;
@@ -118,6 +122,8 @@ public class TestPaperImpl implements TestPaperService {
     private FillInBlankQuestionMapper fillInBlankQuestionMapper;
     @Autowired
     private TestpaperQuestionRelationMapper testpaperQuestionRelationMapper;
+    @Autowired
+    private ExamMapper examMapper;
 
     @Override
     public TestPaperDto getTestPaper(String id) throws Exception {
@@ -424,6 +430,23 @@ public class TestPaperImpl implements TestPaperService {
         if(StringUtils.isBlank(id))
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TESTPAPER_ID_NOT_NULL,null);
 
+        //id对应试卷必须存在
+        TestPaper testPaperDb = testPaperMapper.selectByPrimaryKey(id);
+        if(testPaperDb==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TESTPAPER_NOT_EXIST,null);
+
+        //如果存在使用过该试卷的已结束考试或正在进行的考试则不允许修改
+        ExamExample examExample=new ExamExample();
+        ExamExample.Criteria examCriteria = examExample.createCriteria();
+        examCriteria.andTestPaperIdEqualTo(id);
+        List<Integer> examStatusList=new ArrayList<>();
+        examStatusList.add(new Integer(DICTINFO_EXAM_IS_END_CODE));
+        examStatusList.add(new Integer(DICTINFO_EXAM_IS_PROCEED_CODE));
+        examCriteria.andStatusIn(examStatusList);
+        List<Exam> examList = examMapper.selectByExample(examExample);
+        if(!CollectionUtils.isEmpty(examList))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TESTPAPER_IS_IN_EXAM,null);
+
         //名字不能为空
         String testPaperDtoName = testPaperDto.getName();
         if(StringUtils.isBlank(testPaperDtoName))
@@ -458,11 +481,6 @@ public class TestPaperImpl implements TestPaperService {
 
         if(singleChoiceQuestionNum==null&&trueOrFalseQuestionNum==null&&fillInBlankQuestionNum==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_QUESTION_NUM_NOT_NULL,null);
-
-        //id对应试卷必须存在
-        TestPaper testPaperDb = testPaperMapper.selectByPrimaryKey(id);
-        if(testPaperDb==null)
-            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TESTPAPER_NOT_EXIST,null);
 
         //只有该试卷创建教师才允许修改试卷
         if(!StringUtils.equals(testPaperDb.getCreatedTeacherId(),createdTeacherId))

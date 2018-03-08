@@ -79,6 +79,8 @@ public class ExamImpl implements ExamService {
     private String MESSAGE_CLASS_ID_NOT_NULL;
     @Value("${MESSAGE_STUDENT_EXAM_PARTORDER_NOT_NULL}")
     private String MESSAGE_STUDENT_EXAM_PARTORDER_NOT_NULL;
+    @Value("${MESSAGE_STUDENT_EXAM_IS_END}")
+    private String MESSAGE_STUDENT_EXAM_IS_END;
     @Value("${MESSAGE_EXAM_NOT_EXIST}")
     private String MESSAGE_EXAM_NOT_EXIST;
     @Value("${MESSAGE_CLASS_NOT_EXIST}")
@@ -101,6 +103,8 @@ public class ExamImpl implements ExamService {
     private String MESSAGE_EXAM_NOT_STARTTIME;
     @Value("${MESSAGE_EXAM_IS_STARTED}")
     private String MESSAGE_EXAM_IS_STARTED;
+    @Value("${MESSAGE_EXAM_IS_NOT_STARTED}")
+    private String MESSAGE_EXAM_IS_NOT_STARTED;
     @Value("${MESSAGE_EXAM_PWD_NOT_NULL}")
     private String MESSAGE_EXAM_PWD_NOT_NULL;
     @Value("${MESSAGE_EXAM_PWD_NOT_SAME}")
@@ -111,11 +115,16 @@ public class ExamImpl implements ExamService {
     private String MESSAGE_INVIGILATE_PWD_NOT_NULL;
     @Value("${MESSAGE_INVIGILATE_PWD_NOT_SAME}")
     private String MESSAGE_INVIGILATE_PWD_NOT_SAME;
+    @Value("${MESSAGE_STUDENT_NO_EXIST_COURSE}")
+    private String MESSAGE_STUDENT_NO_EXIST_COURSE;
 
     @Value("${DICTINFO_EXAM_NOT_START_CODE}")
     private String DICTINFO_EXAM_NOT_START_CODE;
     @Value("${DICTINFO_EXAM_IS_PROCEED_CODE}")
     private String DICTINFO_EXAM_IS_PROCEED_CODE;
+    @Value("${DICTINFO_EXAM_IS_END_CODE}")
+    private String DICTINFO_EXAM_IS_END_CODE;
+
     @Value("${DICTINFO_STUDENT_EXAM_NOT_START_CODE}")
     private String DICTINFO_STUDENT_EXAM_NOT_START_CODE;
     @Value("${DICTINFO_STUDENT_STATUS_IS_STTOP_CODE}")
@@ -137,6 +146,9 @@ public class ExamImpl implements ExamService {
     private String MESSAGE_PUT_SUCCESS;
     @Value("${MESSAGE_DELETE_SUCCESS}")
     private String MESSAGE_DELETE_SUCCESS;
+    @Value("${MESSAGE_GET_SUCCESS}")
+    private String MESSAGE_GET_SUCCESS;
+
 
     @Value("${FILE_PATH_PRE_EXAM_STUDENT_EXCEL}")
     private String FILE_PATH_PRE_EXAM_STUDENT_EXCEL;
@@ -160,6 +172,7 @@ public class ExamImpl implements ExamService {
     private String DICTINFO_TRUEORFALSEQUESTION_TYPE_CODE;
     @Value("${DICTINFO_FILLINBLANKQUESTION_TYPE_CODE}")
     private String DICTINFO_FILLINBLANKQUESTION_TYPE_CODE;
+
 
     @Autowired
     private JedisClient jedisClient;
@@ -192,6 +205,8 @@ public class ExamImpl implements ExamService {
     private TestpaperQuestionRelationMapper testpaperQuestionRelationMapper;
     @Autowired
     private ExamstudentAnswerMapper examstudentAnswerMapper;
+    @Autowired
+    private CourseMajorRelationMapper courseMajorRelationMapper;
 
     @Override
     public List<ExamDto> listExam(Exam exam) throws Exception {
@@ -238,9 +253,9 @@ public class ExamImpl implements ExamService {
         if(partNum==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_PART_NUM_NOT_NULL,null);
 
-        //如果场次大于1，则间隔时间不能为空
+        //如果场次大于1，则间隔时间不能为空或0
         Integer intervalTime = exam.getIntervalTime();
-        if(partNum>1&&intervalTime==null)
+        if(partNum>1&&(intervalTime==null||intervalTime==0))
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_INTERVAL_TIME_NOT_NULL,null);
 
         //创建考试教师id不能为空
@@ -294,7 +309,7 @@ public class ExamImpl implements ExamService {
         if(StringUtils.isBlank(id))
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_ID_NOT_NULL,null);
 
-        //id对应专业必须存在
+        //id对应考试必须存在
         Exam examDb = examMapper.selectByPrimaryKey(id);
         if(examDb==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_NOT_EXIST,null);
@@ -334,9 +349,9 @@ public class ExamImpl implements ExamService {
         if(partNum==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_PART_NUM_NOT_NULL,null);
 
-        //如果场次大于1，则间隔时间不能为空
+        //如果场次大于1，则间隔时间不能为空或0
         Integer intervalTime = exam.getIntervalTime();
-        if(partNum>1&&intervalTime==null)
+        if(partNum>1&&(intervalTime==null||intervalTime==0))
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_INTERVAL_TIME_NOT_NULL,null);
 
         //修改的考试所属的试卷必须存在
@@ -417,6 +432,15 @@ public class ExamImpl implements ExamService {
         if(StringUtils.isBlank(id))
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_ID_NOT_NULL,null);
 
+        //为学生添加的考试必须存在
+        Exam exam = examMapper.selectByPrimaryKey(id);
+        if(exam==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_NOT_EXIST,null);
+
+        //只允许为未启动的考试添加考试学生
+        if(!exam.getStatus().equals(new Integer(DICTINFO_EXAM_NOT_START_CODE)))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_IS_STARTED,null);
+
         //学生不允许为空
         if(studentDto==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_STUDENT_NOT_NULL,null);
@@ -444,11 +468,6 @@ public class ExamImpl implements ExamService {
         if(partOrder==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_STUDENT_EXAM_PARTORDER_NOT_NULL,null);
 
-        //为学生添加的考试必须存在
-        Exam exam = examMapper.selectByPrimaryKey(id);
-        if(exam==null)
-            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_NOT_EXIST,null);
-
         //学生班级必须存在
         Class aClass = classMapper.selectByPrimaryKey(classId);
         if(aClass==null)
@@ -458,6 +477,14 @@ public class ExamImpl implements ExamService {
         if(partOrder>exam.getPartNum())
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_PART_ORDER_MORE,null);
 
+        //学生所属专业必须存在该门考试的考试科目
+        CourseMajorRelationExample courseMajorRelationExample=new CourseMajorRelationExample();
+        CourseMajorRelationExample.Criteria courseMajorRelationCriteria = courseMajorRelationExample.createCriteria();
+        courseMajorRelationCriteria.andCourseIdEqualTo(exam.getCourseId());
+        courseMajorRelationCriteria.andMajorIdEqualTo(aClass.getMajorId());
+        List<CourseMajorRelation> courseMajorRelationList = courseMajorRelationMapper.selectByExample(courseMajorRelationExample);
+        if(CollectionUtils.isEmpty(courseMajorRelationList))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_STUDENT_NO_EXIST_COURSE,null);
 
         Student student=null;
 
@@ -541,6 +568,10 @@ public class ExamImpl implements ExamService {
         if(exam==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_NOT_EXIST,null);
 
+        //只允许为未启动的考试添加考试学生
+        if(!exam.getStatus().equals(new Integer(DICTINFO_EXAM_NOT_START_CODE)))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_IS_STARTED,null);
+
         //studentIds对应学生存在，并且状态正常
         for(String studentId:studentIds){
             Student student = studentMapper.selectByPrimaryKey(studentId);
@@ -548,7 +579,20 @@ public class ExamImpl implements ExamService {
                 return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_STUDENT_NOT_EXIST,null);
             if(student.getStatus()==new Integer(DICTINFO_STUDENT_STATUS_IS_STTOP_CODE))
                 return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_STUDENT_STATUS_IS_STOP,null);
+
+            //学生所属专业必须存在该门考试的考试科目
+            Class aClass = classMapper.selectByPrimaryKey(student.getClassId());
+            if(aClass!=null){
+                CourseMajorRelationExample courseMajorRelationExample=new CourseMajorRelationExample();
+                CourseMajorRelationExample.Criteria courseMajorRelationCriteria = courseMajorRelationExample.createCriteria();
+                courseMajorRelationCriteria.andCourseIdEqualTo(exam.getCourseId());
+                courseMajorRelationCriteria.andMajorIdEqualTo(aClass.getMajorId());
+                List<CourseMajorRelation> courseMajorRelationList = courseMajorRelationMapper.selectByExample(courseMajorRelationExample);
+                if(CollectionUtils.isEmpty(courseMajorRelationList))
+                    return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_STUDENT_NO_EXIST_COURSE,null);
+            }
         }
+
 
         Map<Integer,Integer> partOrders=new HashMap<>();
         //查询该考试的各场次人数
@@ -604,6 +648,10 @@ public class ExamImpl implements ExamService {
         Exam exam = examMapper.selectByPrimaryKey(id);
         if(exam==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_NOT_EXIST,null);
+
+        //只允许为未启动的考试添加考试学生
+        if(!exam.getStatus().equals(new Integer(DICTINFO_EXAM_NOT_START_CODE)))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_IS_STARTED,null);
 
         //将上传的文件写到磁盘
 
@@ -746,6 +794,22 @@ public class ExamImpl implements ExamService {
                 }
                 aClass = classList.get(0);
             }
+
+            //学生所属专业必须存在该门考试的考试科目
+            if(major!=null){
+                CourseMajorRelationExample courseMajorRelationExample=new CourseMajorRelationExample();
+                CourseMajorRelationExample.Criteria courseMajorRelationCriteria = courseMajorRelationExample.createCriteria();
+                courseMajorRelationCriteria.andCourseIdEqualTo(exam.getCourseId());
+                courseMajorRelationCriteria.andMajorIdEqualTo(major.getId());
+                List<CourseMajorRelation> courseMajorRelationList = courseMajorRelationMapper.selectByExample(courseMajorRelationExample);
+                if(CollectionUtils.isEmpty(courseMajorRelationList)){
+                    if(StringUtils.isBlank(errorMessage))
+                        errorMessage+=studentStudentId+":学生并未学习该门课程，无法为其分配考试";
+                    else
+                        errorMessage+=",学生并未学习该门课程，无法为其分配考试";
+                }
+            }
+
 
             if(!StringUtils.isBlank(errorMessage)){
                 countError++;
@@ -900,6 +964,15 @@ public class ExamImpl implements ExamService {
 
     @Override
     public ResultInfo removeStudentFromExam(String examStudentRelationId) throws Exception {
+
+        ExamStudentRelation examStudentRelation = examStudentRelationMapper.selectByPrimaryKey(examStudentRelationId);
+
+        //只允许移除未启动的考试学生
+        if(examStudentRelation!=null){
+            Exam exam = examMapper.selectByPrimaryKey(examStudentRelation.getExamId());
+            if(!exam.getStatus().equals(new Integer(DICTINFO_EXAM_NOT_START_CODE)))
+                return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_IS_STARTED,null);
+        }
         examStudentRelationMapper.deleteByPrimaryKey(examStudentRelationId);
         return new ResultInfo(ResultInfo.STATUS_RESULT_NO_CONTENT,MESSAGE_DELETE_SUCCESS,null);
     }
@@ -1000,13 +1073,26 @@ public class ExamImpl implements ExamService {
         examDb.setUpdatedTime(new Date());
         examMapper.updateByPrimaryKey(examDb);
 
+        //启动一个定时器，在考试结束时，修改考试状态
+        Timer timer=new Timer();
+        final Exam examTimer=examDb;
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                //修改考试状态
+                examTimer.setStatus(new Integer(DICTINFO_EXAM_IS_END_CODE));
+                examTimer.setUpdatedTime(new Date());
+                examMapper.updateByPrimaryKey(examTimer);
+            }
+        },examDb.getTime()*1000);
+
         return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_PUT_SUCCESS,null);
 
     }
 
 
     @Override
-    public ExamStudentRelationDto getProceedExamByLoginStudentId(String studentId) throws Exception {
+    public ResultInfo getProceedExamByLoginStudentId(String studentId) throws Exception {
         //查询该学生的所有考试
         ExamStudentRelationExample examStudentRelationExample=new ExamStudentRelationExample();
         ExamStudentRelationExample.Criteria relationCriteria = examStudentRelationExample.createCriteria();
@@ -1027,6 +1113,14 @@ public class ExamImpl implements ExamService {
                 break;
             }
         }
+
+        //如果没有该学生任何正在进行的考试信息，说明考试未启动
+        if(exam==null||examStudentRelation==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_NOT_FOUND,MESSAGE_EXAM_IS_NOT_STARTED,null);
+
+        //如果存在正在进行的考试，但学生已考完
+        if(examStudentRelation!=null&&examStudentRelation.getStatus().equals(new Integer(DICTINFO_STUDENT_EXAM_IS_END_CODE)))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_NOT_FOUND,MESSAGE_STUDENT_EXAM_IS_END,null);
 
         Student student=studentMapper.selectByPrimaryKey(studentId);
 
@@ -1081,7 +1175,7 @@ public class ExamImpl implements ExamService {
             System.out.println(examStudentRelation.getIsProceeded());
         }
 
-        return examStudentRelation;
+        return new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,examStudentRelation);
     }
 
     @Override
