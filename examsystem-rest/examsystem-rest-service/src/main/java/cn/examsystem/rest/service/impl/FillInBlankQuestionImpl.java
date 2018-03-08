@@ -192,7 +192,7 @@ public class FillInBlankQuestionImpl implements FillInBlankQuestionService {
             String[] answerArr=answer.split(",");
             List<String> answerListCustom = new ArrayList<>();
             for(String ans:answerArr){
-                if(!StringUtils.isBlank(ans))
+                if(!StringUtils.isBlank(ans))//去除答案中的所有空格，默认的匹配模式
                     answerListCustom.add(ans.replace(" ",""));
             }
             if(CollectionUtils.isEmpty(answerListCustom))
