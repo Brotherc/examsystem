@@ -16,7 +16,7 @@ public interface TestPaperService {
     //根据id查询试卷
     public TestPaperDto getTestPaper(String id) throws Exception;
 
-    //根据条件查询班级
+    //根据条件查询试卷
     public List<TestPaper> listTestPaper(TestPaperVo testPaperVo) throws Exception;
 
     //添加试卷
