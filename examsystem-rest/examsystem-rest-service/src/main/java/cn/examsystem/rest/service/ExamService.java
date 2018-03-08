@@ -57,7 +57,7 @@ public interface ExamService {
 
 
     //根据学生id查询正在进行的考试
-    public ExamStudentRelationDto getProceedExamByLoginStudentId(String studentId) throws Exception;
+    public ResultInfo getProceedExamByLoginStudentId(String studentId) throws Exception;
 
     //考试
     public ResultInfo test(ExamStudentRelationDto examStudentRelationDto) throws Exception;
