@@ -1,17 +1,16 @@
 package cn.examsystem.rest.service.impl;
 
 import cn.examsystem.common.pojo.ResultInfo;
-import cn.examsystem.rest.mapper.FillInBlankQuestionMapper;
-import cn.examsystem.rest.mapper.SingleChoiceQuestionMapper;
-import cn.examsystem.rest.mapper.TrueOrFalseQuestionMapper;
-import cn.examsystem.rest.pojo.po.FillInBlankQuestion;
-import cn.examsystem.rest.pojo.po.SingleChoiceQuestion;
-import cn.examsystem.rest.pojo.po.TrueOrFalseQuestion;
+import cn.examsystem.rest.mapper.*;
+import cn.examsystem.rest.pojo.po.*;
 import cn.examsystem.rest.service.CheckerService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * Created by Administrator on 2018/2/17.
@@ -26,6 +25,8 @@ public class CheckerImpl implements CheckerService{
     private TrueOrFalseQuestionMapper trueOrFalseQuestionMapper;
     @Autowired
     private FillInBlankQuestionMapper fillInBlankQuestionMapper;
+    @Autowired
+    private TestpaperQuestionRelationMapper testpaperQuestionRelationMapper;
 
     @Value("${DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE}")
     private String DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE;
@@ -40,6 +41,8 @@ public class CheckerImpl implements CheckerService{
     private String MESSAGE_QUESTION_TYPE_NOT_NULL;
     @Value("${MESSAGE_QUESTION_NOT_EXIST}")
     private String MESSAGE_QUESTION_NOT_EXIST;
+    @Value("${MESSAGE_QUESTION_IS_EXIST_TESTPAPER}")
+    private String MESSAGE_QUESTION_IS_EXIST_TESTPAPER;
 
 
     @Value("${MESSAGE_PUT_SUCCESS}")
@@ -55,6 +58,14 @@ public class CheckerImpl implements CheckerService{
         //题目类型不允许为空
         if(StringUtils.isBlank(questionType))
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_QUESTION_TYPE_NOT_NULL,null);
+
+        //如果该题目在试卷中出现，则不允许进行审核操作
+        TestpaperQuestionRelationExample testpaperQuestionRelationExample=new TestpaperQuestionRelationExample();
+        TestpaperQuestionRelationExample.Criteria testpaperQuestionRelationCriteria = testpaperQuestionRelationExample.createCriteria();
+        testpaperQuestionRelationCriteria.andQuestionIdEqualTo(id);
+        List<TestpaperQuestionRelation> testpaperQuestionRelationList = testpaperQuestionRelationMapper.selectByExample(testpaperQuestionRelationExample);
+        if(!CollectionUtils.isEmpty(testpaperQuestionRelationList))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_QUESTION_IS_EXIST_TESTPAPER,null);
 
         //审核的题目必须存在
         if(StringUtils.equals(DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE,questionType)){//单选题
