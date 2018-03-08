@@ -99,7 +99,7 @@ System.out.println(examStudentRelationDto.getIsLocal());
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
-            return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_GET_FAIL,null);
+            return new ResultInfo(ResultInfo.STATUS_RESULT_NOT_FOUND,MESSAGE_GET_FAIL,null);
         }
         return resultInfo;
     }
