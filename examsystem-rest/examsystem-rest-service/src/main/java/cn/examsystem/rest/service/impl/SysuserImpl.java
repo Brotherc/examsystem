@@ -253,7 +253,7 @@ public class SysuserImpl implements SysuserService {
         //设置状态
         sysuserDb.setStatus(sysuserDtoStatus);
 
-        //如果添加的是教师，则修改系
+        //如果修改的是教师，则修改系
         if(sysuserDtoRolesId.contains(ROLE_TEACHER_ID)){
             sysuserDb.setDepartmentId(sysuserDtoDepartmentId);
         }
