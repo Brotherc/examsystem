@@ -129,10 +129,7 @@ public class ExamController {
 
     @GetMapping("/v1/exam/loginStudent/{studentId}")
     public ResultInfo getProceedExamByLoginStudentId(@PathVariable String studentId) throws Exception{
-        ExamStudentRelationDto examStudentRelationDto = examService.getProceedExamByLoginStudentId(studentId);
-        ResultInfo resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,examStudentRelationDto);
-
-        return resultInfo;
+        return examService.getProceedExamByLoginStudentId(studentId);
     }
 
     @PostMapping("/v1/test")
