@@ -44,6 +44,10 @@ public class PageController {
     private String MODEL_KEY_TRUEORFALSEQUESTION_ANSWER;
     @Value("${MODEL_KEY_FILLINBLANKQUESTION_ANSWER}")
     private String MODEL_KEY_FILLINBLANKQUESTION_ANSWER;
+    @Value("${MODEL_KEY_EXAM_STUDENT_REMAIN_TIME}")
+    private String MODEL_KEY_EXAM_STUDENT_REMAIN_TIME;
+    @Value("${MODEL_KEY_EXAM_STUDENT_START_TIME}")
+    private String MODEL_KEY_EXAM_STUDENT_START_TIME;
 
     @Value("${MODEL_KEY_EXAM_STUDENT}")
     private String MODEL_KEY_EXAM_STUDENT;
@@ -63,10 +67,11 @@ public class PageController {
 
         //加载试卷及题目信息
         TestPaperDto testPaperDto=null;
+        LinkedHashMap testPaperMap=null;
         try {
             //调用rest服务
             ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+TEST_URL+TEST_TESTPAPER_URL+"/{testPaperId}"+"?examStudentId="+examStudentRelationDto.getId(), HttpMethod.GET, ResultInfo.class,new Object[]{testPaperId});
-            LinkedHashMap testPaperMap=(LinkedHashMap)resultInfo.getData();
+            testPaperMap=(LinkedHashMap)resultInfo.getData();
             String testPaperJson = JsonUtils.objectToJson(testPaperMap);
             testPaperDto=JsonUtils.jsonToPojo(testPaperJson,TestPaperDto.class);
 
@@ -78,17 +83,25 @@ public class PageController {
             e.printStackTrace();
         }
 
-        //保存到前台
-        model.addAttribute(MODEL_KEY_SINGLECHOICEQUESTIONS,testPaperDto.getSingleChoiceQuestions());
-        model.addAttribute(MODEL_KEY_TRUEORFALSEQUESTIONS,testPaperDto.getTrueOrFalseQuestions());
-        model.addAttribute(MODEL_KEY_FILLINBLANKQUESTIONS,testPaperDto.getFillInBlankQuestions());
+        System.out.println(examStudentRelationDto.getPartOrderStartTime());
+        //计算剩余考试时间
+        Long endTime=examStudentRelationDto.getPartOrderStartTime().getTime()+examStudentRelationDto.getTime()*1000;
+        Long currentTime=System.currentTimeMillis();
+        model.addAttribute(MODEL_KEY_EXAM_STUDENT_REMAIN_TIME, endTime-currentTime);
+        model.addAttribute(MODEL_KEY_EXAM_STUDENT_START_TIME, examStudentRelationDto.getPartOrderStartTime().getTime());
 
-        model.addAttribute(MODEL_KEY_SINGLECHOICEQUESTION_ANSWER,testPaperDto.getSingleChoiceQuestionAnswer());
-        model.addAttribute(MODEL_KEY_TRUEORFALSEQUESTION_ANSWER,testPaperDto.getTrueOrFalseQuestionAnswer());
-        model.addAttribute(MODEL_KEY_FILLINBLANKQUESTION_ANSWER,testPaperDto.getFillInBlankQuestionAnswer());
+        //保存到前台
+        model.addAttribute(MODEL_KEY_SINGLECHOICEQUESTIONS,testPaperMap.get("singleChoiceQuestions"));
+        model.addAttribute(MODEL_KEY_TRUEORFALSEQUESTIONS,testPaperMap.get("trueOrFalseQuestions"));
+        model.addAttribute(MODEL_KEY_FILLINBLANKQUESTIONS,testPaperMap.get("fillInBlankQuestions"));
+
+        model.addAttribute(MODEL_KEY_SINGLECHOICEQUESTION_ANSWER,testPaperMap.get("singleChoiceQuestionAnswer"));
+        model.addAttribute(MODEL_KEY_TRUEORFALSEQUESTION_ANSWER,testPaperMap.get("trueOrFalseQuestionAnswer"));
+        model.addAttribute(MODEL_KEY_FILLINBLANKQUESTION_ANSWER,testPaperMap.get("fillInBlankQuestionAnswer"));
 
         model.addAttribute(MODEL_KEY_EXAM_STUDENT,examStudentRelationDto);
-        model.addAttribute(MODEL_KEY_TESTPAPER,testPaperDto);
+        model.addAttribute(MODEL_KEY_TESTPAPER,testPaperMap);
+
 
         return "testPaper/list";
     }
