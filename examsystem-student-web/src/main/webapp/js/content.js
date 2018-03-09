@@ -11,6 +11,42 @@ function $childNode(name) {
     return window.frames[name]
 }
 
+function tofirst(){
+    if(parent.parent.parent){
+        parent.parent.parent.location='http://localhost:8082/index.html';
+    }else if(parent.parent){
+        parent.parent.location='http://localhost:8082/index.html';
+    }else if(parent){
+        parent.location='http://localhost:8082/index.html';
+    }else{
+        window.location='http://localhost:8082/index.html';
+    }
+}
+
+function to500(){
+    if(parent.parent.parent){
+        parent.parent.parent.location='http://localhost:8082/500.html';
+    }else if(parent.parent){
+        parent.parent.location='http://localhost:8082/500.html';
+    }else if(parent){
+        parent.location='http://localhost:8082/500.html';
+    }else{
+        window.location='http://localhost:8082/500.html';
+    }
+}
+
+function to403(){
+    if(parent.parent.parent){
+        parent.parent.parent.location='http://localhost:8082/403.html';
+    }else if(parent.parent){
+        parent.parent.location='http://localhost:8082/403.html';
+    }else if(parent){
+        parent.location='http://localhost:8082/403.html';
+    }else{
+        window.location='http://localhost:8082/403.html';
+    }
+}
+
 // tooltips
 $('.tooltip-demo').tooltip({
     selector: "[data-toggle=tooltip]",
