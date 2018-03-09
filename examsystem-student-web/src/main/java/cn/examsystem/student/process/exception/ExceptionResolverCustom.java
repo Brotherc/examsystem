@@ -61,7 +61,7 @@ public class ExceptionResolverCustom implements HandlerExceptionResolver {
 
 		}
 		// 这里说明action返回的是jsp页面或html页面
-		ModelAndView modelAndView = new ModelAndView("redirect:/500html");
+		ModelAndView modelAndView = new ModelAndView("redirect:/500.html");
 		return modelAndView;
 	}
 
