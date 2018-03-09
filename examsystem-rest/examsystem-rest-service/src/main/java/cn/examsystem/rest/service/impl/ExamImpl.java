@@ -1073,7 +1073,8 @@ public class ExamImpl implements ExamService {
         examDb.setUpdatedTime(new Date());
         examMapper.updateByPrimaryKey(examDb);
 
-        //启动一个定时器，在考试结束时，修改考试状态
+        //启动一个定时器，在最后一个场次结束时，修改考试状态
+        //定时器延长启动时间：考试时长+（场次-1）*间隔时间
         Timer timer=new Timer();
         final Exam examTimer=examDb;
         timer.schedule(new TimerTask() {
@@ -1084,7 +1085,7 @@ public class ExamImpl implements ExamService {
                 examTimer.setUpdatedTime(new Date());
                 examMapper.updateByPrimaryKey(examTimer);
             }
-        },examDb.getTime()*1000);
+        },(examDb.getTime()+(examDb.getPartNum()-1)*examDb.getIntervalTime())*1000);
 
         return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_PUT_SUCCESS,null);
 
