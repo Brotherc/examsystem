@@ -18,6 +18,7 @@
     <link href="/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
     <link href="/css/animate.css" rel="stylesheet">
     <link href="/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="/css/plugins/toastr/toastr.min.css" rel="stylesheet">
 
 </head>
 
@@ -281,7 +282,7 @@
 
                                 <div class="row">
                                     <div class="col-lg-12">
-                                        <button class="btn btn-success center-block" type="button" onclick="submitTestPaper()"><i class=" fa fa-upload"></i>&nbsp;提交试卷</button>
+                                        <button class="btn btn-success center-block" type="button" id="submitTestPaper" onclick="submitTestPaper()"><i class=" fa fa-upload"></i>&nbsp;提交试卷</button>
                                     </div>
                                 </div>
                             </div>
@@ -354,10 +355,50 @@
     <!-- 自定义js -->
     <script src="/js/examsystem/common.js"></script>
 
+    <!-- Toastr script -->
+    <script src="/js/plugins/toastr/toastr.min.js"></script>
+
     <script>
-        $("#time").text("考试时长："+ES.formatSeconds("${examStudent.time}"));
-        var startTime=new Date("${examStudent.partOrderStartTime}");
-        $("#startTime").text("开始时间："+startTime.format("yyyy-MM-dd hh:mm:ss"));
+
+        function checkTime(i){
+            if(i<10){
+                i="0"+i;
+            }
+            return i;
+        }
+
+        var remainTime="${remainTime}";
+        var leftTime =parseInt(remainTime);
+
+        var h = parseInt(leftTime / 1000 / 60 / 60 % 24 , 10); //计算剩余的小时
+        var m = parseInt(leftTime / 1000 / 60 % 60, 10);//计算剩余的分钟
+        var s = parseInt(leftTime / 1000 % 60, 10);//计算剩余的秒数
+        h = checkTime(h);
+        m = checkTime(m);
+        s = checkTime(s);
+        $("#time").text("考试剩余时间："+h+"小时" + m+"分"+s+"秒");
+        if(leftTime!=0)
+            leftTime=leftTime-1000;
+
+        setInterval(function(){
+            var hours = parseInt(leftTime / 1000 / 60 / 60 % 24 , 10); //计算剩余的小时
+            var minutes = parseInt(leftTime / 1000 / 60 % 60, 10);//计算剩余的分钟
+            var seconds = parseInt(leftTime / 1000 % 60, 10);//计算剩余的秒数
+            hours = checkTime(hours);
+            minutes = checkTime(minutes);
+            seconds = checkTime(seconds);
+            $("#time").text("考试剩余时间："+hours+"小时" + minutes+"分"+seconds+"秒");
+            if(leftTime!=0)
+                leftTime=leftTime-1000;
+            if(leftTime==10000||leftTime==5000){
+                //弹出倒计时提示提交卷显示框
+                toastr.success(leftTime+"秒后将自动提交试卷")
+            }
+            if(leftTime==0){
+                $("#submitTestPaper").trigger('click');
+            }
+        },1000);
+        $("#startTime").text("开始时间："+ES.formatDateTime(parseInt("${partOrderStartTime}")));
 
         $($("#nav_tabs_questions").children().get(0)).addClass("active");
         $($("#content_questions").children().get(0)).addClass("active");
