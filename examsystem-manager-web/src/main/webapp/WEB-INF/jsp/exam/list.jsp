@@ -468,6 +468,7 @@
                         <!--用来存放文件信息-->
                         <div id="thelist" class="uploader-list"></div>
                         <div id="picker">选择文件</div>
+                        <span class="help-block m-b-none"><i class="fa fa-info-circle"></i>注意excel文件中学生场次不要超出所选考试的场次范围，将以导入信息作为学生的最新信息</span>
                     </div>
                 </div>
                 <div class="modal-footer">

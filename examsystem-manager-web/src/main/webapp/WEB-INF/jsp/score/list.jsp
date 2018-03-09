@@ -392,45 +392,6 @@
             return ['<button class="btn btn-outline btn-info" type="button" id="openScoreDetailsModal">详情</button>'].join("");
         }
 
-
-        function updateStudent(){
-            //表单校验
-            if($("#student-update-form [name=studentId]").val().trim()==''){
-                layer.msg("学号不能为空!");
-                return ;
-            }
-            if($("#student-update-form [name=name]").val().trim()==''){
-                layer.msg("名字不能为空!");
-                return ;
-            }
-
-            var studentId=$("#studentId_update").val();
-
-            $.ajax({
-                type: "POST",
-                url: "/v1/examStudent/"+studentId,
-                data: decodeURIComponent($("#student-update-form").serialize().replace(/\+/g,"")),
-                success: function(data){
-                    if(data.status == 201){
-                        $("#modal-form-updateStudent").modal('hide');
-                        swal(data.message, "您已经成功修改了该学生信息。", "success");
-                        $("#examStudentTableEvents").bootstrapTable('refresh');
-                    }
-                    else{
-                        swal("修改失败",data.message, "error");
-                    }
-                },
-                error:function(XMLHttpRequest, textStatus, errorThrown){
-                    var status=XMLHttpRequest.status;
-                    if(status==403){
-                        to403();
-                    }else if(status==500){
-                        to500();
-                    }
-                }
-            });
-        }
-
         window.operateEvents={
             "click #examStudentScoreDetails":function (e,value,row,index) {
                 $("#examId_score").val(row.id);
@@ -442,7 +403,6 @@
 
             },
             "click #autoGrade":function (e,value,row,index) {
-                alert("智能评分");
                 $.ajax({
                     type: "POST",
                     url: "/v1/score/exam/"+row.id,
@@ -476,6 +436,9 @@
                 $("#studentClassId_update_chosen").width(270);
                 $("#studentId_update").val(row.studentId);*/
 
+                $("#nav_tabs_questions").children().remove();
+                $("#content_questions").children().remove();
+
                 $.ajax({
                     type: "GET",
                     url: "/v1/score/exam/student/"+row.id+"/testPaper",
@@ -484,6 +447,7 @@
                             var testPaper=data.data;
 
                             if(testPaper.singleChoiceQuestions!=null){
+
                                 $("#nav_tabs_questions").append('<li class=""><a data-toggle="tab" href="list.jsp#tab-0">单选题</a> </li>');
 
                                 var html="";
@@ -516,29 +480,32 @@
                                     html+='<p>'+question.questionContent;
                                     html+='</p>';
                                     html+='<div class="checkbox checkbox-success checkbox-circle">';
-                                    html+='<input id="singleChoiceQuestion'+(index+1)+'A" value="A" type="radio" name="singleChoiceQuestionAnswer['+(index+1)+']">';
+                                    html+='<input id="singleChoiceQuestion'+(index+1)+'A" value="A" type="radio" disabled="" name="singleChoiceQuestionAnswer['+(index+1)+']">';
                                     html+='<label for="singleChoiceQuestion'+(index+1)+'A">';
                                     html+='A:'+question.optionA;
                                     html+='</label>';
                                     html+='</div>';
                                     html+='<div class="checkbox checkbox-success checkbox-circle">';
-                                    html+='<input id="singleChoiceQuestion'+(index+1)+'B" value="B" type="radio" name="singleChoiceQuestionAnswer['+(index+1)+']">';
+                                    html+='<input id="singleChoiceQuestion'+(index+1)+'B" value="B" type="radio" disabled="" name="singleChoiceQuestionAnswer['+(index+1)+']">';
                                     html+='<label for="singleChoiceQuestion'+(index+1)+'B">';
                                     html+='B:'+question.optionB;
                                     html+='</label>';
                                     html+='</div>';
                                     html+='<div class="checkbox checkbox-success checkbox-circle">';
-                                    html+='<input id="singleChoiceQuestion'+(index+1)+'C" value="C" type="radio" name="singleChoiceQuestionAnswer['+(index+1)+']">';
+                                    html+='<input id="singleChoiceQuestion'+(index+1)+'C" value="C" type="radio" disabled="" name="singleChoiceQuestionAnswer['+(index+1)+']">';
                                     html+='<label for="singleChoiceQuestion'+(index+1)+'C">';
                                     html+='C:'+question.optionC;
                                     html+='</label>';
                                     html+='</div>';
                                     html+='<div class="checkbox checkbox-success checkbox-circle">';
-                                    html+='<input id="singleChoiceQuestion'+(index+1)+'D" value="D" type="radio" name="singleChoiceQuestionAnswer['+(index+1)+']">';
+                                    html+='<input id="singleChoiceQuestion'+(index+1)+'D" value="D" type="radio" disabled="" name="singleChoiceQuestionAnswer['+(index+1)+']">';
                                     html+='<label for="singleChoiceQuestion'+(index+1)+'D">';
                                     html+='D:'+question.optionD;
                                     html+='</label>';
-                                    html+='</div></div></div>';
+                                    html+='</div>';
+                                    html+='<p>得分：'+testPaper.singleChoiceQuestionAnswerScore[(index+1)]+'</p>';
+
+                                    html+='</div></div>';
                                 });
                                 html+='</div></div></div></div></div></div></div></div></form></div>';
                                 $("#content_questions").append(html);
@@ -576,16 +543,18 @@
                                     html+='<p>'+question.questionContent;
                                     html+='</p>';
                                     html+='<div class="checkbox checkbox-success checkbox-circle">';
-                                    html+='<input id="trueOrFalseQuestion'+(index+1)+'-1" value="1" type="radio" name="trueOrFalseQuestionAnswer['+(index+1)+']">';
+                                    html+='<input id="trueOrFalseQuestion'+(index+1)+'-1" value="1" type="radio" disabled="" name="trueOrFalseQuestionAnswer['+(index+1)+']">';
                                     html+='<label for="trueOrFalseQuestion'+(index+1)+'-1">';
                                     html+='√';
                                     html+='</label>';
                                     html+='</div>';
                                     html+='<div class="checkbox checkbox-success checkbox-circle">';
-                                    html+='<input id="trueOrFalseQuestion'+(index+1)+'-0" value="B" type="radio" name="trueOrFalseQuestionAnswer['+(index+1)+']">';
+                                    html+='<input id="trueOrFalseQuestion'+(index+1)+'-0" value="B" type="radio" disabled="" name="trueOrFalseQuestionAnswer['+(index+1)+']">';
                                     html+='<label for="trueOrFalseQuestion'+(index+1)+'-0">';
                                     html+='×';
-                                    html+='</label></div></div></div>';
+                                    html+='</label></div>';
+                                    html+='<p>得分：'+testPaper.trueOrFalseQuestionAnswerScore[(index+1)]+'</p>';
+                                    html+='</div></div>';
                                 });
                                 html+="</div></div></div></div></div></div></div></div></form></div>";
 
@@ -627,8 +596,10 @@
                                     html+='<div class="col-md-4">';
 
                                     for(var i=1;i<=question.blankNum;i++){
-                                        html+='<input type="text" placeholder="" class="form-control  m-b" name="fillInBlankQuestionAnswer['+(index+1)+']['+(i-1)+']" id="fillInBlankQuestion'+(index+1)+'-'+i+'">';
+                                        html+='<input type="text" placeholder="" class="form-control  m-b" disabled="" name="fillInBlankQuestionAnswer['+(index+1)+']['+(i-1)+']" id="fillInBlankQuestion'+(index+1)+'-'+i+'">';
                                     }
+
+                                    html+='<p>得分：'+testPaper.fillInBlankQuestionAnswerScore[(index+1)]+'</p>';
 
                                     html+='</div></div></div></div>';
                                 });
@@ -644,7 +615,6 @@
                             if(testPaper.singleChoiceQuestionAnswer!=null){
 
                                 $.each(testPaper.singleChoiceQuestionAnswer,function (index,answer) {
-                                    console.log(answer);
                                     if(answer=='A'){
                                         $("#singleChoiceQuestion"+index+"A").attr("checked","checked");
                                     }else if(answer=='B'){
