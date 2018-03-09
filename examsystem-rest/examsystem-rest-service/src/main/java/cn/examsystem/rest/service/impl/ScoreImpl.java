@@ -347,6 +347,7 @@ System.out.println(studentAnswer);
                     testPaperFillInBlankQuestionExample.setOrderByClause("question_order");
                     List<TestpaperQuestionRelation> testPaperFillInBlankQuestionList = testpaperQuestionRelationMapper.selectByExample(testPaperFillInBlankQuestionExample);
 
+                    System.out.println(testPaperFillInBlankQuestionList.size());
 
                     if(!CollectionUtils.isEmpty(testPaperFillInBlankQuestionList)){
                         for(int i=0;i<testPaperFillInBlankQuestionList.size();i++){
@@ -368,7 +369,7 @@ System.out.println(studentAnswer);
 
                     testPaperDto.setFillInBlankQuestions(fillInBlankQuestionList);
 
-
+System.out.println(testPaperDto.getFillInBlankQuestions().get(0));
 
                     //加载学生试卷中题目答案
                     ExamstudentAnswerExample examstudentAnswerExample=new ExamstudentAnswerExample();
@@ -380,6 +381,10 @@ System.out.println(studentAnswer);
                     Map<Integer, String> trueOrFalseQuestionAnswer=new HashMap<>();
                     Map<Integer, List> fillInBlankQuestionAnswer=new HashMap<>();
 
+                    Map<Integer, BigDecimal> singleChoiceQuestionAnswerScore=new HashMap<>();
+                    Map<Integer, BigDecimal> trueOrFalseQuestionAnswerScore=new HashMap<>();
+                    Map<Integer, BigDecimal> fillInBlankQuestionAnswerScore=new HashMap<>();
+
 
                     for(ExamstudentAnswer studentAnswer:examstudentAnswerList){
                         //获取试卷题目
@@ -389,20 +394,27 @@ System.out.println(studentAnswer);
 
                         if(testPaperQuestion.getQuestionType().equals(new Integer(DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE))){//单选题
                             singleChoiceQuestionAnswer.put(testPaperQuestion.getQuestionOrder(),studentAnswer.getStudentAnswer());
+                            singleChoiceQuestionAnswerScore.put(testPaperQuestion.getQuestionOrder(),studentAnswer.getScore());
                         }
 
                         if(testPaperQuestion.getQuestionType().equals(new Integer(DICTINFO_TRUEORFALSEQUESTION_TYPE_CODE))){//判断题
                             trueOrFalseQuestionAnswer.put(testPaperQuestion.getQuestionOrder(),studentAnswer.getStudentAnswer());
+                            trueOrFalseQuestionAnswerScore.put(testPaperQuestion.getQuestionOrder(),studentAnswer.getScore());
                         }
                         if(testPaperQuestion.getQuestionType().equals(new Integer(DICTINFO_FILLINBLANKQUESTION_TYPE_CODE))){//填空题
                             List list=JsonUtils.jsonToList(studentAnswer.getStudentAnswer(),String.class);
 
                             fillInBlankQuestionAnswer.put(testPaperQuestion.getQuestionOrder(),list);
+                            fillInBlankQuestionAnswerScore.put(testPaperQuestion.getQuestionOrder(),studentAnswer.getScore());
                         }
                     }
                     testPaperDto.setSingleChoiceQuestionAnswer(singleChoiceQuestionAnswer);
                     testPaperDto.setTrueOrFalseQuestionAnswer(trueOrFalseQuestionAnswer);
                     testPaperDto.setFillInBlankQuestionAnswer(fillInBlankQuestionAnswer);
+
+                    testPaperDto.setSingleChoiceQuestionAnswerScore(singleChoiceQuestionAnswerScore);
+                    testPaperDto.setTrueOrFalseQuestionAnswerScore(trueOrFalseQuestionAnswerScore);
+                    testPaperDto.setFillInBlankQuestionAnswerScore(fillInBlankQuestionAnswerScore);
 
                     System.out.println(testPaperDto.getSingleChoiceQuestionAnswer());
                     System.out.println(testPaperDto.getTrueOrFalseQuestionAnswer());
