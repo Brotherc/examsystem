@@ -36,6 +36,10 @@ public class TestPaperDto extends TestPaper{
     private Map<Integer,String> trueOrFalseQuestionAnswer;
     private Map<Integer,List> fillInBlankQuestionAnswer;
 
+    private Map<Integer,BigDecimal> singleChoiceQuestionAnswerScore;
+    private Map<Integer,BigDecimal> trueOrFalseQuestionAnswerScore;
+    private Map<Integer,BigDecimal> fillInBlankQuestionAnswerScore;
+
     public String getSingleChoiceQuestionIds() {
         return singleChoiceQuestionIds;
     }
@@ -170,5 +174,29 @@ public class TestPaperDto extends TestPaper{
 
     public void setFillInBlankQuestionAnswer(Map<Integer, List> fillInBlankQuestionAnswer) {
         this.fillInBlankQuestionAnswer = fillInBlankQuestionAnswer;
+    }
+
+    public Map<Integer, BigDecimal> getSingleChoiceQuestionAnswerScore() {
+        return singleChoiceQuestionAnswerScore;
+    }
+
+    public void setSingleChoiceQuestionAnswerScore(Map<Integer, BigDecimal> singleChoiceQuestionAnswerScore) {
+        this.singleChoiceQuestionAnswerScore = singleChoiceQuestionAnswerScore;
+    }
+
+    public Map<Integer, BigDecimal> getTrueOrFalseQuestionAnswerScore() {
+        return trueOrFalseQuestionAnswerScore;
+    }
+
+    public void setTrueOrFalseQuestionAnswerScore(Map<Integer, BigDecimal> trueOrFalseQuestionAnswerScore) {
+        this.trueOrFalseQuestionAnswerScore = trueOrFalseQuestionAnswerScore;
+    }
+
+    public Map<Integer, BigDecimal> getFillInBlankQuestionAnswerScore() {
+        return fillInBlankQuestionAnswerScore;
+    }
+
+    public void setFillInBlankQuestionAnswerScore(Map<Integer, BigDecimal> fillInBlankQuestionAnswerScore) {
+        this.fillInBlankQuestionAnswerScore = fillInBlankQuestionAnswerScore;
     }
 }
