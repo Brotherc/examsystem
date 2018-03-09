@@ -78,4 +78,8 @@
     <error-code>404</error-code>
     <location>/404.html</location>
   </error-page>
+
+  <session-config>
+    <session-timeout>180</session-timeout>
+  </session-config>
 </web-app>
