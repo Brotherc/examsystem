@@ -16,7 +16,8 @@ public class ExamStudentRelationDto extends ExamStudentRelation{
     private String gradeName;
     private String majorName;
     private Integer className;
-
+    private Date lastLoginTime;
+    private String lastLoginIp;
 
     private String courseName;
     private String schoolYearName;
@@ -31,6 +32,8 @@ public class ExamStudentRelationDto extends ExamStudentRelation{
 
     private Boolean isProceeded;//学生是否进行过该门考试
     private Boolean isLocal;//学生是否在本地机器操作
+
+    private Long remainTime;//考试学生该门考试剩余时间（单位：毫秒）
 
 
     public String getStudentStudentId() {
@@ -168,5 +171,29 @@ public class ExamStudentRelationDto extends ExamStudentRelation{
 
     public void setIsLocal(Boolean isLocal) {
         this.isLocal = isLocal;
+    }
+
+    public Date getLastLoginTime() {
+        return lastLoginTime;
+    }
+
+    public void setLastLoginTime(Date lastLoginTime) {
+        this.lastLoginTime = lastLoginTime;
+    }
+
+    public String getLastLoginIp() {
+        return lastLoginIp;
+    }
+
+    public void setLastLoginIp(String lastLoginIp) {
+        this.lastLoginIp = lastLoginIp;
+    }
+
+    public Long getRemainTime() {
+        return remainTime;
+    }
+
+    public void setRemainTime(Long remainTime) {
+        this.remainTime = remainTime;
     }
 }
