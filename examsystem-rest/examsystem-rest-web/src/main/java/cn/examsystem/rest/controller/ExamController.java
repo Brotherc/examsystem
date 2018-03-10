@@ -141,4 +141,14 @@ public class ExamController {
     public ResultInfo submitTestPape(@RequestBody ExamStudentRelationDto examStudentRelationDto,@PathVariable String testPaperId) throws Exception{
         return examService.submitTestPape(examStudentRelationDto,testPaperId);
     }
+
+    @GetMapping("/v1/exam/{examId}/invigilation")
+    public ResultInfo listInvigilationExamStudent(@PathVariable String examId,ExamStudentRelationVo examStudentRelationVo) throws Exception{
+        List<ExamStudentRelationDto> examStudentRelationDtoList = examService.listInvigilationExamStudent(examId, examStudentRelationVo);
+
+        ResultInfo resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,examStudentRelationDtoList);
+
+        return resultInfo;
+
+    }
 }
