@@ -41,6 +41,25 @@
     <result column="student_class_id" property="studentClassId" jdbcType="VARCHAR" />
   </resultMap>
 
+  <resultMap id="invigilationExamStudentMap" type="cn.examsystem.rest.pojo.dto.ExamStudentRelationDto" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="exam_id" property="examId" jdbcType="VARCHAR" />
+    <result column="student_id" property="studentId" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="score" property="score" jdbcType="DECIMAL" />
+    <result column="is_graded" property="isGraded" jdbcType="BIT" />
+    <result column="part_order" property="partOrder" jdbcType="INTEGER" />
+    <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
+    <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+
+    <result column="student_student_id" property="studentStudentId" jdbcType="VARCHAR" />
+    <result column="student_name" property="studentName" jdbcType="VARCHAR" />
+    <result column="student_class_id" property="studentClassId" jdbcType="VARCHAR" />
+      <result column="last_login_time" property="lastLoginTime" jdbcType="TIMESTAMP" />
+      <result column="last_login_ip" property="lastLoginIp" jdbcType="VARCHAR" />
+
+  </resultMap>
+
   <sql id="list_exam_where">
     <if test="courseId!=null and courseId!=''">
       and EXAM.course_id = #{courseId}
@@ -98,6 +117,17 @@
         SELECT exam_student_relation.*,student.student_id student_student_id,student.name student_name,student.class_id student_class_id
             FROM exam_student_relation,student
                 WHERE exam_student_relation.student_id=student.id
+    ) EXAM_STUDENT
+    <where>
+      <include refid="list_examStudent_where"></include>
+    </where>
+  </select>
+
+  <select id="listInvigilationExamStudent" parameterType="cn.examsystem.rest.pojo.vo.ExamStudentRelationVo" resultMap="invigilationExamStudentMap">
+    SELECT *FROM(
+      SELECT exam_student_relation.*,student.student_id student_student_id,student.name student_name,student.class_id student_class_id,student.last_login_time,student.last_login_ip
+        FROM exam_student_relation,student
+          WHERE exam_student_relation.student_id=student.id
     ) EXAM_STUDENT
     <where>
       <include refid="list_examStudent_where"></include>

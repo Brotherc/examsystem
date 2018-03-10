@@ -11,4 +11,6 @@ public interface ExamMapperCustom {
     List<ExamDto> listExam(Exam exam);
 
     List<ExamStudentRelationDto> listExamStudent(ExamStudentRelationVo examStudentRelationVo);
+
+    List<ExamStudentRelationDto> listInvigilationExamStudent(ExamStudentRelationVo examStudentRelationVo);
 }
