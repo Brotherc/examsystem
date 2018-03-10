@@ -70,6 +70,9 @@ public class PageController {
     private String DICT_TYPE_QUESTIONTYPE_ID;
     @Value("${DICT_TYPE_STATUS_ID}")
     private String DICT_TYPE_STATUS_ID;
+    @Value("${DICT_TYPE_EXAMSTUDENT_STATUS_ID}")
+    private String DICT_TYPE_EXAMSTUDENT_STATUS_ID;
+
 
     @Value("${MODEL_KEY_DEPARTMENTS}")
     private String MODEL_KEY_DEPARTMENTS;
@@ -717,5 +720,42 @@ public class PageController {
         model.addAttribute(MODEL_KEY_CLASSES,classList);
 
         return "student/list";
+    }
+
+    @RequestMapping("/v1/exam/invigilation")
+    public String toInvigilationPage(Model model) throws Exception{
+
+        //前台搜索用到的条件（班级）
+        List<ClassDto> classList=null;
+        try {
+            //调用rest服务
+            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+CLASS_URL, HttpMethod.GET, ResultInfo.class,new Object[]{});
+            classList=(List<ClassDto>) resultInfo.getData();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        //构造查询条件
+        DictInfo statusDictInfo=new DictInfo();
+        statusDictInfo.setDictTypeId(DICT_TYPE_EXAMSTUDENT_STATUS_ID);
+        //将查询参数构建在url后面
+        JSONObject statusObj=new JSONObject(statusDictInfo);
+        String statusUrl = expandURL(REST_BASE_URL + DICTINFO_URL+"?", statusObj);
+
+        //前台搜索用到的条件（学生考试状态）
+        List<DictInfo> statusList=null;
+        try {
+            //调用rest服务
+            ResultInfo resultInfo = RestTemplateUtils.exchange(statusUrl, HttpMethod.GET, ResultInfo.class,new Object[]{});
+            statusList=(List<DictInfo>) resultInfo.getData();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+        model.addAttribute(MODEL_KEY_CLASSES,classList);
+        model.addAttribute(MODEL_KEY_STATUSES,statusList);
+
+        return "exam/invigilation";
     }
 }
