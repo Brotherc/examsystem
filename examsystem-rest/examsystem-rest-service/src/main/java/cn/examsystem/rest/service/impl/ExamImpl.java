@@ -1480,4 +1480,31 @@ public class ExamImpl implements ExamService {
         }
         return examDto;
     }
+
+    @Override
+    public List<ExamStudentRelationDto> listInvigilationExamStudent(String examId,ExamStudentRelationVo examStudentRelationVo) throws Exception {
+
+        Exam exam = examMapper.selectByPrimaryKey(examId);
+
+
+        examStudentRelationVo=examStudentRelationVo==null?new ExamStudentRelationVo():examStudentRelationVo;
+
+        examStudentRelationVo.setExamId(examId);
+        List<ExamStudentRelationDto> examStudentRelationDtoList = examMapperCustom.listInvigilationExamStudent(examStudentRelationVo);
+
+        for(ExamStudentRelationDto relationDto:examStudentRelationDtoList){
+            //构造每个考试学生的考试剩余时间
+
+            //开考时间：该考试的开考时间+（场次-1）*场次时间间隔
+            relationDto.setPartOrderStartTime(DateUtil.getDateAfterSeconds(exam.getStartTime(),(long)(relationDto.getPartOrder()-1)*exam.getIntervalTime()));
+
+
+            //计算剩余考试时间
+            Long endTime=relationDto.getPartOrderStartTime().getTime()+exam.getTime()*1000;
+            Long currentTime=System.currentTimeMillis();
+            relationDto.setRemainTime(endTime-currentTime);
+        }
+
+        return examStudentRelationDtoList;
+    }
 }
