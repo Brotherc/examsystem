@@ -55,6 +55,9 @@ public interface ExamService {
     public ResultInfo startExam(String id)throws Exception;
 
 
+    //查询监考考试的考试学生
+    public List<ExamStudentRelationDto> listInvigilationExamStudent(String examId,ExamStudentRelationVo examStudentRelationVo) throws Exception;
+
 
     //根据学生id查询正在进行的考试
     public ResultInfo getProceedExamByLoginStudentId(String studentId) throws Exception;
