@@ -41,6 +41,9 @@ public class ExamController {
     private String EXAMSTUDENT_EXAM_URL;
     @Value("${EXAM_STATUS_URL}")
     private String EXAM_STATUS_URL;
+    @Value("${EXAM_INVIGILATION_URL}")
+    private String EXAM_INVIGILATION_URL;
+
 
     @Value("${MESSAGE_GET_FAIL}")
     private String MESSAGE_GET_FAIL;
@@ -281,6 +284,27 @@ public class ExamController {
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
+        }
+        return resultInfo;
+    }
+
+    @GetMapping("/v1/exam/{examId}/invigilation")
+    public ResultInfo listInvigilationExamStudent(@PathVariable String examId, ExamStudentRelationVo examStudentRelationVo) throws Exception{
+
+        ResultInfo resultInfo;
+        try{
+
+            //将查询参数构建在url后面
+            JSONObject obj=new JSONObject(examStudentRelationVo);
+            String url = expandURL(REST_BASE_URL+EXAM_URL+"/{examId}"+EXAM_INVIGILATION_URL+"?", obj);
+
+            //调用rest服务
+            resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{examId});
+            System.out.println("---------"+resultInfo);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("---------"+"失败");
+            return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_GET_FAIL,null);
         }
         return resultInfo;
     }
