@@ -54,4 +54,9 @@ public class SingleChoiceQuestionController {
     public ResultInfo updateSingleChoiceQuestion(@PathVariable String id,@RequestBody SingleChoiceQuestionDto singleChoiceQuestionDto) throws Exception{
         return singleChoiceQuestionService.updateSingleChoiceQuestion(id,singleChoiceQuestionDto);
     }
+
+    @PostMapping("/v1/singleChoiceQuestion/file")
+    public ResultInfo addSingleChoiceQuestionByExcel(String createdTeacherId, @RequestBody byte[] uploadData,String fileName) throws Exception{
+        return singleChoiceQuestionService.addSingleChoiceQuestionByExcel(createdTeacherId,fileName,uploadData);
+    }
 }

@@ -54,4 +54,9 @@ public class TrueOrFalseQuestionController {
     public ResultInfo updateTrueOrFalseQuestion(@PathVariable String id,@RequestBody TrueOrFalseQuestionDto trueOrFalseQuestionDto) throws Exception{
         return trueOrFalseQuestionService.updateTrueOrFalseQuestion(id,trueOrFalseQuestionDto);
     }
+
+    @PostMapping("/v1/trueOrFalseQuestion/file")
+    public ResultInfo addTrueOrFalseQuestionByExcel(String createdTeacherId, @RequestBody byte[] uploadData,String fileName) throws Exception{
+        return trueOrFalseQuestionService.addTrueOrFalseQuestionByExcel(createdTeacherId,fileName,uploadData);
+    }
 }
