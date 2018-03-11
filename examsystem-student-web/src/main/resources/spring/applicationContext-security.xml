@@ -38,6 +38,7 @@
                 default-target-url="/index.html"
                 always-use-default-target="true"
                 authentication-failure-handler-ref="sysuserAuthenticationFailureHandler"
+                authentication-success-handler-ref="studentAuthenticationSuccessHandler"
         />
         <!--认证通过的用户访问没权限时显示的页面-->
         <security:access-denied-handler error-page="/403.html"/>
@@ -52,6 +53,8 @@
 
     <!--校验失败处理器-->
     <bean id="sysuserAuthenticationFailureHandler" class="cn.examsystem.security.handle.SysuserAuthenticationFailureHandler"/>
+    <!--校验失败处理器-->
+    <bean id="studentAuthenticationSuccessHandler" class="cn.examsystem.security.handle.StudentAuthenticationSuccessHandler"/>
 
     <!--自定义验证码拦截器-->
     <bean id="validateCodeFilter" class="cn.examsystem.security.filter.ValidateCodeFilter"/>
