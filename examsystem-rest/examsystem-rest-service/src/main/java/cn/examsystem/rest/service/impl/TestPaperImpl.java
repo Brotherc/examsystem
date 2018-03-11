@@ -73,11 +73,16 @@ public class TestPaperImpl implements TestPaperService {
     private String MESSAGE_TESTPAPER_NOT_AUTHO;
     @Value("${MESSAGE_TESTPAPER_IS_IN_EXAM}")
     private String MESSAGE_TESTPAPER_IS_IN_EXAM;
+    @Value("${MESSAGE_QUESTION_NOT_MOVE}")
+    private String MESSAGE_QUESTION_NOT_MOVE;
+
 
     @Value("${MESSAGE_POST_SUCCESS}")
     private String MESSAGE_POST_SUCCESS;
     @Value("${MESSAGE_PUT_SUCCESS}")
     private String MESSAGE_PUT_SUCCESS;
+    @Value("${MESSAGE_DELETE_SUCCESS}")
+    private String MESSAGE_DELETE_SUCCESS;
 
     @Value("${DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE}")
     private String DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE;
@@ -804,5 +809,230 @@ public class TestPaperImpl implements TestPaperService {
 
 
         return testPaperDto;
+    }
+
+    @Override
+    public TestPaperDto listTestPaperQuestionByTestPaperId(String testPaperId) throws Exception {
+
+
+        //查询该试卷单选题目
+        TestpaperQuestionRelationExample singleChoiceQuestionRelationExample=new TestpaperQuestionRelationExample();
+        TestpaperQuestionRelationExample.Criteria singleChoiceQuestionCriteria = singleChoiceQuestionRelationExample.createCriteria();
+        singleChoiceQuestionCriteria.andTestPaperIdEqualTo(testPaperId);
+        singleChoiceQuestionCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE));
+        singleChoiceQuestionRelationExample.setOrderByClause("question_order");
+        List<TestpaperQuestionRelation> singleChoiceQuestionRelationList = testpaperQuestionRelationMapper.selectByExample(singleChoiceQuestionRelationExample);
+
+        TestPaperDto testPaperDto=new TestPaperDto();
+
+        if(!CollectionUtils.isEmpty(singleChoiceQuestionRelationList)){
+            List<TestPaperSingleChoiceQuestion> singleChoiceQuestions=new ArrayList<>();
+
+            for(TestpaperQuestionRelation relation:singleChoiceQuestionRelationList){
+
+                    TestPaperSingleChoiceQuestion testPaperSingleChoiceQuestion=new TestPaperSingleChoiceQuestion();
+                    BeanUtils.copyProperties(relation,testPaperSingleChoiceQuestion);
+
+                    //查询具体的单选题信息
+                    SingleChoiceQuestion singleChoiceQuestion = singleChoiceQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
+                    if(singleChoiceQuestion!=null){
+                        testPaperSingleChoiceQuestion.setQuestionContent(singleChoiceQuestion.getContent());
+                        testPaperSingleChoiceQuestion.setOptionA(singleChoiceQuestion.getOptionA());
+                        testPaperSingleChoiceQuestion.setOptionB(singleChoiceQuestion.getOptionB());
+                        testPaperSingleChoiceQuestion.setOptionC(singleChoiceQuestion.getOptionC());
+                        testPaperSingleChoiceQuestion.setOptionD(singleChoiceQuestion.getOptionD());
+                    }
+
+                    singleChoiceQuestions.add(relation.getQuestionOrder()-1,testPaperSingleChoiceQuestion);
+
+            }
+            testPaperDto.setSingleChoiceQuestions(singleChoiceQuestions);
+        }
+
+
+        //查询该试卷判断题目
+        TestpaperQuestionRelationExample trueOrFalseQuestionRelationExample=new TestpaperQuestionRelationExample();
+        TestpaperQuestionRelationExample.Criteria trueOrFalseQuestionCriteria = trueOrFalseQuestionRelationExample.createCriteria();
+        trueOrFalseQuestionCriteria.andTestPaperIdEqualTo(testPaperId);
+        trueOrFalseQuestionCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_TRUEORFALSEQUESTION_TYPE_CODE));
+        trueOrFalseQuestionRelationExample.setOrderByClause("question_order");
+        List<TestpaperQuestionRelation> trueOrFalseQuestionRelationList = testpaperQuestionRelationMapper.selectByExample(trueOrFalseQuestionRelationExample);
+
+
+        if(!CollectionUtils.isEmpty(trueOrFalseQuestionRelationList)){
+            List<TestPaperTrueOrFalseQuestion> trueOrFalseQuestions=new ArrayList<>();
+
+            for(TestpaperQuestionRelation relation:trueOrFalseQuestionRelationList){
+
+                TestPaperTrueOrFalseQuestion testPaperTrueOrFalseQuestion=new TestPaperTrueOrFalseQuestion();
+                BeanUtils.copyProperties(relation,testPaperTrueOrFalseQuestion);
+
+                //查询具体的判断题信息
+                TrueOrFalseQuestion trueOrFalseQuestion = trueOrFalseQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
+                if(trueOrFalseQuestion!=null){
+                    testPaperTrueOrFalseQuestion.setQuestionContent(trueOrFalseQuestion.getContent());
+                }
+                trueOrFalseQuestions.add(relation.getQuestionOrder()-1,testPaperTrueOrFalseQuestion);
+            }
+            testPaperDto.setTrueOrFalseQuestions(trueOrFalseQuestions);
+        }
+
+        //查询该试卷填空题目
+        TestpaperQuestionRelationExample fillInBlankQuestionRelationExample=new TestpaperQuestionRelationExample();
+        TestpaperQuestionRelationExample.Criteria fillInBlankQuestionCriteria = fillInBlankQuestionRelationExample.createCriteria();
+        fillInBlankQuestionCriteria.andTestPaperIdEqualTo(testPaperId);
+        fillInBlankQuestionCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_FILLINBLANKQUESTION_TYPE_CODE));
+        fillInBlankQuestionRelationExample.setOrderByClause("question_order");
+        List<TestpaperQuestionRelation> fillInBlankQuestionRelationList = testpaperQuestionRelationMapper.selectByExample(fillInBlankQuestionRelationExample);
+
+
+        if(!CollectionUtils.isEmpty(fillInBlankQuestionRelationList)){
+            List<TestPaperFillInBlankQuestion> fillInBlankQuestions=new ArrayList<>();
+
+            for(TestpaperQuestionRelation relation:fillInBlankQuestionRelationList){
+
+                TestPaperFillInBlankQuestion testPaperFillInBlankQuestion=new TestPaperFillInBlankQuestion();
+                BeanUtils.copyProperties(relation,testPaperFillInBlankQuestion);
+
+                //查询具体的填空题信息
+                FillInBlankQuestion fillInBlankQuestion = fillInBlankQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
+                if(fillInBlankQuestion!=null){
+                    testPaperFillInBlankQuestion.setQuestionContent(fillInBlankQuestion.getContent());
+                }
+                fillInBlankQuestions.add(relation.getQuestionOrder()-1,testPaperFillInBlankQuestion);
+            }
+            testPaperDto.setFillInBlankQuestions(fillInBlankQuestions);
+        }
+
+        return testPaperDto;
+    }
+
+    @Override
+    public ResultInfo removeQuestionFromTestPaper(String testPaperId,String[] ids) throws Exception {
+        //id不允许为空
+        if(StringUtils.isBlank(testPaperId))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TESTPAPER_ID_NOT_NULL,null);
+
+        //id对应试卷必须存在
+        TestPaper testPaperDb = testPaperMapper.selectByPrimaryKey(testPaperId);
+        if(testPaperDb==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TESTPAPER_NOT_EXIST,null);
+
+        //如果存在使用过该试卷的已结束考试或正在进行的考试则不允许修改
+        ExamExample examExample=new ExamExample();
+        ExamExample.Criteria examCriteria = examExample.createCriteria();
+        examCriteria.andTestPaperIdEqualTo(testPaperId);
+        List<Integer> examStatusList=new ArrayList<>();
+        examStatusList.add(new Integer(DICTINFO_EXAM_IS_END_CODE));
+        examStatusList.add(new Integer(DICTINFO_EXAM_IS_PROCEED_CODE));
+        examCriteria.andStatusIn(examStatusList);
+        List<Exam> examList = examMapper.selectByExample(examExample);
+        if(!CollectionUtils.isEmpty(examList))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TESTPAPER_IS_IN_EXAM,null);
+
+        //删除试卷题目关系
+        for(String id:ids){
+           testpaperQuestionRelationMapper.deleteByPrimaryKey(id);
+        }
+
+        return new ResultInfo(ResultInfo.STATUS_RESULT_NO_CONTENT,MESSAGE_DELETE_SUCCESS,null);
+
+    }
+
+    @Override
+    public ResultInfo updateTestPaperQuestionOrder(String testPaperId, String testPaperQuestionId, Integer order) throws Exception {
+        //id不允许为空
+        if(StringUtils.isBlank(testPaperId))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TESTPAPER_ID_NOT_NULL,null);
+
+        //id对应试卷必须存在
+        TestPaper testPaperDb = testPaperMapper.selectByPrimaryKey(testPaperId);
+        if(testPaperDb==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TESTPAPER_NOT_EXIST,null);
+
+        //如果存在使用过该试卷的已结束考试或正在进行的考试则不允许修改
+        ExamExample examExample=new ExamExample();
+        ExamExample.Criteria examCriteria = examExample.createCriteria();
+        examCriteria.andTestPaperIdEqualTo(testPaperId);
+        List<Integer> examStatusList=new ArrayList<>();
+        examStatusList.add(new Integer(DICTINFO_EXAM_IS_END_CODE));
+        examStatusList.add(new Integer(DICTINFO_EXAM_IS_PROCEED_CODE));
+        examCriteria.andStatusIn(examStatusList);
+        List<Exam> examList = examMapper.selectByExample(examExample);
+        if(!CollectionUtils.isEmpty(examList))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TESTPAPER_IS_IN_EXAM,null);
+
+        if(order==1){//向上
+            //如果该题目为第一道，则不允许修改顺序
+            TestpaperQuestionRelation relation = testpaperQuestionRelationMapper.selectByPrimaryKey(testPaperQuestionId);
+            if(relation.getQuestionOrder()==1)
+                return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_QUESTION_NOT_MOVE,null);
+
+            //查询该类型题目的上一道题目
+            TestpaperQuestionRelationExample testpaperQuestionRelationExample=new TestpaperQuestionRelationExample();
+            TestpaperQuestionRelationExample.Criteria relationCriteria = testpaperQuestionRelationExample.createCriteria();
+            relationCriteria.andTestPaperIdEqualTo(testPaperId);
+            relationCriteria.andQuestionTypeEqualTo(relation.getQuestionType());
+            relationCriteria.andQuestionOrderEqualTo(relation.getQuestionOrder()-1);
+            List<TestpaperQuestionRelation> testpaperQuestionRelationList = testpaperQuestionRelationMapper.selectByExample(testpaperQuestionRelationExample);
+            if(!CollectionUtils.isEmpty(testpaperQuestionRelationList)){
+
+                //上一道题目
+                TestpaperQuestionRelation preRelation = testpaperQuestionRelationList.get(0);
+                preRelation.setQuestionOrder(preRelation.getQuestionOrder()+1);
+                preRelation.setUpdatedTime(new Date());
+
+                //修改上一题目顺序为+1;
+                testpaperQuestionRelationMapper.updateByPrimaryKey(preRelation);
+            }
+
+            //修改该题目顺序为-1；
+            relation.setQuestionOrder(relation.getQuestionOrder()-1);
+            relation.setUpdatedTime(new Date());
+            testpaperQuestionRelationMapper.updateByPrimaryKey(relation);
+        }else{//向下
+
+            //如果该题目为最后一道，则不允许修改顺序
+            TestpaperQuestionRelation relation = testpaperQuestionRelationMapper.selectByPrimaryKey(testPaperQuestionId);
+
+            //查询该类型题目数量
+            TestpaperQuestionRelationExample testpaperQuestionRelationNumExample=new TestpaperQuestionRelationExample();
+            TestpaperQuestionRelationExample.Criteria numExampleCriteria = testpaperQuestionRelationNumExample.createCriteria();
+            numExampleCriteria.andTestPaperIdEqualTo(testPaperId);
+            numExampleCriteria.andQuestionTypeEqualTo(relation.getQuestionType());
+            List<TestpaperQuestionRelation> testpaperQuestionRelationNumList = testpaperQuestionRelationMapper.selectByExample(testpaperQuestionRelationNumExample);
+
+            int maxOrder=0;
+            if(!CollectionUtils.isEmpty(testpaperQuestionRelationNumList))
+                maxOrder=testpaperQuestionRelationNumList.size();
+
+            if(relation.getQuestionOrder()==maxOrder)
+                return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_QUESTION_NOT_MOVE,null);
+
+            //查询该类型题目的下一道题目
+            TestpaperQuestionRelationExample testpaperQuestionRelationExample=new TestpaperQuestionRelationExample();
+            TestpaperQuestionRelationExample.Criteria relationCriteria = testpaperQuestionRelationExample.createCriteria();
+            relationCriteria.andTestPaperIdEqualTo(testPaperId);
+            relationCriteria.andQuestionTypeEqualTo(relation.getQuestionType());
+            relationCriteria.andQuestionOrderEqualTo(relation.getQuestionOrder()+1);
+            List<TestpaperQuestionRelation> testpaperQuestionRelationList = testpaperQuestionRelationMapper.selectByExample(testpaperQuestionRelationExample);
+            if(!CollectionUtils.isEmpty(testpaperQuestionRelationList)){
+
+                //下一道题目
+                TestpaperQuestionRelation nextRelation = testpaperQuestionRelationList.get(0);
+                nextRelation.setQuestionOrder(nextRelation.getQuestionOrder()-1);
+                nextRelation.setUpdatedTime(new Date());
+
+                //修改上一题目顺序为-1;
+                testpaperQuestionRelationMapper.updateByPrimaryKey(nextRelation);
+            }
+
+            //修改该题目顺序为+1；
+            relation.setQuestionOrder(relation.getQuestionOrder()+1);
+            relation.setUpdatedTime(new Date());
+            testpaperQuestionRelationMapper.updateByPrimaryKey(relation);
+        }
+
+        return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_PUT_SUCCESS,null);
     }
 }
