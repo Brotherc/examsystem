@@ -23,4 +23,7 @@ public interface TrueOrFalseQuestionService {
 
     //更新判断题
     public ResultInfo updateTrueOrFalseQuestion(String id, TrueOrFalseQuestionDto trueOrFalseQuestionDto) throws Exception;
+
+    //添加判断题（Excel导入）
+    public ResultInfo addTrueOrFalseQuestionByExcel(String createdTeacherId,String fileName, byte[] uploadData) throws Exception;
 }

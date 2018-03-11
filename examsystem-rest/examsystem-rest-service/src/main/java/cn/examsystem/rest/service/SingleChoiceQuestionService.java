@@ -23,4 +23,7 @@ public interface SingleChoiceQuestionService {
 
     //更新单选题
     public ResultInfo updateSingleChoiceQuestion(String id, SingleChoiceQuestionDto singleChoiceQuestionDto) throws Exception;
+
+    //添加单选题（Excel导入）
+    public ResultInfo addSingleChoiceQuestionByExcel(String createdTeacherId,String fileName, byte[] uploadData) throws Exception;
 }
