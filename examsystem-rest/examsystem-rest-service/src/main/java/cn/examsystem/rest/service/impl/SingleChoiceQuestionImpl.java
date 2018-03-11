@@ -1,6 +1,8 @@
 package cn.examsystem.rest.service.impl;
 
 import cn.examsystem.common.pojo.ResultInfo;
+import cn.examsystem.common.utils.FileUtil;
+import cn.examsystem.common.utils.POIUtils;
 import cn.examsystem.common.utils.UUIDBuild;
 import cn.examsystem.rest.mapper.*;
 import cn.examsystem.rest.pojo.dto.SingleChoiceQuestionDto;
@@ -9,6 +11,10 @@ import cn.examsystem.rest.pojo.vo.SingleChoiceQuestionVo;
 import cn.examsystem.rest.service.SingleChoiceQuestionService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -74,6 +80,9 @@ public class SingleChoiceQuestionImpl implements SingleChoiceQuestionService {
     private String MESSAGE_COURSE_ID_NOT_NULL;
     @Value("${MESSAGE_COURSE_NOT_EXIST}")
     private String MESSAGE_COURSE_NOT_EXIST;
+    @Value("${MESSAGE_PARAM_NOT_MATCH}")
+    private String MESSAGE_PARAM_NOT_MATCH;
+
 
     @Value("${MESSAGE_POST_SUCCESS}")
     private String MESSAGE_POST_SUCCESS;
@@ -85,6 +94,9 @@ public class SingleChoiceQuestionImpl implements SingleChoiceQuestionService {
     private String DICTTYPE_DIFFICULTY_ID;
     @Value("${DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE}")
     private String DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE;
+    @Value("${FILE_PATH_PRE_SINGLECHOICEQUESTION_EXCEL}")
+    private String FILE_PATH_PRE_SINGLECHOICEQUESTION_EXCEL;
+
 
     @Override
     public SingleChoiceQuestionDto getSingleChoiceQuestion(String id) throws Exception {
@@ -394,5 +406,272 @@ public class SingleChoiceQuestionImpl implements SingleChoiceQuestionService {
         singleChoiceQuestionMapper.updateByPrimaryKey(singleChoiceQuestionDb);
 
         return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_PUT_SUCCESS,null);
+    }
+
+    @Override
+    public ResultInfo addSingleChoiceQuestionByExcel(String createdTeacherId,String fileName, byte[] uploadData) throws Exception {
+
+        //创建题目教师id不能为空
+        if(StringUtils.isBlank(createdTeacherId))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_CREATED_TEACHER_ID_NOT_NULL,null);
+
+        //添加的题目的教师必须存在
+        Sysuser createdTeacher = sysuserMapper.selectByPrimaryKey(createdTeacherId);
+        if(createdTeacher==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_CREATED_TEACHER_NOT_EXIST,null);
+
+        //将上传的文件写到磁盘
+
+        //获得上传文件所在磁盘路径
+        String absolutePath = FileUtil.byte2File(uploadData,FILE_PATH_PRE_SINGLECHOICEQUESTION_EXCEL,UUIDBuild.getUUID()+fileName.substring(fileName.lastIndexOf(".")));
+
+        //读取文件
+        Workbook book = POIUtils.getExcelWorkbook(absolutePath);
+        Sheet sheet = POIUtils.getSheetByNum(book,1);
+
+        List<SingleChoiceQuestionDto> studentListFromExcel=null;
+
+        try {
+            studentListFromExcel = getSingleChoiceQuestionListFromExcel(book, sheet);
+        }catch (Exception e){
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_PARAM_NOT_MATCH,null);
+        }
+
+        //处理成功的数量
+        Integer countSuccess = 0;
+        //处理失败的数量
+        Integer countError = 0;
+        //错误信息
+        List<ResultInfo> errorDetails=new ArrayList<>();
+
+        for(int i=0;i<studentListFromExcel.size();i++){
+
+            SingleChoiceQuestionDto singleChoiceQuestionDto=studentListFromExcel.get(i);
+
+            String errorMessage="";
+            //题目内容不能为空
+            String content=singleChoiceQuestionDto.getContent();
+            if(StringUtils.isBlank(content)){
+                if(StringUtils.isBlank(errorMessage))
+                    errorMessage+=(i+1)+":内容不能为空";
+                else
+                    errorMessage+=",内容不能为空";
+            }else
+                //名字预处理
+                content=content.trim();
+
+
+            //选项A不能为空
+            String optionA=singleChoiceQuestionDto.getOptionA();
+            if(StringUtils.isBlank(optionA)){
+                if(StringUtils.isBlank(errorMessage))
+                    errorMessage+=(i+1)+":选项A不能为空";
+                else
+                    errorMessage+=",选项A不能为空";
+            }else
+                //选项A预处理
+                optionA=optionA.trim();
+
+            //选项B不能为空
+            String optionB=singleChoiceQuestionDto.getOptionB();
+            if(StringUtils.isBlank(optionB)){
+                if(StringUtils.isBlank(errorMessage))
+                    errorMessage+=(i+1)+":选项B不能为空";
+                else
+                    errorMessage+=",选项B不能为空";
+            }else
+                //选项B预处理
+                optionB=optionB.trim();
+
+            //选项C不能为空
+            String optionC=singleChoiceQuestionDto.getOptionC();
+            if(StringUtils.isBlank(optionC)){
+                if(StringUtils.isBlank(errorMessage))
+                    errorMessage+=(i+1)+":选项C不能为空";
+                else
+                    errorMessage+=",选项C不能为空";
+            }else
+                //选项C预处理
+                optionC=optionC.trim();
+
+            //选项D不能为空
+            String optionD=singleChoiceQuestionDto.getOptionD();
+            if(StringUtils.isBlank(optionD)){
+                if(StringUtils.isBlank(errorMessage))
+                    errorMessage+=(i+1)+":选项D不能为空";
+                else
+                    errorMessage+=",选项D不能为空";
+            }else
+                //选项D预处理
+                optionD=optionD.trim();
+
+            //答案不能为空
+            String answer=singleChoiceQuestionDto.getAnswer();
+            if(StringUtils.isBlank(answer)){
+                if(StringUtils.isBlank(errorMessage))
+                    errorMessage+=(i+1)+":答案不能为空";
+                else
+                    errorMessage+=",答案不能为空";
+            }else
+                //答案预处理
+                answer=answer.trim();
+
+            //难度不能为空
+            Integer difficulty = singleChoiceQuestionDto.getDifficulty();
+            if(difficulty==null){
+                if(StringUtils.isBlank(errorMessage))
+                    errorMessage+=(i+1)+":难度不能为空";
+                else
+                    errorMessage+=",难度不能为空";
+            }
+
+            //课程名字不能为空
+            String courseName=singleChoiceQuestionDto.getCourseName();
+            if(StringUtils.isBlank(courseName)){
+                if(StringUtils.isBlank(errorMessage))
+                    errorMessage+=(i+1)+":课程名字不能为空";
+                else
+                    errorMessage+=",课程名字不能为空";
+            }else
+                //课程名字预处理
+                courseName=courseName.trim();
+
+            //对应难度存在
+            if(difficulty!=null){
+                DictInfoExample dictInfoExample=new DictInfoExample();
+                DictInfoExample.Criteria dictInfoCriteria = dictInfoExample.createCriteria();
+                dictInfoCriteria.andCodeEqualTo(String.valueOf(difficulty));
+                dictInfoCriteria.andDictTypeIdEqualTo(DICTTYPE_DIFFICULTY_ID);
+                List<DictInfo> dictInfoList = dictInfoMapper.selectByExample(dictInfoExample);
+                if(CollectionUtils.isEmpty(dictInfoList)){
+                    if(StringUtils.isBlank(errorMessage))
+                        errorMessage+=(i+1)+":不存在该难度";
+                    else
+                        errorMessage+=",不存在该难度";
+                }
+            }
+
+            //对应课程存在
+            Course course=null;
+            if(!StringUtils.isBlank(courseName)){
+                CourseExample courseExample=new CourseExample();
+                CourseExample.Criteria courseCriteria = courseExample.createCriteria();
+                courseCriteria.andNameEqualTo(courseName);
+                List<Course> courseList = courseMapper.selectByExample(courseExample);
+                if(CollectionUtils.isEmpty(courseList)){
+                    if(StringUtils.isBlank(errorMessage))
+                        errorMessage+=(i+1)+":不存在该课程";
+                    else
+                        errorMessage+=",不存在该课程";
+                }else
+                    course=courseList.get(0);
+            }
+
+            if(!StringUtils.isBlank(errorMessage)){
+                countError++;
+                ResultInfo resultInfo = new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY, errorMessage, null);
+                errorDetails.add(resultInfo);
+                continue;
+            }
+
+            //将该题目添加到系统中
+            SingleChoiceQuestion singleChoiceQuestion=new SingleChoiceQuestion();
+            String questionId = UUIDBuild.getUUID();
+            singleChoiceQuestion.setId(questionId);
+            singleChoiceQuestion.setContent(content);
+            singleChoiceQuestion.setOptionA(optionA);
+            singleChoiceQuestion.setOptionB(optionB);
+            singleChoiceQuestion.setOptionC(optionC);
+            singleChoiceQuestion.setOptionD(optionD);
+            System.out.println(answer);
+            singleChoiceQuestion.setAnswer(answer);
+            singleChoiceQuestion.setType(new Integer(DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE));
+            singleChoiceQuestion.setDifficulty(difficulty);
+            singleChoiceQuestion.setCourseId(course.getId());
+            singleChoiceQuestion.setCreatedTeacherId(createdTeacherId);
+            singleChoiceQuestion.setIsChecked(true);
+            singleChoiceQuestion.setCreatedTime(new Date());
+            singleChoiceQuestion.setUpdatedTime(new Date());
+            singleChoiceQuestionMapper.insert(singleChoiceQuestion);
+            countSuccess++;
+        }
+
+        return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_POST_SUCCESS,countSuccess,errorDetails);
+    }
+
+    private List getSingleChoiceQuestionListFromExcel(Workbook book,Sheet sheet) throws Exception{
+        System.out.println("sheet名称是："+sheet.getSheetName());
+
+        int lastRowNum = sheet.getLastRowNum();
+
+        List<SingleChoiceQuestionDto> singleChoiceQuestionDtoList=new ArrayList<>();
+
+        for(int i=1;i<=lastRowNum;i++){
+            Row row = sheet.getRow(i);
+            if(row != null){
+
+                SingleChoiceQuestionDto singleChoiceQuestionDto=new SingleChoiceQuestionDto();
+
+                Cell cell1 = row.getCell(0);
+                String content=null;
+                if(cell1 != null){
+                    content=cell1.getStringCellValue();
+                    singleChoiceQuestionDto.setContent(content);
+                }
+                Cell cell2 = row.getCell(1);
+                String optionA=null;
+                if(cell2 != null){
+                    optionA=cell2.getStringCellValue();
+                    singleChoiceQuestionDto.setOptionA(optionA);
+                }
+
+                Cell cell3 = row.getCell(2);
+                String optionB=null;
+                if(cell3 != null){
+                    optionB=cell3.getStringCellValue();
+                    singleChoiceQuestionDto.setOptionB(optionB);
+                }
+
+                Cell cell4 = row.getCell(3);
+                String optionC=null;
+                if(cell4 != null){
+                    optionC=cell4.getStringCellValue();
+                    singleChoiceQuestionDto.setOptionC(optionC);
+                }
+
+                Cell cell5 = row.getCell(4);
+                String optionD=null;
+                if(cell5 != null){
+                    optionD=cell5.getStringCellValue();
+                    singleChoiceQuestionDto.setOptionD(optionD);
+                }
+
+                Cell cell6 = row.getCell(5);
+                String answer=null;
+                if(cell6 != null){
+                    answer=cell6.getStringCellValue();
+                    singleChoiceQuestionDto.setAnswer(answer);
+                }
+
+                Cell cell7 = row.getCell(6);
+                Integer difficulty=null;
+                if(cell7 != null){
+                    difficulty=(int)cell7.getNumericCellValue();
+                    singleChoiceQuestionDto.setDifficulty(difficulty);
+                }
+
+                Cell cell8 = row.getCell(7);
+                String courseName=null;
+                if(cell8 != null){
+                    courseName=cell8.getStringCellValue();
+                    singleChoiceQuestionDto.setCourseName(courseName);
+                }
+
+                if(StringUtils.isBlank(content)&&StringUtils.isBlank(optionA)&&StringUtils.isBlank(optionB)&&StringUtils.isBlank(optionC)&&StringUtils.isBlank(optionD)&&StringUtils.isBlank(answer)&&difficulty==null&&StringUtils.isBlank(courseName))
+                    continue;
+                singleChoiceQuestionDtoList.add(singleChoiceQuestionDto);
+            }
+        }
+        return singleChoiceQuestionDtoList;
     }
 }
