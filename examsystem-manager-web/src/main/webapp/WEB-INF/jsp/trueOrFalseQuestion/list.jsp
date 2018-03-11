@@ -20,6 +20,7 @@
     <link href="/css/plugins/bootstrap-table/bootstrap-table.min.css" rel="stylesheet">
     <link href="/css/plugins/chosen/chosen.css" rel="stylesheet">
     <link href="/css/animate.css" rel="stylesheet">
+    <link href="/css/plugins/webuploader/webuploader.css" rel="stylesheet">
     <link href="/css/style.css?v=4.1.0" rel="stylesheet">
 
     <!-- Sweet Alert -->
@@ -116,6 +117,9 @@
                                         </button>
                                         <button type="button" class="btn btn-outline btn-default" onclick="btchDeleteMajor()">
                                             <i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline btn-default" onclick="openExcelModal()">
+                                            <i class="glyphicon glyphicon-file" aria-hidden="true"></i>
                                         </button>
                                         <c:if test="${not empty role_checker  }">
                                             <button type="button" class="btn btn-outline btn-default" onclick="checkQuestion()">
@@ -295,6 +299,30 @@
         </div>
     </div>
 
+    <!-- excel添加题目modal -->
+    <div class="modal inmodal fade" id="modal-form-excel" tabindex="-1" role="dialog"  aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">Excel导入</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="uploader" class="wu-example">
+                        <!--用来存放文件信息-->
+                        <div id="thelist" class="uploader-list"></div>
+                        <div id="picker">选择文件</div>
+                        <span class="help-block m-b-none"><i class="fa fa-info-circle"></i>默认导进来的题目为审核通过,题目所属课程在操作教师任课范围之内</span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary" id="excelAddButton" >导入</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 全局js -->
     <script src="/js/jquery.min.js?v=2.1.4"></script>
     <script src="/js/bootstrap.min.js?v=3.3.6"></script>
@@ -303,6 +331,8 @@
 
     <!-- Chosen -->
     <script src="/js/plugins/chosen/chosen.jquery.js"></script>
+
+    <script src="/js/plugins/webuploader/webuploader.min.js"></script>
 
     <!-- 自定义js -->
     <script src="/js/examsystem/common.js"></script>
@@ -497,6 +527,10 @@
             $(':input',"#question-add-form").not(':button,:submit,:reset,:hidden').val('').removeAttr('checked').removeAttr('selected');
             $("#answer_add").val("true").trigger("chosen:updated");
             $("#difficulty_add").val("0").trigger("chosen:updated");
+        }
+
+        function openExcelModal() {
+            $("#modal-form-excel").modal('show');
         }
 
         function searchQuestion() {
@@ -1094,6 +1128,81 @@
                     }
                 }
             });
+        });
+
+        var uploader;
+        //在点击弹出模态框的时候再初始化WebUploader，解决点击上传无反应问题
+        $("#modal-form-excel").on("shown.bs.modal",function(){
+            uploader = WebUploader.create({
+
+                // swf文件路径
+                swf: 'http://localhost:8081/js/plugins/webuploader/Uploader.swf',
+
+                // 文件接收服务端。
+                server: '',
+
+                // 选择文件的按钮。可选。
+                // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+                pick: {
+                    "id":'#picker',
+                    "multiple":false   //禁止多选。
+                },
+                //去重
+                duplicate:true,
+                //上传文件个数限制
+                fileNumLimit:1,
+                //重要参数:跟后台文件组件的对接参数，后台文件组件叫做upload。
+                fileVal:"upload"
+            });
+
+            // 当有文件被添加进队列的时候
+            uploader.on( 'fileQueued', function( file ) {
+                $("#thelist").append( '<div id="' + file.id + '" class="item">' +
+                    '<h4 class="info">' + file.name + '</h4>' +
+                    '<p class="state">等待上传...</p>' +
+                    '</div>' );
+            });
+
+            uploader.on( 'uploadSuccess',function(file,response){
+                if(response.status == 201){
+                    $("#modal-form-excel").modal('hide');
+                    var length=response.details.length;
+                    var detailMessage="";
+                    $.each(response.details,function (index,resultInfo) {
+                        if(index!=length-1){
+                            detailMessage+=resultInfo.message+"   ";
+                        }
+                        else{
+                            detailMessage+=resultInfo.message;
+                        }
+                    });
+                    swal(response.message+":"+response.data+"条", detailMessage, "success");
+                    $("#exampleTableEvents").bootstrapTable('refresh');
+                }
+                else{
+                    if(response.status!=null)
+                        swal("添加失败",response.message, "error");
+                    else
+                        to500();
+                }
+            });
+
+            uploader.on('uploadError', function(file,response) {
+                to500();
+            });
+        });
+
+        $("#excelAddButton").on('click', function() {
+            var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
+            uploader.options.server="/v1/trueOrFalseQuestion/file";
+            uploader.upload();
+        });
+
+        //关闭模态框销毁WebUploader，解决再次打开模态框时按钮越变越大问题
+        $('#modal-form-excel').on('hide.bs.modal', function () {
+
+            $("#thelist").children().remove();
+            uploader.destroy();
         });
     </script>
 
