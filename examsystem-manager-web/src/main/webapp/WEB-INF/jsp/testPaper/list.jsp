@@ -227,6 +227,55 @@
         </div>
     </div>
 
+    <!-- 试卷题目详情modal -->
+    <div id="modal-form-questionDetails" class="modal fade" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row">
+                        <form class="form-horizontal" id="question-details-form">
+                            <input type="hidden" id="testPaperId" value="">
+                            <div class="ibox-content">
+                                <div class="panel blank-panel">
+
+                                    <div class="panel-heading">
+                                        <div class="panel-options">
+
+                                            <ul class="nav nav-tabs" id="nav_tabs_questions">
+
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div class="panel-body">
+                                        <div class="tab-content" id="content_questions">
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="btn-group hidden-xs" role="group">
+                                    <button type="button" class="btn btn-outline btn-default" onclick="removeQuestion()">
+                                        <i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
+                                        移除
+                                    </button>
+                                    <button type="button" class="btn btn-outline btn-default" onclick="upQuestion()">
+                                        <i class="glyphicon glyphicon-menu-up" aria-hidden="true"></i>
+                                        上移
+                                    </button>
+                                    <button type="button" class="btn btn-outline btn-default" onclick="downQuestion()">
+                                        <i class="glyphicon glyphicon-menu-down" aria-hidden="true"></i>
+                                        下移
+                                    </button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 全局js -->
     <script src="/js/jquery.min.js?v=2.1.4"></script>
     <script src="/js/bootstrap.min.js?v=3.3.6"></script>
@@ -378,6 +427,184 @@
                     }
                 }
             });
+        }
+
+        function removeQuestion() {
+            var checkedQuestions=$("#content_questions .active .checked");
+            if(checkedQuestions.length==0){
+                layer.msg("请选择题目，再进行移除");
+                return;
+            }
+
+            var ids=[];
+            $.each(checkedQuestions,function (index,question) {
+                //$(question).parent().parent().remove();
+                //构造ids;
+                console.log($(question).children().val());
+                ids.push($(question).children().val());
+            });
+
+            var params = {"ids":ids,_method:'delete'};
+
+            $.ajax({
+                type: "POST",
+                url: "/v1/testPaper/"+$("#testPaperId").val()+"/question",
+                data: params,
+                success: function(data){
+                    if(data.status == 204){
+                        $.each(checkedQuestions,function (index,question) {
+                            $(question).parent().parent().remove();
+                        });
+                    }
+                    else{
+                        swal(data.message, "无法移除这些题目。", "error");
+                    }
+                },
+                error:function(XMLHttpRequest, textStatus, errorThrown){
+                    var status=XMLHttpRequest.status;
+                    if(status==403){
+                        to403();
+                    }else if(status==500){
+                        to500();
+                    }
+                }
+            });
+
+
+        }
+        function upQuestion() {
+            var checkedQuestions=$("#content_questions .active .checked");
+            if(checkedQuestions.length==0){
+                layer.msg("请选择题目再进行移动");
+                return;
+            }
+            if(checkedQuestions.length>1){
+                layer.msg("只允许移动一个题目");
+                return;
+            }
+
+            var questionId;
+
+            var go=true;
+
+            var checkedQuestion=$(checkedQuestions[0]).parent().parent()[0];
+            var questions=$("#content_questions .active .ibox");
+            $.each(questions,function (index,question) {
+
+                console.log(index);
+                if($(question)[0]==checkedQuestion){
+                    if(index==0){
+                        layer.msg("该题目已在最前，无法移动");
+                        go=false;
+                        return;
+                    }else{
+                        alert($(checkedQuestions).children().val());
+                        questionId=$(checkedQuestions).children().val();
+                    }
+                }
+            });
+
+            if(go){
+                var params = {"order":1,_method:'put'};
+
+                $.ajax({
+                    type: "POST",
+                    url: "/v1/testPaper/"+$("#testPaperId").val()+"/question/"+questionId,
+                    data: params,
+                    success: function(data){
+                        if(data.status == 201){
+                            $.each(questions,function (index,question) {
+                                console.log($(question));
+                                if($(question)[0]==checkedQuestion){
+                                    //上移
+                                    var pre=$(question).prev()[0];
+                                    $(question).after(pre);
+                                }
+                            });
+                        }
+                        else{
+                            swal(data.message, "无法移动题目。", "error");
+                        }
+                    },
+                    error:function(XMLHttpRequest, textStatus, errorThrown){
+                        var status=XMLHttpRequest.status;
+                        if(status==403){
+                            to403();
+                        }else if(status==500){
+                            to500();
+                        }
+                    }
+                });
+            }
+
+
+        }
+        function downQuestion() {
+            var checkedQuestions=$("#content_questions .active .checked");
+            if(checkedQuestions.length==0){
+                layer.msg("请选择题目再进行移动");
+                return;
+            }
+            if(checkedQuestions.length>1){
+                layer.msg("只允许移动一个题目");
+                return;
+            }
+
+            var questionId;
+
+            var go=true;
+
+            var checkedQuestion=$(checkedQuestions[0]).parent().parent()[0];
+            console.log(checkedQuestion);
+            var questions=$("#content_questions .active .ibox");
+            $.each(questions,function (index,question) {
+
+                console.log($(question));
+                if($(question)[0]==checkedQuestion){
+                    if(index==questions.length-1){
+                        layer.msg("该题目已在最后，无法移动");
+                        go=false;
+                        return;
+                    }
+                    else{
+                        alert($(checkedQuestions).children().val());
+                        questionId=$(checkedQuestions).children().val();
+                    }
+                }
+            });
+
+            if(go){
+                var params = {"order":0,_method:'put'};
+
+                $.ajax({
+                    type: "POST",
+                    url: "/v1/testPaper/"+$("#testPaperId").val()+"/question/"+questionId,
+                    data: params,
+                    success: function(data){
+                        if(data.status == 201){
+                            $.each(questions,function (index,question) {
+                                console.log($(question));
+                                if($(question)[0]==checkedQuestion){
+                                    //下移
+                                    var next=$(question).next()[0];
+                                    $(question).before(next);
+                                }
+                            });
+                        }
+                        else{
+                            swal(data.message, "无法移动该题目。", "error");
+                        }
+                    },
+                    error:function(XMLHttpRequest, textStatus, errorThrown){
+                        var status=XMLHttpRequest.status;
+                        if(status==403){
+                            to403();
+                        }else if(status==500){
+                            to500();
+                        }
+                    }
+                });
+            }
         }
 
         function updateTestPaper(){
@@ -581,6 +808,135 @@
                 });
 
             },
+            "click #testPaperQuestion":function (e,value,row,index) {
+
+                $("#nav_tabs_questions").children().remove();
+                $("#content_questions").children().remove();
+
+                $("#testPaperId").val(row.id);
+
+                $.ajax({
+                    type: "GET",
+                    url: "/v1/testPaper/"+row.id+"/question",
+                    data: null,
+                    success: function(data){
+                        if(data.status == 200){
+
+/*                                <ul class="nav nav-tabs" id="nav_tabs_questions">
+
+                                <div class="tab-content" id="content_questions">*/
+
+
+                            //赋值
+                            var testPaperDetails=data.data;
+
+                            if(testPaperDetails!=null){
+                                if(testPaperDetails.singleChoiceQuestions!=null){
+
+                                    $("#nav_tabs_questions").append('<li class=""><a data-toggle="tab" href="list.jsp#tab-0">单选题</a> </li>');
+
+
+                                    var html="";
+                                    html+='<div id="tab-0" class="tab-pane">';
+                                    html+='<div class="panel-body">';
+                                    html+='<div class="row">';
+                                    html+='<div class="col-lg-12" id="question-0">';
+
+                                    $.each(testPaperDetails.singleChoiceQuestions,function (index,question) {
+                                        var id=question.id;
+                                        var content=question.questionContent;
+                                        var optionA=question.optionA;
+                                        var optionB=question.optionB;
+                                        var optionC=question.optionC;
+                                        var optionD=question.optionD;
+
+                                        html+='<div class="ibox"><div class="ibox-content"><input type="checkbox" value="'+id+'" name="" class="i-checks" />';
+
+                                        html+='<p>'+content+'</p><p>A:'+optionA+'</p><p>B:'+optionB+'</p><p>C:'+optionC+'</p><p>D:'+optionD+'</p>';
+
+
+                                        html+='</div></div>';
+                                    });
+
+                                    html+='</div></div></div></div>';
+
+                                    $("#content_questions").append(html);
+                                }
+                                if(testPaperDetails.trueOrFalseQuestions!=null){
+                                    $("#nav_tabs_questions").append('<li class=""><a data-toggle="tab" href="list.jsp#tab-1">判断题</a> </li>');
+
+                                    var html="";
+                                    html+='<div id="tab-1" class="tab-pane">';
+                                    html+='<div class="panel-body">';
+                                    html+='<div class="row">';
+                                    html+='<div class="col-lg-12" id="question-1">';
+
+                                    $.each(testPaperDetails.trueOrFalseQuestions,function (index,question) {
+                                        var id=question.id;
+                                        var content=question.questionContent;
+
+                                        html+='<div class="ibox"><div class="ibox-content"><input type="checkbox" value="'+id+'" name="" class="i-checks" />';
+
+                                        html+='<p>'+content+'</p>';
+
+                                        html+='</div></div>';
+                                    });
+
+                                    html+='</div></div></div></div>';
+
+                                    $("#content_questions").append(html);
+                                }
+                                if(testPaperDetails.fillInBlankQuestions!=null){
+                                    $("#nav_tabs_questions").append('<li class=""><a data-toggle="tab" href="list.jsp#tab-2">填空题</a> </li>');
+
+                                    var html="";
+                                    html+='<div id="tab-2" class="tab-pane">';
+                                    html+='<div class="panel-body">';
+                                    html+='<div class="row">';
+                                    html+='<div class="col-lg-12" id="question-2">';
+
+                                    $.each(testPaperDetails.fillInBlankQuestions,function (index,question) {
+                                        var id=question.id;
+                                        var content=question.questionContent;
+
+                                        html+='<div class="ibox"><div class="ibox-content"><input type="checkbox" value="'+id+'" name="" class="i-checks" />';
+
+                                        html+='<p>'+content+'</p>';
+
+                                        html+='</div></div>';
+                                    });
+
+                                    html+='</div></div></div></div>';
+
+                                    $("#content_questions").append(html);
+                                }
+                            }
+
+                            $($("#nav_tabs_questions").children().get(0)).addClass("active");
+                            $($("#content_questions").children().get(0)).addClass("active");
+
+                            $('.i-checks').iCheck({
+                                checkboxClass: 'icheckbox_square-green',
+                                radioClass: 'iradio_square-green',
+                            });
+
+                            $("#modal-form-questionDetails").modal('show');
+                        }
+                        else{
+                            swal("查看失败",data.message, "error");
+                        }
+                    },
+                    error:function(XMLHttpRequest, textStatus, errorThrown){
+                        var status=XMLHttpRequest.status;
+                        if(status==403){
+                            to403();
+                        }else if(status==500){
+                            to500();
+                        }
+                    }
+                });
+
+            }
         };
         (function () {
 

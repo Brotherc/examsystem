@@ -905,12 +905,14 @@
 
                 var repate=false;
                 var ids=$("#question-"+type+" input[type='checkbox']");
+
                 $.each(ids,function (index,_id) {
                    if(id==$(_id).attr("value")){
                        repate=true;
                        return ;
                    }
                 });
+
                 if(repate){
                     layer.msg("该题目已在试题篮中，无需添加!");
                     return;
@@ -945,18 +947,20 @@
 
                                 html+='<p>'+content+'</p><p>A:'+optionA+'</p><p>B:'+optionB+'</p><p>C:'+optionC+'</p><p>D:'+optionD+'</p>';
                                 html+='<div class="row"><div class="col-md-6"><h5>知识点：</h5>';
-
-                                $.each(questionDetails.knowledgePoints,function (index,knowledgePoint) {
-                                    if(index==0)
-                                        html+='<button class="btn btn-success btn-xs" type="button">'+knowledgePoint+'</button>';
-                                    else
-                                        html+='<button class="btn btn-white btn-xs" type="button">'+knowledgePoint+'</button>';
-                                });
-
+                                if(questionDetails.knowledgePoints!=null){
+                                    $.each(questionDetails.knowledgePoints,function (index,knowledgePoint) {
+                                        if(index==0)
+                                            html+='<button class="btn btn-success btn-xs" type="button">'+knowledgePoint+'</button>';
+                                        else
+                                            html+='<button class="btn btn-white btn-xs" type="button">'+knowledgePoint+'</button>';
+                                    });
+                                }
                                 html+='</div><div class="col-md-6"><div class="small text-right"><h5>难度：</h5><div><i class="fa fa-flash"> </i>'+difficultyName+'</div>';
                                 html+='</div></div></div>';
 
                                 $("#question-"+type).append(html);
+
+
 
                                 var num=$("#small-chat span").text();
                                 $("#small-chat span").text(parseInt(num)+1);
