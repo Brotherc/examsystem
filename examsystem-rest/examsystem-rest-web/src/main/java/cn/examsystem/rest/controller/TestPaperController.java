@@ -60,4 +60,21 @@ public class TestPaperController {
         ResultInfo resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,testPaperDto);
         return resultInfo;
     }
+
+    @GetMapping("/v1/testPaper/{id}/question")
+    public ResultInfo listTestPaperQuestionByTestPaperId(@PathVariable String id) throws Exception{
+        TestPaperDto testPaperDto = testPaperService.listTestPaperQuestionByTestPaperId(id);
+        ResultInfo resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,testPaperDto);
+        return resultInfo;
+    }
+
+    @DeleteMapping(value = "/v1/testPaper/{testPaperId}/question")
+    public ResultInfo removeQuestionFromTestPaper(@PathVariable String testPaperId,@RequestBody String[] ids) throws Exception{
+        return testPaperService.removeQuestionFromTestPaper(testPaperId,ids);
+    }
+
+    @PutMapping("/v1/testPaper/{id}/question/{questionId}")
+    public ResultInfo updateTestPaperQuestionOrder(@PathVariable String id,@PathVariable String questionId,@RequestBody Integer order) throws Exception{
+        return testPaperService.updateTestPaperQuestionOrder(id,questionId,order);
+    }
 }
