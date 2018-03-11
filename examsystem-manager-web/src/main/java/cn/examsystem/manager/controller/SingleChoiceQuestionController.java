@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 
@@ -26,6 +27,8 @@ public class SingleChoiceQuestionController {
     private String REST_BASE_URL;
     @Value("${SINGLECHOICEQUESTION_URL}")
     private String SINGLECHOICEQUESTION_URL;
+    @Value("${QUESTION_FILE_URL}")
+    private String QUESTION_FILE_URL;
 
     @Value("${MESSAGE_GET_FAIL}")
     private String MESSAGE_GET_FAIL;
@@ -125,6 +128,26 @@ public class SingleChoiceQuestionController {
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
+        }
+        return resultInfo;
+    }
+
+    @PostMapping("/v1/singleChoiceQuestion/file")
+    public ResultInfo addSingleChoiceQuestionByExcel( MultipartFile upload,HttpSession session) throws Exception{
+
+        //从session中获取springsecurity认证的用户信息
+        SecurityContext securityContext= (SecurityContext) session.getAttribute("SPRING_SECURITY_CONTEXT");
+        SysuserDto sysuserDto= (SysuserDto) securityContext.getAuthentication().getPrincipal();
+
+        System.out.println(upload.getOriginalFilename());
+
+        ResultInfo resultInfo;
+        try {
+            //调用rest服务
+            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+SINGLECHOICEQUESTION_URL+QUESTION_FILE_URL+"?fileName="+upload.getOriginalFilename()+"&createdTeacherId="+sysuserDto.getId(),HttpMethod.POST,upload.getBytes(),ResultInfo.class,new Object[]{});
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_SAVE_FAIL,null);
         }
         return resultInfo;
     }
