@@ -26,6 +26,9 @@ public class TestPaperController {
     private String REST_BASE_URL;
     @Value("${TESTPAPER_URL}")
     private String TESTPAPER_URL;
+    @Value("${TESTPAPER_QUESTION_URL}")
+    private String TESTPAPER_QUESTION_URL;
+
 
     @Value("${MESSAGE_GET_FAIL}")
     private String MESSAGE_GET_FAIL;
@@ -120,6 +123,51 @@ public class TestPaperController {
         try {
             //调用rest服务
             resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+TESTPAPER_URL+"/{id}",HttpMethod.PUT,testPaperDto,ResultInfo.class,new Object[]{id});
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
+        }
+        return resultInfo;
+    }
+
+    @GetMapping("/v1/testPaper/{id}/question")
+    public ResultInfo listTestPaperQuestionByTestPaperId(@PathVariable String id) throws Exception{
+
+        ResultInfo resultInfo;
+        try{
+
+            //调用rest服务
+            resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+TESTPAPER_URL+"/{id}"+TESTPAPER_QUESTION_URL, HttpMethod.GET, ResultInfo.class,new Object[]{id});
+            System.out.println("---------"+resultInfo);
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("---------"+"失败");
+            return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_GET_FAIL,null);
+        }
+        return resultInfo;
+    }
+
+    @DeleteMapping("/v1/testPaper/{testPaperId}/question")
+    public ResultInfo removeQuestionFromTestPaper(@PathVariable String testPaperId,@RequestParam(value = "ids[]") String[] ids) throws Exception{
+
+        ResultInfo resultInfo;
+        try {
+            //调用rest服务
+            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+TESTPAPER_URL+"/{testPaperId}"+TESTPAPER_QUESTION_URL,HttpMethod.DELETE,ids,ResultInfo.class,new Object[]{testPaperId});
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_DELETE_FAIL,null);
+        }
+        return resultInfo;
+    }
+
+    @PutMapping("/v1/testPaper/{id}/question/{questionId}")
+    public ResultInfo updateTestPaperQuestionOrder(@PathVariable String id,@PathVariable String questionId,Integer order,HttpSession session) throws Exception{
+
+        ResultInfo resultInfo;
+        try {
+            //调用rest服务
+            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+TESTPAPER_URL+"/{id}"+TESTPAPER_QUESTION_URL+"/{questionId}",HttpMethod.PUT,order,ResultInfo.class,new Object[]{id,questionId});
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
