@@ -321,6 +321,36 @@
                         <form class="form-horizontal" id="question-details-form">
                             <p>欢迎查看该题目(⊙o⊙)</p>
                             <div class="form-group">
+                                <label class="col-sm-3 control-label">内容：</label>
+                                <div class="col-sm-6">
+                                    <p class="form-control-static" id="content_details"></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">A：</label>
+                                <div class="col-sm-6">
+                                    <p class="form-control-static" id="optionA_details"></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">B：</label>
+                                <div class="col-sm-6">
+                                    <p class="form-control-static" id="optionB_details"></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">C：</label>
+                                <div class="col-sm-6">
+                                    <p class="form-control-static" id="optionC_details"></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">D：</label>
+                                <div class="col-sm-6">
+                                    <p class="form-control-static" id="optionD_details"></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label class="col-sm-3 control-label">课程：</label>
                                 <div class="col-sm-6">
                                     <p class="form-control-static" id="course_details"></p>
@@ -741,6 +771,68 @@
             $("#modal-form-excel").modal('show');
         }
 
+        function checkQuestion(){
+            var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
+            if(sels.length == 0){
+                layer.msg("必须选择一个题目才能审核!");
+                return ;
+            }else if(sels.length >1){
+                layer.msg("只能选择一个题目!");
+                return ;
+            }
+
+            var isChecked=sels[0].isChecked;
+            var id=sels[0].id;
+
+            var title="";
+            if(isChecked){
+                title="确定不让该题目通过审核吗"
+            }else{
+                title="确定让该题目通过审核吗"
+            }
+            swal({
+                        title: title,
+                        text: "请谨慎操作！",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "是的，我已确认！",
+                        cancelButtonText: "让我再考虑一下…",
+                        closeOnConfirm: false,
+                        closeOnCancel: false
+                    },
+                    function (isConfirm) {
+                        if (isConfirm) {
+                            var params = {_method:'put',questionType:'0'};
+                            $.ajax({
+                                type: "POST",
+                                url: "/v1/checker/question/"+id,
+                                data: params,
+                                success: function(data){
+                                    if(data.status == 201){
+                                        swal(data.message, "您已经审核了该题目。", "success");
+                                        $("#exampleTableEvents").bootstrapTable('refresh');
+                                    }
+                                    else{
+                                        swal(data.message, "无法审核该题目。", "error");
+                                    }
+                                },
+                                error:function(XMLHttpRequest, textStatus, errorThrown){
+                                    var status=XMLHttpRequest.status;
+                                    if(status==403){
+                                        to403();
+                                    }else if(status==500){
+                                        to500();
+                                    }
+                                }
+                            });
+
+                        } else {
+                            swal("已取消", "您取消了审核操作！", "error");
+                        }
+                    });
+        }
+
         function btchDeleteMajor(){
             var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
             if(sels.length == 0){
@@ -820,7 +912,7 @@
             $.ajax({
                 type: "POST",
                 url: "/v1/singleChoiceQuestion",
-                data: decodeURIComponent($("#question-add-form").serialize().replace(/\+/g,"")),
+                data: $("#question-add-form").serialize(),
                 success: function(data){
                     if(data.status == 201){
                         $("#modal-form-save").modal('hide');
@@ -871,7 +963,7 @@
             $.ajax({
                 type: "POST",
                 url: "/v1/singleChoiceQuestion/"+id,
-                data: decodeURIComponent($("#question-update-form").serialize().replace(/\+/g,"")),
+                data: $("#question-update-form").serialize(),
                 success: function(data){
                     if(data.status == 201){
                         $("#modal-form-update").modal('hide');
@@ -962,6 +1054,11 @@
                             //赋值
                             var courseDetails=data.data;
 
+                            $("#content_details").text(courseDetails.content);
+                            $("#optionA_details").text(courseDetails.optionA);
+                            $("#optionB_details").text(courseDetails.optionB);
+                            $("#optionC_details").text(courseDetails.optionC);
+                            $("#optionD_details").text(courseDetails.optionD);
                             $("#course_details").text(courseDetails.courseName);
                             $("#difficulty_details").text(courseDetails.difficultyName);
                             $("#created_teacher_details").text(courseDetails.createdTeacher.sysuserId+"-"+courseDetails.createdTeacher.name);
@@ -1067,7 +1164,7 @@
             $("#course_add_chosen").width(270);
             $("#answer_add_chosen").width(270);
             $("#difficulty_add_chosen").width(270);
-
+            $("#course_add").val($("#course").val()).trigger("chosen:updated");
         });
         $("#modal-form-update").on('shown.bs.modal',function () {
             $("#course_update_chosen").width(270);

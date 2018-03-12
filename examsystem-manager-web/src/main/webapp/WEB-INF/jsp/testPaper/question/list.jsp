@@ -299,6 +299,12 @@
                         <form class="form-horizontal" id="question-details-special-form">
                             <p>欢迎查看该题目(⊙o⊙)</p>
                             <div class="form-group">
+                                <label class="col-sm-3 control-label">内容：</label>
+                                <div class="col-sm-6">
+                                    <p class="form-control-static" id="content_details_special"></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label class="col-sm-3 control-label">课程：</label>
                                 <div class="col-sm-6">
                                     <p class="form-control-static" id="course_details_special"></p>
@@ -343,6 +349,12 @@
                     <div class="row">
                         <form class="form-horizontal" id="question-details-general-form">
                             <p>欢迎查看该题目(⊙o⊙)</p>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">内容：</label>
+                                <div class="col-sm-6">
+                                    <p class="form-control-static" id="content_details_general"></p>
+                                </div>
+                            </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">课程：</label>
                                 <div class="col-sm-6">
@@ -833,6 +845,7 @@
                             var questionDetails=data.data;
 
                             if(type==2){//填空题
+                                $("#content_details_special").text(questionDetails.content);
                                 $("#course_details_special").text(questionDetails.courseName);
                                 $("#difficulty_details_special").text(questionDetails.difficultyName);
                                 $("#created_teacher_details_special").text(questionDetails.createdTeacher.sysuserId+"-"+questionDetails.createdTeacher.name);
@@ -872,6 +885,7 @@
                                 $("#modal-form-details-special").modal('show');
 
                             }else{//非填空题
+                                $("#content_details_general").text(questionDetails.content);
                                 $("#course_details_general").text(questionDetails.courseName);
                                 $("#difficulty_details_general").text(questionDetails.difficultyName);
                                 $("#created_teacher_details_general").text(questionDetails.createdTeacher.sysuserId+"-"+questionDetails.createdTeacher.name);
@@ -1252,7 +1266,7 @@
 
 
             $('#trueOfFalseTableEvents').bootstrapTable({
-                url: "/v1/trueOfFalseQuestion",
+                url: "/v1/trueOrFalseQuestion",
                 search: false,
                 pagination: true,
                 showRefresh: true,

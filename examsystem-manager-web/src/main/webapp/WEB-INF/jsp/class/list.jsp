@@ -221,13 +221,13 @@
         function btchDeleteMajor(){
             var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
             if(sels.length == 0){
-                layer.msg("未选中专业!");
+                layer.msg("未选中班级!");
                 return ;
             }
 
             var ids = getSelectionsIds(sels);
             swal({
-                        title: "确定删除所选专业吗",
+                        title: "确定删除所选班级吗",
                         text: "删除后将无法恢复，请谨慎操作！",
                         type: "warning",
                         showCancelButton: true,
@@ -246,11 +246,11 @@
                                 data: params,
                                 success: function(data){
                                     if(data.status == 201){
-                                        swal(data.message, "您已经永久删除了这些专业。", "success");
+                                        swal(data.message, "您已经永久删除了这些班级。", "success");
                                         $("#exampleTableEvents").bootstrapTable('refresh');
                                     }
                                     else{
-                                        swal(data.message, "无法删除这些专业。", "error");
+                                        swal(data.message, "无法删除这些班级。", "error");
                                     }
                                 },
                                 error:function(XMLHttpRequest, textStatus, errorThrown){
@@ -275,14 +275,19 @@
                 layer.msg("请正确填写班级范围!");
                 return ;
             }
-            if($("#class-add-form [name=majorId]").val()==null){
+            if($("#class-add-form [name=names]").val().trim().indexOf("00")!=-1){
+                layer.msg("班级名字不允许为0!");
+                return ;
+            }
+            if($("#class-add-form [name=majorId]").val().trim()==""){
                 layer.msg("专业名字不能为空!");
                 return ;
             }
-            if($("#class-add-form [name=gradeId]").val()==null){
+            if($("#class-add-form [name=gradeId]").val().trim()==""){
                 layer.msg("年级名字不能为空!");
                 return ;
             }
+
             //ajax的post方式提交表单
             //$("#itemAddForm").serialize()将表单序列号为key-value形式的字符串
             $.ajax({
@@ -303,7 +308,8 @@
                                 detailMessage+=resultInfo.message;
                             }
                         });
-                        detailMessage+="名字重复";
+                        if(length!=0)
+                            detailMessage+="名字重复";
                         swal(data.message+":"+data.data+"条", detailMessage, "success");
                         $("#exampleTableEvents").bootstrapTable('refresh');
                     }

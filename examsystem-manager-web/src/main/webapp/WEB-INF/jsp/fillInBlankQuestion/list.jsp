@@ -314,6 +314,12 @@
                         <form class="form-horizontal" id="question-details-form">
                             <p>欢迎查看该题目(⊙o⊙)</p>
                             <div class="form-group">
+                                <label class="col-sm-3 control-label">内容：</label>
+                                <div class="col-sm-6">
+                                    <p class="form-control-static" id="content_details"></p>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label class="col-sm-3 control-label">课程：</label>
                                 <div class="col-sm-6">
                                     <p class="form-control-static" id="course_details"></p>
@@ -612,7 +618,7 @@
                     $.ajax({
                         type: "POST",
                         url: "/v1/fillInBlankQuestion",
-                        data: decodeURIComponent($("#question-add-form").serialize().replace(/\+/g,"")),
+                        data: $("#question-add-form").serialize(),
                         success: function(data){
                             if(data.status == 201){
                                 $("#modal-form-save").modal('hide');
@@ -713,7 +719,7 @@
                     $.ajax({
                         type: "POST",
                         url: "/v1/fillInBlankQuestion/"+sels[0].id,
-                        data: decodeURIComponent($("#question-update-form").serialize().replace(/\+/g,"")),
+                        data: $("#question-update-form").serialize(),
                         success: function(data){
                             if(data.status == 201){
                                 $("#modal-form-update").modal('hide');
@@ -1002,7 +1008,7 @@
 
             var ids = getSelectionsIds(sels);
             swal({
-                        title: "确定删除所选专业吗",
+                        title: "确定删除所选题目吗",
                         text: "删除后将无法恢复，请谨慎操作！",
                         type: "warning",
                         showCancelButton: true,
@@ -1087,7 +1093,7 @@
                                         $("#exampleTableEvents").bootstrapTable('refresh');
                                     }
                                     else{
-                                        swal(data.message, "无法审核该专业。", "error");
+                                        swal(data.message, "无法审核该题目。", "error");
                                     }
                                 },
                                 error:function(XMLHttpRequest, textStatus, errorThrown){
@@ -1172,6 +1178,7 @@
                             //赋值
                             var questionDetails=data.data;
 
+                            $("#content_details").text(questionDetails.content);
                             $("#course_details").text(questionDetails.courseName);
                             $("#difficulty_details").text(questionDetails.difficultyName);
                             $("#created_teacher_details").text(questionDetails.createdTeacher.sysuserId+"-"+questionDetails.createdTeacher.name);
@@ -1340,6 +1347,8 @@
             $("#course_add_chosen").width(270);
             $("#matcher_add_chosen").width(270);
             $("#difficulty_add_chosen").width(270);
+
+            $("#course_add").val($("#course").val()).trigger("chosen:updated");
 
             $("#question-add-form").children("input[name^='answerList']").remove();
 
