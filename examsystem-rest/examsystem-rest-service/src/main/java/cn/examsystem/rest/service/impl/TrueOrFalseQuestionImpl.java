@@ -45,6 +45,8 @@ public class TrueOrFalseQuestionImpl implements TrueOrFalseQuestionService {
     private CourseTeacherRelationMapper courseTeacherRelationMapper;
     @Autowired
     private QuestionKnowledgepointRelationMapper questionKnowledgepointRelationMapper;
+    @Autowired
+    private KnowledgePointMapper knowledgePointMapper;
 
     @Value("${MESSAGE_QUESTION_IS_CHECKED}")
     private String MESSAGE_QUESTION_IS_CHECKED;
@@ -117,6 +119,28 @@ public class TrueOrFalseQuestionImpl implements TrueOrFalseQuestionService {
             List<DictInfo> dictInfoList = dictInfoMapper.selectByExample(dictInfoExample);
             if(!CollectionUtils.isEmpty(dictInfoList)){
                 trueOrFalseQuestionDto.setDifficultyName(dictInfoList.get(0).getName());
+            }
+
+            //查询知识点信息
+            QuestionKnowledgepointRelationExample questionKnowledgepointRelationExample=new QuestionKnowledgepointRelationExample();
+            QuestionKnowledgepointRelationExample.Criteria questionKnowledgepointRelationCriteria = questionKnowledgepointRelationExample.createCriteria();
+            questionKnowledgepointRelationCriteria.andQuestionIdEqualTo(id);
+            List<QuestionKnowledgepointRelation> questionKnowledgepointRelationList = questionKnowledgepointRelationMapper.selectByExample(questionKnowledgepointRelationExample);
+            if(!CollectionUtils.isEmpty(questionKnowledgepointRelationList)){
+                List<String> knowledgePointIdList=new ArrayList<>();
+                for(QuestionKnowledgepointRelation relation:questionKnowledgepointRelationList){
+                    knowledgePointIdList.add(relation.getKnowledgePointId());
+                }
+                KnowledgePointExample knowledgePointExample=new KnowledgePointExample();
+                KnowledgePointExample.Criteria knowledgePointCriteria = knowledgePointExample.createCriteria();
+                knowledgePointCriteria.andIdIn(knowledgePointIdList);
+                List<KnowledgePoint> knowledgePointList = knowledgePointMapper.selectByExample(knowledgePointExample);
+
+                List<String> knowledgePointNameList=new ArrayList<>();
+                for(KnowledgePoint knowledgePoint:knowledgePointList){
+                    knowledgePointNameList.add(knowledgePoint.getName());
+                }
+                trueOrFalseQuestionDto.setKnowledgePoints(knowledgePointNameList);
             }
         }
         return trueOrFalseQuestionDto;

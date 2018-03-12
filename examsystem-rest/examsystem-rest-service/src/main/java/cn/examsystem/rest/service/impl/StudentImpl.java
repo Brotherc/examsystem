@@ -114,6 +114,10 @@ public class StudentImpl implements StudentService{
             studentDb.setPassword(studentPassword);
         }
 
+        //如果状态不为空，则修改状态
+        Integer status = student.getStatus();
+        if(status!=null)
+            studentDb.setStatus(status);
 
         //更新学生
         studentDb.setName(studentName);

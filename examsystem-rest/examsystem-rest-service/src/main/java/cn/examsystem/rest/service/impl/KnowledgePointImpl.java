@@ -5,8 +5,10 @@ import cn.examsystem.common.pojo.TreeNode;
 import cn.examsystem.common.pojo.TreeNodeState;
 import cn.examsystem.common.utils.UUIDBuild;
 import cn.examsystem.rest.mapper.KnowledgePointMapper;
+import cn.examsystem.rest.mapper.QuestionKnowledgepointRelationMapper;
 import cn.examsystem.rest.pojo.po.KnowledgePoint;
 import cn.examsystem.rest.pojo.po.KnowledgePointExample;
+import cn.examsystem.rest.pojo.po.QuestionKnowledgepointRelationExample;
 import cn.examsystem.rest.service.KnowledgePointService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -49,6 +51,8 @@ public class KnowledgePointImpl implements KnowledgePointService {
 
     @Autowired
     private KnowledgePointMapper knowledgePointMapper;
+    @Autowired
+    private QuestionKnowledgepointRelationMapper questionKnowledgepointRelationMapper;
 
     @Override
     public ResultInfo getKnowledgePoint(String parentId) throws Exception {
@@ -61,6 +65,7 @@ public class KnowledgePointImpl implements KnowledgePointService {
         KnowledgePointExample knowledgePointOneExample=new KnowledgePointExample();
         KnowledgePointExample.Criteria knowledgePointOneCriteria = knowledgePointOneExample.createCriteria();
         knowledgePointOneCriteria.andParentIdEqualTo(parentId);
+        knowledgePointOneExample.setOrderByClause("SORT_ORDER ASC");
         List<KnowledgePoint> knowledgePointOneList = knowledgePointMapper.selectByExample(knowledgePointOneExample);
 
         List<TreeNode>oneTreeNodeList=new ArrayList<>();
@@ -227,6 +232,12 @@ public class KnowledgePointImpl implements KnowledgePointService {
             knowledgePointParentDb.setUpdatedTime(new Date());
             knowledgePointMapper.updateByPrimaryKey(knowledgePointParentDb);
         }
+
+        //将该知识点对应的题目删除
+        QuestionKnowledgepointRelationExample questionKnowledgepointRelationExample=new QuestionKnowledgepointRelationExample();
+        QuestionKnowledgepointRelationExample.Criteria questionKnowledgepointRelationCriteria = questionKnowledgepointRelationExample.createCriteria();
+        questionKnowledgepointRelationCriteria.andKnowledgePointIdEqualTo(id);
+        questionKnowledgepointRelationMapper.deleteByExample(questionKnowledgepointRelationExample);
 
         return new ResultInfo(ResultInfo.STATUS_RESULT_NO_CONTENT,MESSAGE_DELETE_SUCCESS,null);
     }

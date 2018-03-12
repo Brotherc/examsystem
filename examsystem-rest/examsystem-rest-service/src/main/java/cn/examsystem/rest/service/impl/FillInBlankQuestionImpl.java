@@ -83,6 +83,8 @@ public class FillInBlankQuestionImpl implements FillInBlankQuestionService {
     private CourseTeacherRelationMapper courseTeacherRelationMapper;
     @Autowired
     private QuestionKnowledgepointRelationMapper questionKnowledgepointRelationMapper;
+    @Autowired
+    private KnowledgePointMapper knowledgePointMapper;
 
 
     @Override
@@ -138,6 +140,28 @@ public class FillInBlankQuestionImpl implements FillInBlankQuestionService {
                     matcherNameList.add(matcherDictInfo.getName());
                 }
                 fillInBlankQuestionDto.setMatcherNames(matcherNameList);
+            }
+
+            //查询知识点信息
+            QuestionKnowledgepointRelationExample questionKnowledgepointRelationExample=new QuestionKnowledgepointRelationExample();
+            QuestionKnowledgepointRelationExample.Criteria questionKnowledgepointRelationCriteria = questionKnowledgepointRelationExample.createCriteria();
+            questionKnowledgepointRelationCriteria.andQuestionIdEqualTo(id);
+            List<QuestionKnowledgepointRelation> questionKnowledgepointRelationList = questionKnowledgepointRelationMapper.selectByExample(questionKnowledgepointRelationExample);
+            if(!CollectionUtils.isEmpty(questionKnowledgepointRelationList)){
+                List<String> knowledgePointIdList=new ArrayList<>();
+                for(QuestionKnowledgepointRelation relation:questionKnowledgepointRelationList){
+                    knowledgePointIdList.add(relation.getKnowledgePointId());
+                }
+                KnowledgePointExample knowledgePointExample=new KnowledgePointExample();
+                KnowledgePointExample.Criteria knowledgePointCriteria = knowledgePointExample.createCriteria();
+                knowledgePointCriteria.andIdIn(knowledgePointIdList);
+                List<KnowledgePoint> knowledgePointList = knowledgePointMapper.selectByExample(knowledgePointExample);
+
+                List<String> knowledgePointNameList=new ArrayList<>();
+                for(KnowledgePoint knowledgePoint:knowledgePointList){
+                    knowledgePointNameList.add(knowledgePoint.getName());
+                }
+                fillInBlankQuestionDto.setKnowledgePoints(knowledgePointNameList);
             }
         }
         return fillInBlankQuestionDto;
