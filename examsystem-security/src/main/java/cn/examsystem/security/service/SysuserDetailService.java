@@ -114,6 +114,7 @@ public class SysuserDetailService implements UserDetailsService{
             //判断该用户是否可用
             Integer status = sysuser.getStatus();
             if(status==0){
+                System.out.println("不可用");
                 sysuserDto.setEnabled(false);
             }
 
