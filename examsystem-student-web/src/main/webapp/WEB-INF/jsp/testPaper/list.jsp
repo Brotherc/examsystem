@@ -190,7 +190,7 @@
                                                                                                 </label>
                                                                                             </div>
                                                                                             <div class="checkbox checkbox-success checkbox-circle">
-                                                                                                <input id="trueOrFalseQuestion${vs.count}-0" value="B" type="radio" name="trueOrFalseQuestionAnswer[${vs.count}]">
+                                                                                                <input id="trueOrFalseQuestion${vs.count}-0" value="0" type="radio" name="trueOrFalseQuestionAnswer[${vs.count}]">
                                                                                                 <label for="trueOrFalseQuestion${vs.count}-0">
                                                                                                     ×
                                                                                                 </label>
@@ -322,6 +322,7 @@
         <script type="text/javascript">
             function initTrueOrFalseQuestionAnswer() {
                 <c:forEach var="answer" items="${trueOrFalseQuestionAnswer }">
+                console.log("${answer.value}");
                     <c:choose>
                         <c:when test="${answer.value eq '0'}">
                             $("#trueOrFalseQuestion${answer.key}-0").attr("checked","checked");
@@ -388,13 +389,16 @@
             minutes = checkTime(minutes);
             seconds = checkTime(seconds);
             $("#time").text("考试剩余时间："+hours+"小时" + minutes+"分"+seconds+"秒");
+
             if(leftTime!=0)
                 leftTime=leftTime-1000;
-            if(leftTime==10000||leftTime==5000){
+            var temLeftTime=Math.round(leftTime/1000);
+            console.log(temLeftTime);
+            if(temLeftTime==10||temLeftTime==5){
                 //弹出倒计时提示提交卷显示框
-                toastr.success(leftTime+"秒后将自动提交试卷")
+                toastr.success(temLeftTime+"秒后将自动提交试卷")
             }
-            if(leftTime==0){
+            if(temLeftTime==0){
                 $("#submitTestPaper").trigger('click');
             }
         },1000);
@@ -406,8 +410,9 @@
         if(typeof (initSingleChoiceQuestionAnswer)=="function")
             initSingleChoiceQuestionAnswer();
 
-        if(typeof (initTrueOrFalseQuestionAnswer)=="function")
+        if(typeof (initTrueOrFalseQuestionAnswer)=="function"){
             initTrueOrFalseQuestionAnswer();
+        }
 
         if(typeof (initFillInBlankQuestionAnswer)=="function")
             initFillInBlankQuestionAnswer();
@@ -416,25 +421,70 @@
     <script>
         
         function submitTestPaper() {
+
             $.ajax({
                 type: "POST",
-                url: "/v1/test/testPaper/"+"${examStudent.testPaperId}",
+                url: "/v1/test/singleChoiceQuestion/answer",
+                data: decodeURIComponent($("#singleChoiceQuestions-form").serialize().replace(/\+/g,"")),
                 success: function(data){
                     if(data.status == 201){
-                        layer.msg("提交成功");
-                        location.href = "http://localhost:8082";
-                    }
-                    else{
-                        layer.msg("提交失败");
+                        $.ajax({
+                            type: "POST",
+                            url: "/v1/test/trueOrFalseQuestion/answer",
+                            data: decodeURIComponent($("#trueOrFalseQuestions-form").serialize().replace(/\+/g,"")),
+                            success: function(data){
+                                if(data.status == 201){
+                                    $.ajax({
+                                        type: "POST",
+                                        url: "/v1/test/fillInBlankQuestion/answer",
+                                        data: decodeURIComponent($("#fillInBlankQuestions-form").serialize().replace(/\+/g,"")),
+                                        success: function(data){
+                                            if(data.status == 201){
+                                                $.ajax({
+                                                    type: "POST",
+                                                    url: "/v1/test/testPaper/"+"${examStudent.testPaperId}",
+                                                    success: function(data){
+                                                        if(data.status == 201){
+                                                            layer.msg("提交成功");
+                                                            location.href = "http://localhost:8082";
+                                                        }
+                                                        else{
+                                                            layer.msg("提交失败");
+                                                        }
+                                                    },
+                                                    error:function(XMLHttpRequest, textStatus, errorThrown){
+                                                        var status=XMLHttpRequest.status;
+                                                        if(status==403){
+                                                            to403();
+                                                        }else if(status==500){
+                                                            to500();
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                            else{
+                                                layer.msg("填空题保存失败");
+                                            }
+                                        },
+                                        error:function(XMLHttpRequest, textStatus, errorThrown){
+                                            layer.msg("填空题保存失败");
+                                        }
+                                    });
+                                }
+                                else{
+                                    layer.msg("判断题保存失败");
+                                }
+                            },
+                            error:function(XMLHttpRequest, textStatus, errorThrown){
+                                layer.msg("判断题保存失败");
+                            }
+                        });
+                    }else{
+                        layer.msg("单选题保存失败");
                     }
                 },
                 error:function(XMLHttpRequest, textStatus, errorThrown){
-                    var status=XMLHttpRequest.status;
-                    if(status==403){
-                        to403();
-                    }else if(status==500){
-                        to500();
-                    }
+                    layer.msg("单选题保存失败");
                 }
             });
         }
