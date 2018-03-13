@@ -801,7 +801,7 @@ public class TestPaperImpl implements TestPaperService {
             if(!StringUtils.isBlank(trueOrFalseQuestionAnswer))
                 testPaperDto.setTrueOrFalseQuestionAnswer(JsonUtils.jsonToMap(trueOrFalseQuestionAnswer,Integer.class,String.class));
 
-            //获取单选题答案
+            //获取填空题答案
             String fillInBlankQuestionAnswer = jedisClient.hget(examStudentId, REDIS_KEY_FILL_IN_BLANK_QUESTION_ANSWER);
             if(!StringUtils.isBlank(fillInBlankQuestionAnswer))
                 testPaperDto.setFillInBlankQuestionAnswer(JsonUtils.jsonToMap(fillInBlankQuestionAnswer,Integer.class,List.class));

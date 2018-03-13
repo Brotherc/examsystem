@@ -1338,7 +1338,10 @@ public class ExamImpl implements ExamService {
                 //设置考试学生id
                 examstudentAnswer.setExamStudentId(examStudentRelationId);
                 //设置答案
-                examstudentAnswer.setStudentAnswer(singleChoiceQuestionAnswer.get(index));
+                if(singleChoiceQuestionAnswer==null||StringUtils.isBlank(singleChoiceQuestionAnswer.get(index)))
+                    examstudentAnswer.setStudentAnswer("");
+                else
+                    examstudentAnswer.setStudentAnswer(singleChoiceQuestionAnswer.get(index));
                 //设置分数初始为0分
                 examstudentAnswer.setScore(new BigDecimal(0));
                 //设置为未评分
@@ -1379,7 +1382,10 @@ public class ExamImpl implements ExamService {
                 //设置考试学生id
                 examstudentAnswer.setExamStudentId(examStudentRelationId);
                 //设置答案
-                examstudentAnswer.setStudentAnswer(trueOrFalseQuestionAnswer.get(index));
+                if(trueOrFalseQuestionAnswer==null||StringUtils.isBlank(trueOrFalseQuestionAnswer.get(index)))
+                    examstudentAnswer.setStudentAnswer("");
+                else
+                    examstudentAnswer.setStudentAnswer(trueOrFalseQuestionAnswer.get(index));
                 //设置分数初始为0分
                 examstudentAnswer.setScore(new BigDecimal(0));
                 //设置为未评分
@@ -1451,6 +1457,8 @@ public class ExamImpl implements ExamService {
                 //设置答案
                 String json = JsonUtils.objectToJson(questionAnswerList);
                 examstudentAnswer.setStudentAnswer(json);
+
+                System.out.println(examstudentAnswer.getTestpaperQuestionId());
 
                 examstudentAnswerMapper.insert(examstudentAnswer);
                 index++;
