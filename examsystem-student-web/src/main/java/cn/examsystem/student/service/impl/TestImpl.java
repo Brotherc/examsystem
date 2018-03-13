@@ -52,28 +52,14 @@ public class TestImpl implements TestService {
 
         //如果用户全写了，则中间为null的答案设置为“”
 
-        //如果用户则写了一部分，则后面的全部设置为“”，在校验全部，如果中间为null，则设置为“”
-
         if(singleChoiceQuestionAnswer==null||singleChoiceQuestionAnswer.size()<1){
-            for(int i=1;i<=singleChoiceQuestionAnswer.size();i++){
+            for(int i=1;i<=singleChoiceQuestionNum;i++){
                 redisMap.put(i, "");
             }
-        }else if(singleChoiceQuestionAnswer.size()==singleChoiceQuestionNum){
-            System.out.println("相等"+singleChoiceQuestionAnswer.size());
+        }else{
             for(int i=1;i<=singleChoiceQuestionNum;i++){
                 String answer = singleChoiceQuestionAnswer.get(i);
                 if(StringUtils.isBlank(answer))
-                    answer="";
-                redisMap.put(i, answer);
-            }
-        }else if(singleChoiceQuestionAnswer.size()<singleChoiceQuestionNum){
-            System.out.println("小于"+singleChoiceQuestionAnswer.size());
-            for(int i=singleChoiceQuestionAnswer.size()+1;i<=singleChoiceQuestionNum;i++){
-                singleChoiceQuestionAnswer.put(i,"");
-            }
-            for(int i=1;i<=singleChoiceQuestionNum;i++){
-                String answer = singleChoiceQuestionAnswer.get(i);
-                if(answer==null)
                     answer="";
                 redisMap.put(i, answer);
             }
@@ -100,28 +86,14 @@ public class TestImpl implements TestService {
 
         //如果用户全写了，则中间为null的答案设置为“”
 
-        //如果用户则写了一部分，则后面的全部设置为“”，在校验全部，如果中间为null，则设置为“”
-
         if(trueOrFalseQuestionAnswer==null||trueOrFalseQuestionAnswer.size()<1){
-            for(int i=1;i<=trueOrFalseQuestionAnswer.size();i++){
+            for(int i=1;i<=trueOrFalseQuestionNum;i++){
                 redisMap.put(i, "");
             }
-        }else if(trueOrFalseQuestionAnswer.size()==trueOrFalseQuestionNum){
-            System.out.println("相等"+trueOrFalseQuestionAnswer.size());
+        }else{
             for(int i=1;i<=trueOrFalseQuestionNum;i++){
                 String answer = trueOrFalseQuestionAnswer.get(i);
                 if(StringUtils.isBlank(answer))
-                    answer="";
-                redisMap.put(i, answer);
-            }
-        }else if(trueOrFalseQuestionAnswer.size()<trueOrFalseQuestionNum){
-            System.out.println("小于"+trueOrFalseQuestionAnswer.size());
-            for(int i=trueOrFalseQuestionAnswer.size()+1;i<=trueOrFalseQuestionNum;i++){
-                trueOrFalseQuestionAnswer.put(i,"");
-            }
-            for(int i=1;i<=trueOrFalseQuestionNum;i++){
-                String answer = trueOrFalseQuestionAnswer.get(i);
-                if(answer==null)
                     answer="";
                 redisMap.put(i, answer);
             }
@@ -141,7 +113,6 @@ public class TestImpl implements TestService {
 
         //学生试卷填空题答题信息
         Map<Integer, List> fillInBlankQuestionAnswer = testPaperDto.getFillInBlankQuestionAnswer();
-
 
         Map< Integer, List> redisMap=new LinkedHashMap<Integer, List>();
 
