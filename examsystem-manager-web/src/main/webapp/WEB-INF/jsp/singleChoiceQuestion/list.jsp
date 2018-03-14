@@ -162,6 +162,12 @@
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label class="col-sm-3 control-label">括号：</label>
+                                <div class="col-sm-6">
+                                    <p>( )</p>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label class="col-sm-3 control-label">A：</label>
                                 <div class="col-sm-6">
                                     <input type="text" placeholder="选项A" class="form-control" name="optionA">
@@ -243,6 +249,12 @@
                                 <label class="col-sm-3 control-label">内容：</label>
                                 <div class="col-sm-6">
                                     <textarea  name="content" placeholder="题目内容" class="form-control" required="" aria-required="true" rows="4" style="resize: none"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">括号：</label>
+                                <div class="col-sm-6">
+                                    <p>( )</p>
                                 </div>
                             </div>
                             <div class="form-group">
@@ -489,6 +501,7 @@
                                                 success: function(data){
                                                     if(data.status == 201){
                                                         swal(data.message, "您已经永久将该知识点录入对应题目中", "success");
+                                                        $("#exampleTableEvents").bootstrapTable('refresh');
                                                     }
                                                     else{
                                                         swal("录入失败",data.message, "error");
@@ -530,6 +543,7 @@
                                                 success: function(data){
                                                     if(data.status == 201){
                                                         swal(data.message, "您已经永久将该知识点从对应题目中移除", "success");
+                                                        $("#exampleTableEvents").bootstrapTable('refresh');
                                                     }
                                                     else{
                                                         swal("移除失败",data.message, "error");
@@ -667,6 +681,7 @@
                                                     success: function(data){
                                                         if(data.status == 201){
                                                             swal(data.message, "您已经永久将该知识点录入对应题目中", "success");
+                                                            $("#exampleTableEvents").bootstrapTable('refresh');
                                                         }
                                                         else{
                                                             swal("录入失败",data.message, "error");
@@ -708,6 +723,7 @@
                                                     success: function(data){
                                                         if(data.status == 201){
                                                             swal(data.message, "您已经永久将该知识点从对应题目中移除", "success");
+                                                            $("#exampleTableEvents").bootstrapTable('refresh');
                                                         }
                                                         else{
                                                             swal("移除失败",data.message, "error");

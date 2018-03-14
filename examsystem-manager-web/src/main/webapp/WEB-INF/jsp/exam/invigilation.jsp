@@ -816,6 +816,14 @@
 
                 if(leftTime!=0)
                     leftTime=leftTime-1000;
+
+                var temLeftTime=Math.round(leftTime/1000);
+                console.log(temLeftTime);
+                if(temLeftTime<=0){
+                    //刷新表格
+                    $("#studentStatusTableEvents").bootstrapTable('refresh');
+                }
+
                 $(obj).attr("data-time",leftTime);
             });
         },1000);

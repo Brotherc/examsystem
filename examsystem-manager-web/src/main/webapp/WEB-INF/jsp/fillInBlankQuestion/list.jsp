@@ -160,7 +160,12 @@
                                         <textarea  name="content" placeholder="题目内容" class="form-control" required="" aria-required="true" id="content_add" rows="4" style="resize: none"></textarea>
                                     </div>
                                 </div>
-
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">空格：</label>
+                                    <div class="col-sm-6">
+                                        <p>____</p>
+                                    </div>
+                                </div>
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">空格数：</label>
                                     <div class="col-sm-7 " >
@@ -241,7 +246,12 @@
                                         <textarea  name="content" placeholder="题目内容" class="form-control" required="" aria-required="true" id="content_update" rows="4" style="resize: none"></textarea>
                                     </div>
                                 </div>
-
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label">空格：</label>
+                                    <div class="col-sm-6">
+                                        <p>____</p>
+                                    </div>
+                                </div>
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">空格数：</label>
                                     <div class="col-sm-7 " >
@@ -440,6 +450,7 @@
                                                 success: function(data){
                                                     if(data.status == 201){
                                                         swal(data.message, "您已经永久将该知识点录入对应题目中", "success");
+                                                        $("#exampleTableEvents").bootstrapTable('refresh');
                                                     }
                                                     else{
                                                         swal("录入失败",data.message, "error");
@@ -481,6 +492,7 @@
                                                 success: function(data){
                                                     if(data.status == 201){
                                                         swal(data.message, "您已经永久将该知识点从对应题目中移除", "success");
+                                                        $("#exampleTableEvents").bootstrapTable('refresh');
                                                     }
                                                     else{
                                                         swal("移除失败",data.message, "error");
@@ -899,6 +911,7 @@
                                                     success: function(data){
                                                         if(data.status == 201){
                                                             swal(data.message, "您已经永久将该知识点录入对应题目中", "success");
+                                                            $("#exampleTableEvents").bootstrapTable('refresh');
                                                         }
                                                         else{
                                                             swal("录入失败",data.message, "error");
@@ -940,6 +953,7 @@
                                                     success: function(data){
                                                         if(data.status == 201){
                                                             swal(data.message, "您已经永久将该知识点从对应题目中移除", "success");
+                                                            $("#exampleTableEvents").bootstrapTable('refresh');
                                                         }
                                                         else{
                                                             swal("移除失败",data.message, "error");

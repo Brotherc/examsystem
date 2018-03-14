@@ -413,6 +413,7 @@
                                                 success: function(data){
                                                     if(data.status == 201){
                                                         swal(data.message, "您已经永久将该知识点录入对应题目中", "success");
+                                                        $("#exampleTableEvents").bootstrapTable('refresh');
                                                     }
                                                     else{
                                                         swal("录入失败",data.message, "error");
@@ -454,6 +455,7 @@
                                                 success: function(data){
                                                     if(data.status == 201){
                                                         swal(data.message, "您已经永久将该知识点从对应题目中移除", "success");
+                                                        $("#exampleTableEvents").bootstrapTable('refresh');
                                                     }
                                                     else{
                                                         swal("移除失败",data.message, "error");
@@ -594,6 +596,7 @@
                                                     success: function(data){
                                                         if(data.status == 201){
                                                             swal(data.message, "您已经永久将该知识点录入对应题目中", "success");
+                                                            $("#exampleTableEvents").bootstrapTable('refresh');
                                                         }
                                                         else{
                                                             swal("录入失败",data.message, "error");
@@ -635,6 +638,7 @@
                                                     success: function(data){
                                                         if(data.status == 201){
                                                             swal(data.message, "您已经永久将该知识点从对应题目中移除", "success");
+                                                            $("#exampleTableEvents").bootstrapTable('refresh');
                                                         }
                                                         else{
                                                             swal("移除失败",data.message, "error");
