@@ -14,16 +14,20 @@
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
 			<!-- 传播行为 -->
-			<tx:method name="remove*" propagation="REQUIRED" />
 			<tx:method name="save*" propagation="REQUIRED" />
 			<tx:method name="insert*" propagation="REQUIRED" />
 			<tx:method name="add*" propagation="REQUIRED" />
-			<tx:method name="check*" propagation="REQUIRED" />
 			<tx:method name="create*" propagation="REQUIRED" />
+			<tx:method name="btchSave*" propagation="REQUIRED"/>
+			<tx:method name="remove*" propagation="REQUIRED" />
 			<tx:method name="delete*" propagation="REQUIRED" />
-			<tx:method name="update*" propagation="REQUIRED" />
 			<tx:method name="btchDelete*" propagation="REQUIRED"/>
+			<tx:method name="update*" propagation="REQUIRED" />
+			<tx:method name="check*" propagation="REQUIRED" />
+			<tx:method name="submit*" propagation="REQUIRED"/>
 			<tx:method name="test" propagation="REQUIRED"/>
+			<tx:method name="startExam" propagation="REQUIRED"/>
+			<tx:method name="autoGradeForExam" propagation="REQUIRED"/>
 			<tx:method name="list*" propagation="SUPPORTS" read-only="true" />
 			<tx:method name="find*" propagation="SUPPORTS" read-only="true" />
 			<tx:method name="select*" propagation="SUPPORTS" read-only="true" />
