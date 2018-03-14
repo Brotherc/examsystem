@@ -63,7 +63,7 @@ public class SysuserDto extends Sysuser implements UserDetails{
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isEnabled;
     }
 
     public List<Menu> getMenus() {

@@ -63,7 +63,7 @@ public class StudentDto extends Student implements UserDetails{
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isEnabled;
     }
 
     public List<Menu> getMenus() {
