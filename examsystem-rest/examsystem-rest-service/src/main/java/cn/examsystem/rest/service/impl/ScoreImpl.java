@@ -178,7 +178,7 @@ System.out.println(studentAnswer);
                         boolean isOrder=true;
 
                         for(QuestionMatcherRelation matcher:questionMatcherRelationList){
-                            if(matcher.getMatcherCode()==new Integer(DICTINFO_MATCHER_IS_NOT_ORDER_CODE)){
+                            if(matcher.getMatcherCode().equals(new Integer(DICTINFO_MATCHER_IS_NOT_ORDER_CODE))){
                                 isOrder=false;
                                 break;
                             }
@@ -198,6 +198,7 @@ System.out.println(studentAnswer);
 
                             }
                         }else{
+                            //无序题目一般不会出现相同答案
                             //遍历学生该题从第一个空到最后一个空的答案,去除重复的答案
                             for (int x = 0; x < studentAnswerList.size() - 1; x++) {
                                 for (int y = x + 1; y < studentAnswerList.size(); y++) {

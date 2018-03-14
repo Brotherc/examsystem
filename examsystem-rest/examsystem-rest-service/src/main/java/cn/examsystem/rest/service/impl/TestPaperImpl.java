@@ -930,10 +930,73 @@ public class TestPaperImpl implements TestPaperService {
         if(!CollectionUtils.isEmpty(examList))
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TESTPAPER_IS_IN_EXAM,null);
 
+
+        //移除的题目总分数
+        BigDecimal removeScore=new BigDecimal(0);
+
         //删除试卷题目关系
         for(String id:ids){
-           testpaperQuestionRelationMapper.deleteByPrimaryKey(id);
+            TestpaperQuestionRelation relation = testpaperQuestionRelationMapper.selectByPrimaryKey(id);
+            removeScore=removeScore.add(relation.getQuestionScore());
+            testpaperQuestionRelationMapper.deleteByPrimaryKey(id);
         }
+
+        //该试卷的各类型题目顺序要重新改变
+        //查询试卷单选题信息
+        TestpaperQuestionRelationExample singleChoiceQuestionExample=new TestpaperQuestionRelationExample();
+        TestpaperQuestionRelationExample.Criteria singleChoiceQuestionCriteria = singleChoiceQuestionExample.createCriteria();
+        singleChoiceQuestionCriteria.andTestPaperIdEqualTo(testPaperId);
+        singleChoiceQuestionCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE));
+        singleChoiceQuestionExample.setOrderByClause("question_order");
+        List<TestpaperQuestionRelation> singleChoiceQuestionList = testpaperQuestionRelationMapper.selectByExample(singleChoiceQuestionExample);
+
+        if(!CollectionUtils.isEmpty(singleChoiceQuestionList)){
+            for(int i=1;i<=singleChoiceQuestionList.size();i++){
+                TestpaperQuestionRelation relation = singleChoiceQuestionList.get(i - 1);
+                relation.setQuestionOrder(i);
+                relation.setUpdatedTime(new Date());
+                testpaperQuestionRelationMapper.updateByPrimaryKey(relation);
+            }
+        }
+
+        //查询试卷判断题信息
+        TestpaperQuestionRelationExample trueOrFalseQuestionExample=new TestpaperQuestionRelationExample();
+        TestpaperQuestionRelationExample.Criteria trueOrFalseQuestionCriteria = trueOrFalseQuestionExample.createCriteria();
+        trueOrFalseQuestionCriteria.andTestPaperIdEqualTo(testPaperId);
+        trueOrFalseQuestionCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_TRUEORFALSEQUESTION_TYPE_CODE));
+        trueOrFalseQuestionExample.setOrderByClause("question_order");
+        List<TestpaperQuestionRelation> trueOrFalseQuestionList = testpaperQuestionRelationMapper.selectByExample(trueOrFalseQuestionExample);
+
+        if(!CollectionUtils.isEmpty(trueOrFalseQuestionList)){
+            for(int i=1;i<=trueOrFalseQuestionList.size();i++){
+                TestpaperQuestionRelation relation = trueOrFalseQuestionList.get(i - 1);
+                relation.setQuestionOrder(i);
+                relation.setUpdatedTime(new Date());
+                testpaperQuestionRelationMapper.updateByPrimaryKey(relation);
+            }
+        }
+
+        //查询试卷填空题信息
+        TestpaperQuestionRelationExample fillInBlankQuestionExample=new TestpaperQuestionRelationExample();
+        TestpaperQuestionRelationExample.Criteria fillInBlankQuestionCriteria = fillInBlankQuestionExample.createCriteria();
+        fillInBlankQuestionCriteria.andTestPaperIdEqualTo(testPaperId);
+        fillInBlankQuestionCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_FILLINBLANKQUESTION_TYPE_CODE));
+        fillInBlankQuestionExample.setOrderByClause("question_order");
+        List<TestpaperQuestionRelation> fillInBlankQuestionList = testpaperQuestionRelationMapper.selectByExample(fillInBlankQuestionExample);
+
+        if(!CollectionUtils.isEmpty(fillInBlankQuestionList)){
+            for(int i=1;i<=fillInBlankQuestionList.size();i++){
+                TestpaperQuestionRelation relation = fillInBlankQuestionList.get(i - 1);
+                relation.setQuestionOrder(i);
+                relation.setUpdatedTime(new Date());
+                testpaperQuestionRelationMapper.updateByPrimaryKey(relation);
+            }
+        }
+
+        //试卷总分减去移除的题目总分
+        testPaperDb.setScore(testPaperDb.getScore().subtract(removeScore));
+        testPaperDb.setUpdatedTime(new Date());
+        testPaperMapper.updateByPrimaryKey(testPaperDb);
 
         return new ResultInfo(ResultInfo.STATUS_RESULT_NO_CONTENT,MESSAGE_DELETE_SUCCESS,null);
 

@@ -1077,6 +1077,7 @@ public class ExamImpl implements ExamService {
         //定时器延长启动时间：考试时长+（场次-1）*间隔时间
         Timer timer=new Timer();
         final Exam examTimer=examDb;
+        System.out.println(examDb.getTime()+(examDb.getPartNum()-1)*examDb.getIntervalTime());
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -1239,7 +1240,9 @@ public class ExamImpl implements ExamService {
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_STUDENT_NOT_EXIST,null);
 
         //当前时间<学生考试场次开始时间，则不允许开始考试
+
         Date startTime = DateUtil.getDateAfterSeconds(exam.getStartTime(), (long) (examStudentRelation.getPartOrder() - 1) * exam.getIntervalTime());
+        System.out.println("学生考试开始时间"+startTime);
         if(new Date().compareTo(startTime)==-1)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_NOT_STARTTIME,null);
 
