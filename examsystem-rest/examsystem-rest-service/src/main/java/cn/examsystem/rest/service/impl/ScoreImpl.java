@@ -154,7 +154,7 @@ System.out.println(studentAnswer);
                     else if(testPaperQuestion.getQuestionType().equals(new Integer(DICTINFO_FILLINBLANKQUESTION_TYPE_CODE))){
                         System.out.println("填空题");
                         //查询填空题信息
-                        FillInBlankQuestion fillInBlankQuestion = fillInBlankQuestionMapper.selectByPrimaryKey(testPaperQuestion.getQuestionId());
+                        FillInBlankQuestionWithBLOBs fillInBlankQuestion = fillInBlankQuestionMapper.selectByPrimaryKey(testPaperQuestion.getQuestionId());
                         //填空题答案
 
 
@@ -359,7 +359,7 @@ System.out.println(studentAnswer);
                             BeanUtils.copyProperties(relation,testPaperFillInBlankQuestion);
 
                             //查询某一条填空题信息
-                            FillInBlankQuestion fillInBlankQuestion = fillInBlankQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
+                            FillInBlankQuestionWithBLOBs fillInBlankQuestion = fillInBlankQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
                             if(fillInBlankQuestion!=null){
                                 testPaperFillInBlankQuestion.setQuestionContent(fillInBlankQuestion.getContent());
                                 testPaperFillInBlankQuestion.setBlankNum(fillInBlankQuestion.getBlankNum());

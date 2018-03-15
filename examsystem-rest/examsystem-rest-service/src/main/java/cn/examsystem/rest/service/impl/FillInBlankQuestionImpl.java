@@ -367,7 +367,7 @@ public class FillInBlankQuestionImpl implements FillInBlankQuestionService {
         }
 
         //id对应题目必须存在
-        FillInBlankQuestion fillInBlankQuestionDb = fillInBlankQuestionMapper.selectByPrimaryKey(id);
+        FillInBlankQuestionWithBLOBs fillInBlankQuestionDb = fillInBlankQuestionMapper.selectByPrimaryKey(id);
         if(fillInBlankQuestionDb==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_QUESTION_NOT_EXIST,null);
 

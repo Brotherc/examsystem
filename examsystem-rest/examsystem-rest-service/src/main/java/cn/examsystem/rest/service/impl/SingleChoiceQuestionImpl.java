@@ -403,7 +403,7 @@ public class SingleChoiceQuestionImpl implements SingleChoiceQuestionService {
         singleChoiceQuestionDb.setUpdatedTime(new Date());
 
         //更新题目
-        singleChoiceQuestionMapper.updateByPrimaryKey(singleChoiceQuestionDb);
+        singleChoiceQuestionMapper.updateByPrimaryKeyWithBLOBs(singleChoiceQuestionDb);
 
         return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_PUT_SUCCESS,null);
     }

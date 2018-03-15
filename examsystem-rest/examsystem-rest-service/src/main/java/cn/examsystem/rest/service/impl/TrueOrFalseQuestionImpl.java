@@ -319,7 +319,7 @@ public class TrueOrFalseQuestionImpl implements TrueOrFalseQuestionService {
         trueOrFalseQuestionDb.setUpdatedTime(new Date());
 
         //更新题目
-        trueOrFalseQuestionMapper.updateByPrimaryKey(trueOrFalseQuestionDb);
+        trueOrFalseQuestionMapper.updateByPrimaryKeyWithBLOBs(trueOrFalseQuestionDb);
 
         return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_PUT_SUCCESS,null);
     }

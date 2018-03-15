@@ -756,7 +756,7 @@ public class TestPaperImpl implements TestPaperService {
                     BeanUtils.copyProperties(relation,testPaperFillInBlankQuestion);
 
                     //查询某一条填空题信息
-                    FillInBlankQuestion fillInBlankQuestion = fillInBlankQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
+                    FillInBlankQuestionWithBLOBs fillInBlankQuestion = fillInBlankQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
                     if(fillInBlankQuestion!=null){
                         testPaperFillInBlankQuestion.setQuestionContent(fillInBlankQuestion.getContent());
                         testPaperFillInBlankQuestion.setBlankNum(fillInBlankQuestion.getBlankNum());
@@ -895,7 +895,7 @@ public class TestPaperImpl implements TestPaperService {
                 BeanUtils.copyProperties(relation,testPaperFillInBlankQuestion);
 
                 //查询具体的填空题信息
-                FillInBlankQuestion fillInBlankQuestion = fillInBlankQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
+                FillInBlankQuestionWithBLOBs fillInBlankQuestion = fillInBlankQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
                 if(fillInBlankQuestion!=null){
                     testPaperFillInBlankQuestion.setQuestionContent(fillInBlankQuestion.getContent());
                 }
