@@ -5,8 +5,6 @@ import java.util.Date;
 public class SingleChoiceQuestion {
     private String id;
 
-    private String content;
-
     private String optionA;
 
     private String optionB;
@@ -31,20 +29,14 @@ public class SingleChoiceQuestion {
 
     private Date updatedTime;
 
+    private String content;
+
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id == null ? null : id.trim();
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content == null ? null : content.trim();
     }
 
     public String getOptionA() {
@@ -141,5 +133,13 @@ public class SingleChoiceQuestion {
 
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content == null ? null : content.trim();
     }
 }

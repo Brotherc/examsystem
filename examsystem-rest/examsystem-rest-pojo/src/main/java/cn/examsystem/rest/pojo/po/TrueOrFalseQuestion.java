@@ -5,8 +5,6 @@ import java.util.Date;
 public class TrueOrFalseQuestion {
     private String id;
 
-    private String content;
-
     private Boolean answer;
 
     private Integer type;
@@ -23,20 +21,14 @@ public class TrueOrFalseQuestion {
 
     private Date updatedTime;
 
+    private String content;
+
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id == null ? null : id.trim();
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content == null ? null : content.trim();
     }
 
     public Boolean getAnswer() {
@@ -101,5 +93,13 @@ public class TrueOrFalseQuestion {
 
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content == null ? null : content.trim();
     }
 }

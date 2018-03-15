@@ -5,8 +5,6 @@ import java.util.Date;
 public class FillInBlankQuestion {
     private String id;
 
-    private String content;
-
     private Integer type;
 
     private Integer difficulty;
@@ -23,22 +21,12 @@ public class FillInBlankQuestion {
 
     private Date updatedTime;
 
-    private String answer;
-
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id == null ? null : id.trim();
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content == null ? null : content.trim();
     }
 
     public Integer getType() {
@@ -103,13 +91,5 @@ public class FillInBlankQuestion {
 
     public void setUpdatedTime(Date updatedTime) {
         this.updatedTime = updatedTime;
-    }
-
-    public String getAnswer() {
-        return answer;
-    }
-
-    public void setAnswer(String answer) {
-        this.answer = answer == null ? null : answer.trim();
     }
 }

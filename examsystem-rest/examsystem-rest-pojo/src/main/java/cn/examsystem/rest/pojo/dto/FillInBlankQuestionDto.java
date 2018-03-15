@@ -1,6 +1,6 @@
 package cn.examsystem.rest.pojo.dto;
 
-import cn.examsystem.rest.pojo.po.FillInBlankQuestion;
+import cn.examsystem.rest.pojo.po.FillInBlankQuestionWithBLOBs;
 import cn.examsystem.rest.pojo.po.Sysuser;
 
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
  * Created by Administrator on 2018/2/11.
  * 填空题（包括知识点）
  */
-public class  FillInBlankQuestionDto extends FillInBlankQuestion {
+public class  FillInBlankQuestionDto extends FillInBlankQuestionWithBLOBs {
 
     private String courseName;
     private String difficultyName;

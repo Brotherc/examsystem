@@ -1,11 +1,11 @@
 package cn.examsystem.rest.pojo.vo;
 
-import cn.examsystem.rest.pojo.po.FillInBlankQuestion;
+import cn.examsystem.rest.pojo.po.FillInBlankQuestionWithBLOBs;
 
 /**
  * Created by Administrator on 2018/2/11.
  */
-public class FillInBlankQuestionVo extends FillInBlankQuestion {
+public class FillInBlankQuestionVo extends FillInBlankQuestionWithBLOBs {
     private String knowledgePointId;
 
     public String getKnowledgePointId() {
