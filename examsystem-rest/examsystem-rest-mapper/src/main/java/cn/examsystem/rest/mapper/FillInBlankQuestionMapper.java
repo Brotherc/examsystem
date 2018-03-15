@@ -2,8 +2,10 @@ package cn.examsystem.rest.mapper;
 
 import cn.examsystem.rest.pojo.po.FillInBlankQuestion;
 import cn.examsystem.rest.pojo.po.FillInBlankQuestionExample;
-import java.util.List;
+import cn.examsystem.rest.pojo.po.FillInBlankQuestionWithBLOBs;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface FillInBlankQuestionMapper {
     int countByExample(FillInBlankQuestionExample example);
@@ -12,25 +14,25 @@ public interface FillInBlankQuestionMapper {
 
     int deleteByPrimaryKey(String id);
 
-    int insert(FillInBlankQuestion record);
+    int insert(FillInBlankQuestionWithBLOBs record);
 
-    int insertSelective(FillInBlankQuestion record);
+    int insertSelective(FillInBlankQuestionWithBLOBs record);
 
-    List<FillInBlankQuestion> selectByExampleWithBLOBs(FillInBlankQuestionExample example);
+    List<FillInBlankQuestionWithBLOBs> selectByExampleWithBLOBs(FillInBlankQuestionExample example);
 
     List<FillInBlankQuestion> selectByExample(FillInBlankQuestionExample example);
 
-    FillInBlankQuestion selectByPrimaryKey(String id);
+    FillInBlankQuestionWithBLOBs selectByPrimaryKey(String id);
 
-    int updateByExampleSelective(@Param("record") FillInBlankQuestion record, @Param("example") FillInBlankQuestionExample example);
+    int updateByExampleSelective(@Param("record") FillInBlankQuestionWithBLOBs record, @Param("example") FillInBlankQuestionExample example);
 
-    int updateByExampleWithBLOBs(@Param("record") FillInBlankQuestion record, @Param("example") FillInBlankQuestionExample example);
+    int updateByExampleWithBLOBs(@Param("record") FillInBlankQuestionWithBLOBs record, @Param("example") FillInBlankQuestionExample example);
 
     int updateByExample(@Param("record") FillInBlankQuestion record, @Param("example") FillInBlankQuestionExample example);
 
-    int updateByPrimaryKeySelective(FillInBlankQuestion record);
+    int updateByPrimaryKeySelective(FillInBlankQuestionWithBLOBs record);
 
-    int updateByPrimaryKeyWithBLOBs(FillInBlankQuestion record);
+    int updateByPrimaryKeyWithBLOBs(FillInBlankQuestionWithBLOBs record);
 
     int updateByPrimaryKey(FillInBlankQuestion record);
 }

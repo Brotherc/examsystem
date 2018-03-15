@@ -3,7 +3,7 @@
 <mapper namespace="cn.examsystem.rest.mapper.FillInBlankQuestionMapperCustom" >
   <resultMap id="fillInBlankQuestionMap" type="cn.examsystem.rest.pojo.dto.FillInBlankQuestionDto" >
     <id column="id" property="id" jdbcType="VARCHAR" />
-    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
     <result column="type" property="type" jdbcType="INTEGER" />
     <result column="difficulty" property="difficulty" jdbcType="INTEGER" />
     <result column="course_id" property="courseId" jdbcType="VARCHAR" />

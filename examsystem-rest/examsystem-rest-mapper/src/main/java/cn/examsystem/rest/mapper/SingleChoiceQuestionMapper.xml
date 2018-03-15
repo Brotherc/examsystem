@@ -3,7 +3,6 @@
 <mapper namespace="cn.examsystem.rest.mapper.SingleChoiceQuestionMapper" >
   <resultMap id="BaseResultMap" type="cn.examsystem.rest.pojo.po.SingleChoiceQuestion" >
     <id column="id" property="id" jdbcType="VARCHAR" />
-    <result column="content" property="content" jdbcType="VARCHAR" />
     <result column="option_a" property="optionA" jdbcType="VARCHAR" />
     <result column="option_b" property="optionB" jdbcType="VARCHAR" />
     <result column="option_c" property="optionC" jdbcType="VARCHAR" />
@@ -16,6 +15,9 @@
     <result column="is_checked" property="isChecked" jdbcType="BIT" />
     <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="cn.examsystem.rest.pojo.po.SingleChoiceQuestion" extends="BaseResultMap" >
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -76,9 +78,28 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    id, content, option_a, option_b, option_c, option_d, answer, type, difficulty, course_id, 
+    id, option_a, option_b, option_c, option_d, answer, type, difficulty, course_id, 
     created_teacher_id, is_checked, created_time, updated_time
   </sql>
+  <sql id="Blob_Column_List" >
+    content
+  </sql>
+  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="cn.examsystem.rest.pojo.po.SingleChoiceQuestionExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from single_choice_question
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="cn.examsystem.rest.pojo.po.SingleChoiceQuestionExample" >
     select
     <if test="distinct" >
@@ -93,9 +114,11 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
     from single_choice_question
     where id = #{id,jdbcType=VARCHAR}
   </select>
@@ -110,25 +133,22 @@
     </if>
   </delete>
   <insert id="insert" parameterType="cn.examsystem.rest.pojo.po.SingleChoiceQuestion" >
-    insert into single_choice_question (id, content, option_a, 
-      option_b, option_c, option_d, 
-      answer, type, difficulty, 
-      course_id, created_teacher_id, is_checked, 
-      created_time, updated_time)
-    values (#{id,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{optionA,jdbcType=VARCHAR}, 
-      #{optionB,jdbcType=VARCHAR}, #{optionC,jdbcType=VARCHAR}, #{optionD,jdbcType=VARCHAR}, 
-      #{answer,jdbcType=VARCHAR}, #{type,jdbcType=INTEGER}, #{difficulty,jdbcType=INTEGER}, 
-      #{courseId,jdbcType=VARCHAR}, #{createdTeacherId,jdbcType=VARCHAR}, #{isChecked,jdbcType=BIT}, 
-      #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP})
+    insert into single_choice_question (id, option_a, option_b, 
+      option_c, option_d, answer, 
+      type, difficulty, course_id, 
+      created_teacher_id, is_checked, created_time, 
+      updated_time, content)
+    values (#{id,jdbcType=VARCHAR}, #{optionA,jdbcType=VARCHAR}, #{optionB,jdbcType=VARCHAR}, 
+      #{optionC,jdbcType=VARCHAR}, #{optionD,jdbcType=VARCHAR}, #{answer,jdbcType=VARCHAR}, 
+      #{type,jdbcType=INTEGER}, #{difficulty,jdbcType=INTEGER}, #{courseId,jdbcType=VARCHAR}, 
+      #{createdTeacherId,jdbcType=VARCHAR}, #{isChecked,jdbcType=BIT}, #{createdTime,jdbcType=TIMESTAMP}, 
+      #{updatedTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="cn.examsystem.rest.pojo.po.SingleChoiceQuestion" >
     insert into single_choice_question
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
-      </if>
-      <if test="content != null" >
-        content,
       </if>
       <if test="optionA != null" >
         option_a,
@@ -166,13 +186,13 @@
       <if test="updatedTime != null" >
         updated_time,
       </if>
+      <if test="content != null" >
+        content,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         #{id,jdbcType=VARCHAR},
-      </if>
-      <if test="content != null" >
-        #{content,jdbcType=VARCHAR},
       </if>
       <if test="optionA != null" >
         #{optionA,jdbcType=VARCHAR},
@@ -210,6 +230,9 @@
       <if test="updatedTime != null" >
         #{updatedTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="content != null" >
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="cn.examsystem.rest.pojo.po.SingleChoiceQuestionExample" resultType="java.lang.Integer" >
@@ -223,9 +246,6 @@
     <set >
       <if test="record.id != null" >
         id = #{record.id,jdbcType=VARCHAR},
-      </if>
-      <if test="record.content != null" >
-        content = #{record.content,jdbcType=VARCHAR},
       </if>
       <if test="record.optionA != null" >
         option_a = #{record.optionA,jdbcType=VARCHAR},
@@ -263,7 +283,30 @@
       <if test="record.updatedTime != null" >
         updated_time = #{record.updatedTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="record.content != null" >
+        content = #{record.content,jdbcType=LONGVARCHAR},
+      </if>
     </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExampleWithBLOBs" parameterType="map" >
+    update single_choice_question
+    set id = #{record.id,jdbcType=VARCHAR},
+      option_a = #{record.optionA,jdbcType=VARCHAR},
+      option_b = #{record.optionB,jdbcType=VARCHAR},
+      option_c = #{record.optionC,jdbcType=VARCHAR},
+      option_d = #{record.optionD,jdbcType=VARCHAR},
+      answer = #{record.answer,jdbcType=VARCHAR},
+      type = #{record.type,jdbcType=INTEGER},
+      difficulty = #{record.difficulty,jdbcType=INTEGER},
+      course_id = #{record.courseId,jdbcType=VARCHAR},
+      created_teacher_id = #{record.createdTeacherId,jdbcType=VARCHAR},
+      is_checked = #{record.isChecked,jdbcType=BIT},
+      created_time = #{record.createdTime,jdbcType=TIMESTAMP},
+      updated_time = #{record.updatedTime,jdbcType=TIMESTAMP},
+      content = #{record.content,jdbcType=LONGVARCHAR}
     <if test="_parameter != null" >
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -271,7 +314,6 @@
   <update id="updateByExample" parameterType="map" >
     update single_choice_question
     set id = #{record.id,jdbcType=VARCHAR},
-      content = #{record.content,jdbcType=VARCHAR},
       option_a = #{record.optionA,jdbcType=VARCHAR},
       option_b = #{record.optionB,jdbcType=VARCHAR},
       option_c = #{record.optionC,jdbcType=VARCHAR},
@@ -291,9 +333,6 @@
   <update id="updateByPrimaryKeySelective" parameterType="cn.examsystem.rest.pojo.po.SingleChoiceQuestion" >
     update single_choice_question
     <set >
-      <if test="content != null" >
-        content = #{content,jdbcType=VARCHAR},
-      </if>
       <if test="optionA != null" >
         option_a = #{optionA,jdbcType=VARCHAR},
       </if>
@@ -330,13 +369,32 @@
       <if test="updatedTime != null" >
         updated_time = #{updatedTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
     </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="cn.examsystem.rest.pojo.po.SingleChoiceQuestion" >
+    update single_choice_question
+    set option_a = #{optionA,jdbcType=VARCHAR},
+      option_b = #{optionB,jdbcType=VARCHAR},
+      option_c = #{optionC,jdbcType=VARCHAR},
+      option_d = #{optionD,jdbcType=VARCHAR},
+      answer = #{answer,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
+      difficulty = #{difficulty,jdbcType=INTEGER},
+      course_id = #{courseId,jdbcType=VARCHAR},
+      created_teacher_id = #{createdTeacherId,jdbcType=VARCHAR},
+      is_checked = #{isChecked,jdbcType=BIT},
+      created_time = #{createdTime,jdbcType=TIMESTAMP},
+      updated_time = #{updatedTime,jdbcType=TIMESTAMP},
+      content = #{content,jdbcType=LONGVARCHAR}
     where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="cn.examsystem.rest.pojo.po.SingleChoiceQuestion" >
     update single_choice_question
-    set content = #{content,jdbcType=VARCHAR},
-      option_a = #{optionA,jdbcType=VARCHAR},
+    set option_a = #{optionA,jdbcType=VARCHAR},
       option_b = #{optionB,jdbcType=VARCHAR},
       option_c = #{optionC,jdbcType=VARCHAR},
       option_d = #{optionD,jdbcType=VARCHAR},

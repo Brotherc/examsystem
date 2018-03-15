@@ -3,11 +3,11 @@
 <mapper namespace="cn.examsystem.rest.mapper.SingleChoiceQuestionMapperCustom" >
   <resultMap id="singleChoiceQuestionMap" type="cn.examsystem.rest.pojo.dto.SingleChoiceQuestionDto" >
     <id column="id" property="id" jdbcType="VARCHAR" />
-    <result column="content" property="content" jdbcType="VARCHAR" />
-    <result column="option_a" property="optionA" jdbcType="VARCHAR" />
-    <result column="option_b" property="optionB" jdbcType="VARCHAR" />
-    <result column="option_c" property="optionC" jdbcType="VARCHAR" />
-    <result column="option_d" property="optionD" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
+    <result column="option_a" property="optionA" jdbcType="LONGVARCHAR" />
+    <result column="option_b" property="optionB" jdbcType="LONGVARCHAR" />
+    <result column="option_c" property="optionC" jdbcType="LONGVARCHAR" />
+    <result column="option_d" property="optionD" jdbcType="LONGVARCHAR" />
     <result column="answer" property="answer" jdbcType="VARCHAR" />
     <result column="type" property="type" jdbcType="INTEGER" />
     <result column="difficulty" property="difficulty" jdbcType="INTEGER" />

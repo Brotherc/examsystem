@@ -16,15 +16,21 @@ public interface SingleChoiceQuestionMapper {
 
     int insertSelective(SingleChoiceQuestion record);
 
+    List<SingleChoiceQuestion> selectByExampleWithBLOBs(SingleChoiceQuestionExample example);
+
     List<SingleChoiceQuestion> selectByExample(SingleChoiceQuestionExample example);
 
     SingleChoiceQuestion selectByPrimaryKey(String id);
 
     int updateByExampleSelective(@Param("record") SingleChoiceQuestion record, @Param("example") SingleChoiceQuestionExample example);
 
+    int updateByExampleWithBLOBs(@Param("record") SingleChoiceQuestion record, @Param("example") SingleChoiceQuestionExample example);
+
     int updateByExample(@Param("record") SingleChoiceQuestion record, @Param("example") SingleChoiceQuestionExample example);
 
     int updateByPrimaryKeySelective(SingleChoiceQuestion record);
+
+    int updateByPrimaryKeyWithBLOBs(SingleChoiceQuestion record);
 
     int updateByPrimaryKey(SingleChoiceQuestion record);
 }
