@@ -21,6 +21,7 @@
     <link href="/css/plugins/chosen/chosen.css" rel="stylesheet">
     <link href="/css/animate.css" rel="stylesheet">
     <link href="/css/plugins/webuploader/webuploader.css" rel="stylesheet">
+    <link href="/css/plugins/simditor/simditor.css" rel="stylesheet" />
     <link href="/css/style.css?v=4.1.0" rel="stylesheet">
 
     <!-- Sweet Alert -->
@@ -149,51 +150,51 @@
 
     <!-- 添加题目modal -->
     <div id="modal-form-save" class="modal fade" aria-hidden="true" >
-        <div class="modal-dialog">
+        <div class="modal-dialog" style="width: 800px">
             <div class="modal-content">
                 <div class="modal-body">
                     <div class="row">
                         <form class="form-horizontal" id="question-add-form">
                             <p>欢迎添加题目(⊙o⊙)</p>
-                            <div class="form-group">
+                            <div class="form-group " id="content_add">
                                 <label class="col-sm-3 control-label">内容：</label>
-                                <div class="col-sm-6">
-                                    <textarea  name="content" placeholder="题目内容" class="form-control" required="" aria-required="true" rows="4" style="resize: none"></textarea>
+                                <div class="col-sm-8">
+                                    <textarea id="content_addEditor" name="content" placeholder="题目内容" class="form-control" autofocus></textarea>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">括号：</label>
-                                <div class="col-sm-6">
-                                    <p>( )</p>
+                                <div class="col-sm-8">
+                                    <p class="form-control">( )</p>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group option">
                                 <label class="col-sm-3 control-label">A：</label>
-                                <div class="col-sm-6">
-                                    <input type="text" placeholder="选项A" class="form-control" name="optionA">
+                                <div class="col-sm-8">
+                                    <textarea id="optionA_add" name="optionA" placeholder="选项A" class="form-control" autofocus></textarea>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group option">
                                 <label class="col-sm-3 control-label">B：</label>
-                                <div class="col-sm-6">
-                                    <input type="text" placeholder="选项B" class="form-control" name="optionB">
+                                <div class="col-sm-8">
+                                    <textarea id="optionB_add" name="optionB" placeholder="选项B" class="form-control" autofocus></textarea>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group option">
                                 <label class="col-sm-3 control-label">C：</label>
-                                <div class="col-sm-6">
-                                    <input type="text" placeholder="选项C" class="form-control" name="optionC">
+                                <div class="col-sm-8">
+                                    <textarea id="optionC_add" name="optionC" placeholder="选项C" class="form-control" autofocus></textarea>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group option">
                                 <label class="col-sm-3 control-label">D：</label>
-                                <div class="col-sm-6">
-                                    <input type="text" placeholder="选项D" class="form-control" name="optionD">
+                                <div class="col-sm-8">
+                                    <textarea id="optionD_add" name="optionD" placeholder="选项D" class="form-control" autofocus></textarea>
                                 </div>
                             </div>
                             <div class="form-group " >
                                 <label class="col-sm-3 control-label">答案：</label>
-                                <div class=" col-sm-6">
+                                <div class=" col-sm-8">
                                     <select data-placeholder="选择答案..." class="form-control chosen-select " style="width:270px;" tabindex="2" id="answer_add"   name="answer">
                                         <option value="A" hassubinfo="true">A</option>
                                         <option value="B" hassubinfo="true">B</option>
@@ -204,7 +205,7 @@
                             </div>
                             <div class="form-group " >
                                 <label class="col-sm-3 control-label">课程名称：</label>
-                                <div class=" col-sm-6">
+                                <div class=" col-sm-8">
                                     <select data-placeholder="选择课程..." class="form-control chosen-select " style="width:270px;" tabindex="2" id="course_add"   name="courseId">
                                         <c:forEach items="${courses}" var="course" >
                                             <option value="${course.id}" hassubinfo="true">${course.name}</option>
@@ -214,7 +215,7 @@
                             </div>
                             <div class="form-group " >
                                 <label class="col-sm-3 control-label">难度：</label>
-                                <div class=" col-sm-6">
+                                <div class=" col-sm-8">
                                     <select data-placeholder="选择难度..." class="form-control chosen-select " style="width:270px;" tabindex="2" id="difficulty_add"   name="difficulty">
                                         <c:forEach items="${difficultys}" var="difficulty" >
                                             <option value="${difficulty.code}" hassubinfo="true">${difficulty.name}</option>
@@ -236,7 +237,7 @@
 
     <!-- 修改题目modal -->
     <div id="modal-form-update" class="modal fade" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog" style="width: 800px">
             <div class="modal-content">
                 <div class="modal-body">
                     <div class="row">
@@ -245,45 +246,45 @@
                             <input type="hidden" name="isChecked">
                             <input type="hidden" name="_method" value="put">
                             <p>欢迎修改题目(⊙o⊙)</p>
-                            <div class="form-group">
+                            <div class="form-group" id="content_update">
                                 <label class="col-sm-3 control-label">内容：</label>
-                                <div class="col-sm-6">
-                                    <textarea  name="content" placeholder="题目内容" class="form-control" required="" aria-required="true" rows="4" style="resize: none"></textarea>
+                                <div class="col-sm-8">
+                                    <textarea id='content_updateEditor' name='content' class='form-control' autofocus></textarea>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">括号：</label>
-                                <div class="col-sm-6">
+                                <div class="col-sm-8">
                                     <p>( )</p>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group option" id="optionA_update">
                                 <label class="col-sm-3 control-label">A：</label>
-                                <div class="col-sm-6">
-                                    <input type="text" placeholder="选项A" class="form-control" name="optionA">
+                                <div class="col-sm-8">
+                                    <textarea id='optionA_updateEditor' name='optionA' class='form-control' autofocus></textarea>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group option" id="optionB_update">
                                 <label class="col-sm-3 control-label">B：</label>
-                                <div class="col-sm-6">
-                                    <input type="text" placeholder="选项B" class="form-control" name="optionB">
+                                <div class="col-sm-8">
+                                    <textarea id='optionB_updateEditor' name='optionB' class='form-control' autofocus></textarea>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group option" id="optionC_update">
                                 <label class="col-sm-3 control-label">C：</label>
-                                <div class="col-sm-6">
-                                    <input type="text" placeholder="选项C" class="form-control" name="optionC">
+                                <div class="col-sm-8">
+                                    <textarea id='optionC_updateEditor' name='optionC' class='form-control' autofocus></textarea>
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group option" id="optionD_update">
                                 <label class="col-sm-3 control-label">D：</label>
-                                <div class="col-sm-6">
-                                    <input type="text" placeholder="选项D" class="form-control" name="optionD">
+                                <div class="col-sm-8">
+                                    <textarea id='optionD_updateEditor' name='optionD' class='form-control' autofocus></textarea>
                                 </div>
                             </div>
                             <div class="form-group " >
                                 <label class="col-sm-3 control-label">答案：</label>
-                                <div class=" col-sm-6">
+                                <div class=" col-sm-8">
                                     <select data-placeholder="选择答案..." class="form-control chosen-select " style="width:270px;" tabindex="2" id="answer_update"   name="answer">
                                         <option value="A" hassubinfo="true">A</option>
                                         <option value="B" hassubinfo="true">B</option>
@@ -294,7 +295,7 @@
                             </div>
                             <div class="form-group " >
                                 <label class="col-sm-3 control-label">课程名称：</label>
-                                <div class=" col-sm-6">
+                                <div class=" col-sm-8">
                                     <select data-placeholder="选择课程..." class="form-control chosen-select " style="width:270px;" tabindex="2" id="course_update"   name="courseId">
                                         <c:forEach items="${courses}" var="course" >
                                             <option value="${course.id}" hassubinfo="true">${course.name}</option>
@@ -304,7 +305,7 @@
                             </div>
                             <div class="form-group " >
                                 <label class="col-sm-3 control-label">难度：</label>
-                                <div class=" col-sm-6">
+                                <div class=" col-sm-8">
                                     <select data-placeholder="选择难度..." class="form-control chosen-select " style="width:270px;" tabindex="2" id="difficulty_update"   name="difficulty">
                                         <c:forEach items="${difficultys}" var="difficulty" >
                                             <option value="${difficulty.code}" hassubinfo="true">${difficulty.name}</option>
@@ -332,36 +333,6 @@
                     <div class="row">
                         <form class="form-horizontal" id="question-details-form">
                             <p>欢迎查看该题目(⊙o⊙)</p>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">内容：</label>
-                                <div class="col-sm-6">
-                                    <p class="form-control-static" id="content_details"></p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">A：</label>
-                                <div class="col-sm-6">
-                                    <p class="form-control-static" id="optionA_details"></p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">B：</label>
-                                <div class="col-sm-6">
-                                    <p class="form-control-static" id="optionB_details"></p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">C：</label>
-                                <div class="col-sm-6">
-                                    <p class="form-control-static" id="optionC_details"></p>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">D：</label>
-                                <div class="col-sm-6">
-                                    <p class="form-control-static" id="optionD_details"></p>
-                                </div>
-                            </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">课程：</label>
                                 <div class="col-sm-6">
@@ -605,6 +576,28 @@
     <script src="/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
 
     <script src="/js/plugins/webuploader/webuploader.min.js"></script>
+
+    <!-- simditor -->
+    <script type="text/javascript" src="/js/plugins/simditor/module.js"></script>
+    <script type="text/javascript" src="/js/plugins/simditor/uploader.js"></script>
+    <script type="text/javascript" src="/js/plugins/simditor/hotkeys.js"></script>
+    <script type="text/javascript" src="/js/plugins/simditor/simditor.js"></script>
+
+    <style>
+        .option .simditor-wrapper{
+            height: 34px;
+        }
+        .option .simditor .simditor-body{
+            padding: 6px 12px;
+            height: 34px;
+        }
+        .option .simditor .simditor-placeholder{
+            padding: 6px 12px;
+            height: 34px;
+        }
+
+
+    </style>
 
     <script type="text/javascript">
 
@@ -1024,18 +1017,54 @@
 
             $("#question-update-form").attr('selected',false);
 
-            $("#question-update-form [name=content]").val(content);
+            var contentHtml="<textarea id='content_updateEditor' name='content' class='form-control' autofocus>"+content+"</textarea>";
+
+            var optionAHtml="<textarea id='optionA_updateEditor' name='optionA' class='form-control' autofocus>"+optionA+"</textarea>";
+            var optionBHtml="<textarea id='optionB_updateEditor' name='optionB' class='form-control' autofocus>"+optionB+"</textarea>";
+            var optionCHtml="<textarea id='optionC_updateEditor' name='optionC' class='form-control' autofocus>"+optionC+"</textarea>";
+            var optionDHtml="<textarea id='optionD_updateEditor' name='optionD' class='form-control' autofocus>"+optionD+"</textarea>";
+
+            $("#question-update-form .simditor").remove();
+            $("#question-update-form textarea").remove();
+
+            $("#content_update").children().last().append(contentHtml);
+            $("#optionA_update").children().last().append(optionAHtml);
+            $("#optionB_update").children().last().append(optionBHtml);
+            $("#optionC_update").children().last().append(optionCHtml);
+            $("#optionD_update").children().last().append(optionDHtml);
+
             $("#question-update-form [name=id]").val(id);
             $("#question-update-form [name=isChecked]").val(isChecked);
-            $("#question-update-form [name=optionA]").val(optionA);
-            $("#question-update-form [name=optionB]").val(optionB);
-            $("#question-update-form [name=optionC]").val(optionC);
-            $("#question-update-form [name=optionD]").val(optionD);
             $("#answer_update").val(answer).trigger("chosen:updated");
             $("#course_update").val(courseId).trigger("chosen:updated");
             $("#difficulty_update").val(difficulty).trigger("chosen:updated");
 
             $("#modal-form-update").modal('show');
+
+            var contentUpdateEditor = new Simditor({
+                textarea: $('#content_updateEditor'),
+                toolbarHidden:true
+            });
+
+            var optionAUpdateEditor = new Simditor({
+                textarea: $('#optionA_updateEditor'),
+                toolbarHidden:true
+            });
+
+            var optionBUpdateEditor = new Simditor({
+                textarea: $('#optionB_updateEditor'),
+                toolbarHidden:true
+            });
+
+            var optionCUpdateEditor = new Simditor({
+                textarea: $('#optionC_updateEditor'),
+                toolbarHidden:true
+            });
+
+            var optionDUpdateEditor = new Simditor({
+                textarea: $('#optionD_updateEditor'),
+                toolbarHidden:true
+            });
         }
 
         //获取查询参数
@@ -1069,12 +1098,6 @@
 
                             //赋值
                             var courseDetails=data.data;
-
-                            $("#content_details").text(courseDetails.content);
-                            $("#optionA_details").text(courseDetails.optionA);
-                            $("#optionB_details").text(courseDetails.optionB);
-                            $("#optionC_details").text(courseDetails.optionC);
-                            $("#optionD_details").text(courseDetails.optionD);
                             $("#course_details").text(courseDetails.courseName);
                             $("#difficulty_details").text(courseDetails.difficultyName);
                             $("#created_teacher_details").text(courseDetails.createdTeacher.sysuserId+"-"+courseDetails.createdTeacher.name);
@@ -1414,6 +1437,31 @@
             $("#thelist").children().remove();
             uploader.destroy();
         });
+    </script>
+
+    <script>
+            var contentAddEditor = new Simditor({
+                textarea: $('#content_addEditor'),
+                toolbarHidden:true
+            });
+
+            var optionAEditor = new Simditor({
+                textarea: $('#optionA_add'),
+                toolbarHidden:true
+            });
+
+            var optionBEditor = new Simditor({
+                textarea: $('#optionB_add'),
+                toolbarHidden:true
+            });
+            var optionCEditor = new Simditor({
+                textarea: $('#optionC_add'),
+                toolbarHidden:true
+            });
+            var optionDEditor = new Simditor({
+                textarea: $('#optionD_add'),
+                toolbarHidden:true
+            });
     </script>
 
     <!-- Peity -->
