@@ -21,6 +21,7 @@
     <link href="/css/plugins/chosen/chosen.css" rel="stylesheet">
     <link href="/css/animate.css" rel="stylesheet">
     <link href="/css/plugins/webuploader/webuploader.css" rel="stylesheet">
+    <link href="/css/plugins/simditor/simditor.css" rel="stylesheet" />
     <link href="/css/style.css?v=4.1.0" rel="stylesheet">
 
     <!-- Sweet Alert -->
@@ -158,7 +159,7 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">内容：</label>
                                 <div class="col-sm-6">
-                                    <textarea  name="content" placeholder="题目内容" class="form-control" required="" aria-required="true" rows="4" style="resize: none"></textarea>
+                                    <textarea id="content_addEditor" name="content" placeholder="题目内容" class="form-control" autofocus></textarea>
                                 </div>
                             </div>
                             <div class="form-group " >
@@ -204,7 +205,7 @@
 
     <!-- 修改题目modal -->
     <div id="modal-form-update" class="modal fade" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog" >
             <div class="modal-content">
                 <div class="modal-body">
                     <div class="row">
@@ -213,10 +214,10 @@
                             <input type="hidden" name="isChecked">
                             <input type="hidden" name="_method" value="put">
                             <p>欢迎修改题目(⊙o⊙)</p>
-                            <div class="form-group">
+                            <div class="form-group" id="content_update">
                                 <label class="col-sm-3 control-label">内容：</label>
                                 <div class="col-sm-6">
-                                    <textarea  name="content" placeholder="题目内容" class="form-control" required="" aria-required="true" rows="4" style="resize: none"></textarea>
+                                    <textarea id='content_updateEditor' name='content' class='form-control' autofocus></textarea>
                                 </div>
                             </div>
                             <div class="form-group " >
@@ -260,7 +261,7 @@
         </div>
     </div>
 
-    <!-- 查看详情课程modal -->
+    <!-- 查看详情题目modal -->
     <div id="modal-form-details" class="modal fade" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -268,12 +269,6 @@
                     <div class="row">
                         <form class="form-horizontal" id="question-details-form">
                             <p>欢迎查看该题目(⊙o⊙)</p>
-                            <div class="form-group">
-                                <label class="col-sm-3 control-label">内容：</label>
-                                <div class="col-sm-6">
-                                    <p class="form-control-static" id="content_details"></p>
-                                </div>
-                            </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">课程：</label>
                                 <div class="col-sm-6">
@@ -354,6 +349,17 @@
         }
         .jstree-default-contextmenu{
             z-index: 200;
+        }
+        .option .simditor-wrapper{
+            height: 34px;
+        }
+        .option .simditor .simditor-body{
+            padding: 6px 12px;
+            height: 34px;
+        }
+        .option .simditor .simditor-placeholder{
+            padding: 6px 12px;
+            height: 34px;
         }
     </style>
 
@@ -516,6 +522,11 @@
     <script src="/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
     <script src="/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
 
+    <!-- simditor -->
+    <script type="text/javascript" src="/js/plugins/simditor/module.js"></script>
+    <script type="text/javascript" src="/js/plugins/simditor/uploader.js"></script>
+    <script type="text/javascript" src="/js/plugins/simditor/hotkeys.js"></script>
+    <script type="text/javascript" src="/js/plugins/simditor/simditor.js"></script>
 
     <script type="text/javascript">
 
@@ -535,6 +546,8 @@
             $(':input',"#question-add-form").not(':button,:submit,:reset,:hidden').val('').removeAttr('checked').removeAttr('selected');
             $("#answer_add").val("true").trigger("chosen:updated");
             $("#difficulty_add").val("0").trigger("chosen:updated");
+
+            $("#question-add-form .simditor-body").children().remove();
         }
 
         function openExcelModal() {
@@ -899,7 +912,13 @@
 
             $("#question-update-form").attr('selected',false);
 
-            $("#question-update-form [name=content]").val(content);
+            var contentHtml="<textarea id='content_updateEditor' name='content' class='form-control' autofocus>"+content+"</textarea>";
+
+            $("#question-update-form .simditor").remove();
+            $("#question-update-form textarea").remove();
+
+            $("#content_update").children().last().append(contentHtml);
+
             $("#question-update-form [name=id]").val(id);
             $("#question-update-form [name=isChecked]").val(isChecked);
 
@@ -913,6 +932,11 @@
             $("#difficulty_update").val(difficulty).trigger("chosen:updated");
 
             $("#modal-form-update").modal('show');
+
+            var contentUpdateEditor = new Simditor({
+                textarea: $('#content_updateEditor'),
+                toolbarHidden:true
+            });
         }
 
         //获取查询参数
@@ -947,7 +971,6 @@
                             //赋值
                             var courseDetails=data.data;
 
-                            $("#content_details").text(courseDetails.content);
                             $("#course_details").text(courseDetails.courseName);
                             $("#difficulty_details").text(courseDetails.difficultyName);
                             $("#created_teacher_details").text(courseDetails.createdTeacher.sysuserId+"-"+courseDetails.createdTeacher.name);
@@ -1276,6 +1299,13 @@
 
             $("#thelist").children().remove();
             uploader.destroy();
+        });
+    </script>
+
+    <script>
+        var contentAddEditor = new Simditor({
+            textarea: $('#content_addEditor'),
+            toolbarHidden:true
         });
     </script>
 

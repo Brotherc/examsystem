@@ -255,7 +255,7 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">括号：</label>
                                 <div class="col-sm-8">
-                                    <p>( )</p>
+                                    <p class="form-control">( )</p>
                                 </div>
                             </div>
                             <div class="form-group option" id="optionA_update">
@@ -325,7 +325,7 @@
         </div>
     </div>
 
-    <!-- 查看详情课程modal -->
+    <!-- 查看详情题目modal -->
     <div id="modal-form-details" class="modal fade" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -595,8 +595,6 @@
             padding: 6px 12px;
             height: 34px;
         }
-
-
     </style>
 
     <script type="text/javascript">
@@ -617,6 +615,8 @@
             $(':input',"#question-add-form").not(':button,:submit,:reset,:hidden').val('').removeAttr('checked').removeAttr('selected');
             $("#answer_add").val("A").trigger("chosen:updated");
             $("#difficulty_add").val("0").trigger("chosen:updated");
+
+            $("#question-add-form .simditor-body").children().remove();
         }
 
         function searchQuestion() {

@@ -21,6 +21,7 @@
     <link href="/css/plugins/chosen/chosen.css" rel="stylesheet">
     <link href="/css/plugins/steps/jquery.steps.css" rel="stylesheet">
     <link href="/css/animate.css" rel="stylesheet">
+    <link href="/css/plugins/simditor/simditor.css" rel="stylesheet" />
     <link href="/css/style.css?v=4.1.0" rel="stylesheet">
 
     <link href="/css/plugins/spinner/bootstrap-spinner.css" rel="stylesheet">
@@ -157,13 +158,13 @@
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">内容：</label>
                                     <div class="col-sm-7">
-                                        <textarea  name="content" placeholder="题目内容" class="form-control" required="" aria-required="true" id="content_add" rows="4" style="resize: none"></textarea>
+                                        <textarea id="content_addEditor" name="content" placeholder="题目内容" id="content_add" class="form-control" autofocus></textarea>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">空格：</label>
-                                    <div class="col-sm-6">
-                                        <p>____</p>
+                                    <div class="col-sm-7">
+                                        <p class="form-control">____</p>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -240,16 +241,16 @@
                             <input type="hidden" name="_method" value="put">
                             <h1>题目内容</h1>
                             <fieldset style="overflow-x: hidden;">
-                                <div class="form-group">
+                                <div class="form-group" id="content_update">
                                     <label class="col-sm-3 control-label">内容：</label>
                                     <div class="col-sm-7">
-                                        <textarea  name="content" placeholder="题目内容" class="form-control" required="" aria-required="true" id="content_update" rows="4" style="resize: none"></textarea>
+                                        <textarea id='content_updateEditor' name='content' class='form-control' autofocus></textarea>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">空格：</label>
-                                    <div class="col-sm-6">
-                                        <p>____</p>
+                                    <div class="col-sm-7">
+                                        <p class="form-control">____</p>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -389,6 +390,17 @@
         }
         .jstree-default-contextmenu{
             z-index: 200;
+        }
+        .option .simditor-wrapper{
+            height: 34px;
+        }
+        .option .simditor .simditor-body{
+            padding: 6px 12px;
+            height: 34px;
+        }
+        .option .simditor .simditor-placeholder{
+            padding: 6px 12px;
+            height: 34px;
         }
     </style>
 
@@ -558,6 +570,12 @@
     <script src="/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
     <script src="/js/plugins/bootstrap-table/bootstrap-table-mobile.min.js"></script>
     <script src="/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+
+    <!-- simditor -->
+    <script type="text/javascript" src="/js/plugins/simditor/module.js"></script>
+    <script type="text/javascript" src="/js/plugins/simditor/uploader.js"></script>
+    <script type="text/javascript" src="/js/plugins/simditor/hotkeys.js"></script>
+    <script type="text/javascript" src="/js/plugins/simditor/simditor.js"></script>
 
     <script>
             $("#question-add-form").steps({
@@ -1146,6 +1164,13 @@
 
             $("#question-update-form").attr('selected',false);
 
+            var contentHtml="<textarea id='content_updateEditor' name='content' class='form-control' autofocus>"+content+"</textarea>";
+
+            $("#question-update-form .simditor").remove();
+            $("#question-update-form textarea").remove();
+
+            $("#content_update").children().last().append(contentHtml);
+
             $("#question-update-form [name=content]").val(content);
             $("#question-update-form [name=id]").val(id);
             $("#question-update-form [name=isChecked]").val(isChecked);
@@ -1158,6 +1183,11 @@
             $("#matcher_update").val(matchersArr).trigger("chosen:updated");
 
             $("#modal-form-update").modal('show');
+
+            var contentUpdateEditor = new Simditor({
+                textarea: $('#content_updateEditor'),
+                toolbarHidden:true
+            });
         }
 
         //获取查询参数
@@ -1601,6 +1631,13 @@
                     }
                 }
             });
+        });
+    </script>
+
+    <script>
+        var contentAddEditor = new Simditor({
+            textarea: $('#content_addEditor'),
+            toolbarHidden:true
         });
     </script>
 
