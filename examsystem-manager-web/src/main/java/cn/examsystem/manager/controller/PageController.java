@@ -723,7 +723,39 @@ public class PageController {
     }
 
     @RequestMapping("/v1/exam/invigilation")
-    public String toInvigilationPage(Model model) throws Exception{
+    public String toInvigilationPage(Model model,HttpSession session) throws Exception{
+
+        //从session中获取springsecurity认证的用户信息
+        SecurityContext securityContext= (SecurityContext) session.getAttribute("SPRING_SECURITY_CONTEXT");
+        SysuserDto sysuserDto= (SysuserDto) securityContext.getAuthentication().getPrincipal();
+
+        //前台搜索用到的条件（课程）
+        List<Course> courseList=null;
+        try {
+            //调用rest服务
+            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+COURSE_URL+"/teacher/{teacherId}", HttpMethod.GET, ResultInfo.class,new Object[]{sysuserDto.getId()});
+            courseList=(List<Course>) resultInfo.getData();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        //构造查询条件
+        SchoolYearVo schoolYearVo=new SchoolYearVo();
+        int year=DateUtil.getYear(new Date());
+        schoolYearVo.setLessName(year+"-"+(year+1));
+        //将查询参数构建在url后面
+        JSONObject obj=new JSONObject(schoolYearVo);
+        String url = expandURL(REST_BASE_URL + SCHOOL_YEAR_URL+"?", obj);
+
+        //前台搜索用到的条件（学年）
+        List<SchoolYear> schoolYearList=null;
+        try {
+            //调用rest服务
+            ResultInfo resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{});
+            schoolYearList=(List<SchoolYear>) resultInfo.getData();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         //前台搜索用到的条件（班级）
         List<ClassDto> classList=null;
@@ -755,6 +787,8 @@ public class PageController {
 
         model.addAttribute(MODEL_KEY_CLASSES,classList);
         model.addAttribute(MODEL_KEY_STATUSES,statusList);
+        model.addAttribute(MODEL_KEY_COURSES,courseList);
+        model.addAttribute(MODEL_KEY_SCHOOLYEARS,schoolYearList);
 
         return "exam/invigilation";
     }
