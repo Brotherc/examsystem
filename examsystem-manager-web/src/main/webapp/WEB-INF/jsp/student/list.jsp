@@ -136,13 +136,13 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">学号：</label>
                                 <div class="col-sm-6">
-                                    <input type="text" placeholder="学号" class="form-control" name="studentId">
+                                    <input type="text" placeholder="学号" maxlength="8" class="form-control" name="studentId">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">姓名：</label>
                                 <div class="col-sm-6">
-                                    <input type="text" placeholder="姓名" class="form-control" name="name">
+                                    <input type="text" placeholder="姓名" maxlength="4" class="form-control" name="name">
                                 </div>
                             </div>
                             <div class="form-group " >
@@ -180,19 +180,19 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">学号：</label>
                                 <div class="col-sm-6">
-                                    <input type="text" placeholder="学号" class="form-control" name="studentId">
+                                    <input type="text" placeholder="学号" maxlength="8" class="form-control" name="studentId">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">名字：</label>
                                 <div class="col-sm-6">
-                                    <input type="text" placeholder="名字" class="form-control" name="name">
+                                    <input type="text" placeholder="名字" maxlength="4" class="form-control" name="name">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">密码：</label>
                                 <div class="col-sm-6">
-                                    <input type="password" class="form-control" name="password"  placeholder="密码" >
+                                    <input type="password" class="form-control" name="password" maxlength="4"  placeholder="密码" >
                                     <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 如需修改密码，请填写该项</span>
                                 </div>
                             </div>

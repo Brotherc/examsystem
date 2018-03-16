@@ -66,7 +66,7 @@
                                     <form role="form" class="form-inline ">
                                         <div class="form-group m-l-none" >
                                             <label for="name" class="sr-only">账号</label>
-                                            <input type="text" placeholder="请输入账号" id="sysuserId" class="form-control">
+                                            <input type="text" placeholder="请输入账号"  id="sysuserId" class="form-control">
                                         </div>
                                         <div class="form-group m-l-none" >
                                             <label for="name" class="sr-only">名字</label>
@@ -140,21 +140,21 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">账号：</label>
                                 <div class="col-sm-6">
-                                    <input type="text" placeholder="用户账号" class="form-control" name="sysuserId">
+                                    <input type="text" placeholder="用户账号" maxlength="8" class="form-control" name="sysuserId">
                                     <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 如果添加用户为教师，则填写教师工号</span>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">名称：</label>
                                 <div class="col-sm-6">
-                                    <input type="text" placeholder="用户名称" class="form-control" name="name">
+                                    <input type="text" placeholder="用户名称" maxlength="8" class="form-control" name="name">
                                     <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 真实姓名</span>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">密码：</label>
                                 <div class="col-sm-6">
-                                    <input type="password" class="form-control" name="password"  placeholder="密码" >
+                                    <input type="password" class="form-control" name="password" maxlength="8"  placeholder="密码" >
                                 </div>
                             </div>
                             <div class="form-group " >
@@ -204,19 +204,19 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">账号：</label>
                                 <div class="col-sm-6">
-                                    <input type="text" placeholder="账号名称" class="form-control" name="sysuserId">
+                                    <input type="text" placeholder="账号名称" maxlength="8" class="form-control" name="sysuserId">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">名称：</label>
                                 <div class="col-sm-6">
-                                    <input type="text" placeholder="用户名称" class="form-control" name="name">
+                                    <input type="text" placeholder="用户名称" maxlength="8" class="form-control" name="name">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">密码：</label>
                                 <div class="col-sm-6">
-                                    <input type="password" class="form-control" name="password"  placeholder="密码" >
+                                    <input type="password" class="form-control" name="password" maxlength="8"  placeholder="密码" >
                                     <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 如需修改密码，请填写该项</span>
                                 </div>
                             </div>

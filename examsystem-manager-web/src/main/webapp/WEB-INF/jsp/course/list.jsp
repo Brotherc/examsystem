@@ -126,7 +126,7 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">名称：</label>
                                 <div class="col-sm-6">
-                                    <input type="text" placeholder="课程名称" class="form-control" name="name">
+                                    <input type="text" placeholder="课程名称" maxlength="32" class="form-control" name="name">
                                 </div>
                             </div>
                             <div class="form-group " >
@@ -174,7 +174,7 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">名称：</label>
                                 <div class="col-sm-6">
-                                    <input type="text" placeholder="课程名称" class="form-control" name="name">
+                                    <input type="text" placeholder="课程名称" maxlength="32" class="form-control" name="name">
                                 </div>
                             </div>
                             <div class="form-group " >
