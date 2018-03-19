@@ -133,7 +133,7 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">名称：</label>
                                 <div class="col-sm-6">
-                                    <input type="text" placeholder="试卷名称" id="name_update" class="form-control" name="name">
+                                    <input type="text" placeholder="试卷名称" maxlength="32" id="name_update" class="form-control" name="name">
                                 </div>
                             </div>
                             <div class="form-group " >
@@ -455,6 +455,7 @@
                         $.each(checkedQuestions,function (index,question) {
                             $(question).parent().parent().remove();
                         });
+                        $("#exampleTableEvents").bootstrapTable('refresh');
                     }
                     else{
                         swal(data.message, "无法移除这些题目。", "error");

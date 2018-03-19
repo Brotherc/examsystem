@@ -131,7 +131,7 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">名称：</label>
                                 <div class="col-sm-6">
-                                    <input type="text" placeholder="试卷名称" id="name_add" class="form-control" name="name">
+                                    <input type="text" placeholder="试卷名称" id="name_add" maxlength="32" class="form-control" name="name">
                                 </div>
                             </div>
                             <div class="form-group " >

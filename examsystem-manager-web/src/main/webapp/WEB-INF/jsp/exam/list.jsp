@@ -411,13 +411,13 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">学号：</label>
                                 <div class="col-sm-6">
-                                    <input type="text" placeholder="学号" class="form-control" name="studentId">
+                                    <input type="text" placeholder="学号" maxlength="8" class="form-control" name="studentId">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">姓名：</label>
                                 <div class="col-sm-6">
-                                    <input type="text" placeholder="姓名" class="form-control" name="name">
+                                    <input type="text" placeholder="姓名" maxlength="4" class="form-control" name="name">
                                 </div>
                             </div>
                             <div class="form-group " >
@@ -564,7 +564,7 @@
                                             </div>
                                             <div class="form-group m-l-none" >
                                                 <label for="studentName" class="sr-only">名字</label>
-                                                <input type="text" placeholder="请输入名字" id="studentName_add" class="form-control" style="width: 100px">
+                                                <input type="text" placeholder="请输入名字" maxlength="4" id="studentName_add" class="form-control" style="width: 100px">
                                             </div>
                                             <div class="form-group " >
                                                 <div class="input-group ">
@@ -650,7 +650,7 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">学号：</label>
                                 <div class="col-sm-6">
-                                    <input type="text" placeholder="学号" class="form-control" name="studentId">
+                                    <input type="text" placeholder="学号" maxlength="8" class="form-control" name="studentId">
                                 </div>
                             </div>
                             <div class="form-group">
