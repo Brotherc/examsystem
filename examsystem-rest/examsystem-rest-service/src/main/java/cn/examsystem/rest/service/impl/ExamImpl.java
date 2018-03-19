@@ -287,6 +287,12 @@ public class ExamImpl implements ExamService {
         String examId = UUIDBuild.getUUID();
         exam.setId(examId);
         exam.setStatus(new Integer(DICTINFO_EXAM_NOT_START_CODE));
+
+        //如果场次为1，则场次间隔时间为0
+        if(partNum==1)
+            exam.setIntervalTime(0);
+
+
         long time = (endTime.getTime() - startTime.getTime()) / 1000;
         exam.setTime((int)time);
         exam.setExamPwd(RandomUtils.FourPwd());
@@ -368,6 +374,11 @@ public class ExamImpl implements ExamService {
         examDb.setSchoolYearId(examSchoolYearId);
         examDb.setTerm(term);
         examDb.setPartNum(partNum);
+
+        //如果场次为1，则场次间隔时间为0
+        if(partNum==1)
+            intervalTime=0;
+
         examDb.setIntervalTime(intervalTime);
 
         long time = (endTime.getTime() - startTime.getTime()) / 1000;
