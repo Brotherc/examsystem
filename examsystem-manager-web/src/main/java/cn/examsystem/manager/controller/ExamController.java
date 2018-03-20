@@ -223,13 +223,13 @@ public class ExamController {
         return resultInfo;
     }
 
-    @PutMapping("/v1/exam/student/{examStudentRelationId}")
+    @PutMapping("/v1/exam/student/{examStudentRelationId}/partOrder")
     public ResultInfo updateExamStudentPartOrder(@PathVariable String examStudentRelationId, ExamStudentRelation examStudentRelation) throws Exception{
 
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+EXAM_URL+EXAM_STUDENT_URL+"/{examStudentRelationId}",HttpMethod.PUT,examStudentRelation,ResultInfo.class,new Object[]{examStudentRelationId});
+            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+EXAM_URL+EXAM_STUDENT_URL+"/{examStudentRelationId}/partOrder",HttpMethod.PUT,examStudentRelation,ResultInfo.class,new Object[]{examStudentRelationId});
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
@@ -237,13 +237,13 @@ public class ExamController {
         return resultInfo;
     }
 
-    @PutMapping("/v1/examStudent/{id}")
-    public ResultInfo updateStudent(@PathVariable String id, Student student) throws Exception{
+    @PutMapping("/v1/exam/{examId}/student/{studentId}")
+    public ResultInfo updateStudent(@PathVariable String examId,@PathVariable String studentId, Student student) throws Exception{
 
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+EXAMSTUDENT_URL+"/{id}",HttpMethod.PUT,student,ResultInfo.class,new Object[]{id});
+            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+EXAM_URL+"/{examId}"+EXAM_STUDENT_URL+"/{studentId}",HttpMethod.PUT,student,ResultInfo.class,new Object[]{examId,studentId});
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
