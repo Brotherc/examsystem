@@ -468,7 +468,7 @@
                         <!--用来存放文件信息-->
                         <div id="thelist" class="uploader-list"></div>
                         <div id="picker">选择文件</div>
-                        <span class="help-block m-b-none"><i class="fa fa-info-circle"></i>注意excel文件中学生场次不要超出所选考试的场次范围，将以导入信息作为学生的最新信息</span>
+                        <span class="help-block m-b-none"><i class="fa fa-info-circle"></i>注意excel文件中学生场次不要超出所选考试的场次范围，将以导入信息作为学生的最新信息,支持.xlsx和.xls后缀文件</span>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -656,7 +656,7 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">姓名：</label>
                                 <div class="col-sm-6">
-                                    <input type="text" placeholder="姓名" class="form-control" name="name">
+                                    <input type="text" placeholder="姓名" maxlength="4" class="form-control" name="name">
                                 </div>
                             </div>
                             <div class="form-group " >
@@ -1181,7 +1181,7 @@
             var examStudentId=$("#examStudent").val();
             $.ajax({
                 type: "POST",
-                url: "/v1/exam/student/"+examStudentId,
+                url: "/v1/exam/student/"+examStudentId+"/partOrder",
                 data: {partOrder:partOrder,_method:"put"},
                 success: function(data){
                     if(data.status == 201){
@@ -1213,11 +1213,13 @@
                 return ;
             }
 
+            var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
+
             var studentId=$("#studentId_update").val();
 
             $.ajax({
                 type: "POST",
-                url: "/v1/examStudent/"+studentId,
+                url: "/v1/exam/"+sels[0].id+"/student/"+studentId,
                 data: decodeURIComponent($("#student-update-form").serialize().replace(/\+/g,"")),
                 success: function(data){
                     if(data.status == 201){
