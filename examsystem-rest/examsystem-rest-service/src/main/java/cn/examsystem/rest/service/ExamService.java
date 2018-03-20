@@ -45,6 +45,9 @@ public interface ExamService {
     //将学生从考试中移除
     public ResultInfo removeStudentFromExam(String examStudentRelationId) throws Exception;
 
+    //修改考试学生信息
+    public ResultInfo updateExamStudent(String examId,String studentId,Student student) throws Exception;
+
     //修改考试学生场次
     public ResultInfo updateExamStudentPartOrder(String examStudentRelationId,Integer partOrdeer) throws Exception;
 
