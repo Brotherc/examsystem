@@ -117,6 +117,10 @@ public class ExamImpl implements ExamService {
     private String MESSAGE_INVIGILATE_PWD_NOT_SAME;
     @Value("${MESSAGE_STUDENT_NO_EXIST_COURSE}")
     private String MESSAGE_STUDENT_NO_EXIST_COURSE;
+    @Value("${MESSAGE_STUDENT_ID_NOT_NULL}")
+    private String MESSAGE_STUDENT_ID_NOT_NULL;
+    @Value("${MESSAGE_STUDENT_STUDENTID_NOT_REPEAT}")
+    private String MESSAGE_STUDENT_STUDENTID_NOT_REPEAT;
 
     @Value("${DICTINFO_EXAM_NOT_START_CODE}")
     private String DICTINFO_EXAM_NOT_START_CODE;
@@ -991,6 +995,18 @@ public class ExamImpl implements ExamService {
     @Override
     public ResultInfo updateExamStudentPartOrder(String examStudentRelationId, Integer partOrdeer) throws Exception {
 
+        //id对应的考试学生关系存在
+        ExamStudentRelation examStudentRelation = examStudentRelationMapper.selectByPrimaryKey(examStudentRelationId);
+        if(examStudentRelation==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_STUDENT_NOT_EXIST,null);
+
+        //只允许更新未启动的考试学生的场次
+        if(examStudentRelation!=null){
+            Exam exam = examMapper.selectByPrimaryKey(examStudentRelation.getExamId());
+            if(!exam.getStatus().equals(new Integer(DICTINFO_EXAM_NOT_START_CODE)))
+                return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_IS_STARTED,null);
+        }
+
         //id不允许为空
         if(StringUtils.isBlank(examStudentRelationId))
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_STUDENT_ID_NOT_NULL,null);
@@ -998,11 +1014,6 @@ public class ExamImpl implements ExamService {
         //场次不能为空
         if(partOrdeer==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_STUDENT_EXAM_PARTORDER_NOT_NULL,null);
-
-        //id对应的考试学生关系存在
-        ExamStudentRelation examStudentRelation = examStudentRelationMapper.selectByPrimaryKey(examStudentRelationId);
-        if(examStudentRelation==null)
-            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_STUDENT_NOT_EXIST,null);
 
         //场次不能超出范围
         Exam exam = examMapper.selectByPrimaryKey(examStudentRelation.getExamId());
@@ -1528,5 +1539,93 @@ public class ExamImpl implements ExamService {
         }
 
         return examStudentRelationDtoList;
+    }
+
+    @Override
+    public ResultInfo updateExamStudent(String examId, String studentId, Student student) throws Exception {
+
+        //考试id不允许为空
+        if(StringUtils.isBlank(examId))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_ID_NOT_NULL,null);
+
+        //修改的考试学生所在考试必须存在
+        Exam exam = examMapper.selectByPrimaryKey(examId);
+        if(exam==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_NOT_EXIST,null);
+
+        //只允许修改未启动的考试对应的考试学生
+        if(!exam.getStatus().equals(new Integer(DICTINFO_EXAM_NOT_START_CODE)))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_IS_STARTED,null);
+
+        //id不允许为空
+        if(StringUtils.isBlank(studentId))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_STUDENT_ID_NOT_NULL,null);
+
+        //学号不允许为空
+        String studentStudentId=student.getStudentId();
+        if(StringUtils.isBlank(studentStudentId))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_STUDENT_STUDENTID_NOT_NULL,null);
+
+        //学号预处理
+        studentStudentId=studentStudentId.trim();
+
+        //名字不允许为空
+        String studentName=student.getName();
+        if(StringUtils.isBlank(studentName))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_STUDENT_NAME_NOT_NULL,null);
+
+        //名字预处理
+        studentName=studentName.trim();
+
+        //学生班级id不能为空
+        String classId = student.getClassId();
+        if(StringUtils.isBlank(classId))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_CLASS_ID_NOT_NULL,null);
+
+        //学生班级必须存在
+        Class aClass = classMapper.selectByPrimaryKey(classId);
+        if(aClass==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_CLASS_NOT_EXIST,null);
+
+        //id对应学生必须存在
+        Student studentDb = studentMapper.selectByPrimaryKey(studentId);
+
+        if(studentDb==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_STUDENT_NOT_EXIST,null);
+
+        //若对学号进行了修改
+        if(!StringUtils.equals(studentStudentId,studentDb.getStudentId())){
+            //学号不能重复
+            StudentExample studentExample=new StudentExample();
+            StudentExample.Criteria studentCriteria = studentExample.createCriteria();
+            studentCriteria.andStudentIdEqualTo(studentStudentId);
+            List<Student> studentList = studentMapper.selectByExample(studentExample);
+            if(!CollectionUtils.isEmpty(studentList)){
+                return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_STUDENT_STUDENTID_NOT_REPEAT,null);
+            }
+            //设置学号
+            studentDb.setStudentId(studentStudentId);
+        }
+
+        //如果密码不为空，则修改密码
+        String studentPassword = student.getPassword();
+        if(!StringUtils.isBlank(studentPassword)){
+            BCryptPasswordEncoder encoder =new BCryptPasswordEncoder();
+            studentPassword=encoder.encode(studentPassword.trim());
+            studentDb.setPassword(studentPassword);
+        }
+
+        //如果状态不为空，则修改状态
+        Integer status = student.getStatus();
+        if(status!=null)
+            studentDb.setStatus(status);
+
+        //更新学生
+        studentDb.setName(studentName);
+        studentDb.setClassId(classId);
+        studentDb.setUpdatedTime(new Date());
+        studentMapper.updateByPrimaryKey(studentDb);
+
+        return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_PUT_SUCCESS,null);
     }
 }
