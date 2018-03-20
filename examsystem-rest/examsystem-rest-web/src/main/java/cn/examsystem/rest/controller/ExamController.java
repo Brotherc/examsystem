@@ -104,14 +104,14 @@ public class ExamController {
         return examService.removeStudentFromExam(examStudentRelationId);
     }
 
-    @PutMapping("/v1/exam/student/{examStudentRelationId}")
+    @PutMapping("/v1/exam/student/{examStudentRelationId}/partOrder")
     public ResultInfo updateExamStudentPartOrder(@PathVariable String examStudentRelationId, @RequestBody ExamStudentRelation examStudentRelation) throws Exception{
         return examService.updateExamStudentPartOrder(examStudentRelationId,examStudentRelation.getPartOrder());
     }
 
-    @PutMapping("/v1/examStudent/{id}")
-    public ResultInfo updateStudent(@PathVariable String id,@RequestBody Student student) throws Exception{
-        return studentService.updateStudent(id,student);
+    @PutMapping("/v1/exam/{examId}/student/{studentId}")
+    public ResultInfo updateStudent(@PathVariable String examId,@PathVariable String studentId,@RequestBody Student student) throws Exception{
+        return examService.updateExamStudent(examId,studentId,student);
     }
 
     @GetMapping("/v1/examStudent/exam/{id}")
