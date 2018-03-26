@@ -73,9 +73,9 @@
                                     <button type="button" class="btn btn-outline btn-default" onclick="openUpdateDepartmentModal()">
                                         <i class="glyphicon glyphicon-pencil" aria-hidden="true"></i>
                                     </button>
-                                    <button type="button" class="btn btn-outline btn-default" onclick="btchDeleteDepartment()">
+<%--                                    <button type="button" class="btn btn-outline btn-default" onclick="btchDeleteDepartment()">
                                         <i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
-                                    </button>
+                                    </button>--%>
                                 </div>
                                 <table id="exampleTableEvents" data-height="400" data-mobile-responsive="true">
                                 </table>
@@ -184,7 +184,7 @@
             $("#exampleTableEvents").bootstrapTable('refresh');
         }
 
-        function btchDeleteDepartment(){
+        /*function btchDeleteDepartment(){
             var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
             if(sels.length == 0){
                 layer.msg("未选中系!");
@@ -233,7 +233,7 @@
                             swal("已取消", "您取消了删除操作！", "error");
                         }
                     });
-        }
+        }*/
 
         function saveDepartment(){
             //表单校验

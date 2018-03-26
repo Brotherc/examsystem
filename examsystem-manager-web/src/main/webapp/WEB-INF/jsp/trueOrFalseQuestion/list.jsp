@@ -116,9 +116,9 @@
                                         <button type="button" class="btn btn-outline btn-default" onclick="openUpdateQuestionModal()">
                                             <i class="glyphicon glyphicon-pencil" aria-hidden="true"></i>
                                         </button>
-                                        <button type="button" class="btn btn-outline btn-default" onclick="btchDeleteMajor()">
+<%--                                        <button type="button" class="btn btn-outline btn-default" onclick="btchDeleteQuestion()">
                                             <i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
-                                        </button>
+                                        </button>--%>
                                         <button type="button" class="btn btn-outline btn-default" onclick="openExcelModal()">
                                             <i class="glyphicon glyphicon-file" aria-hidden="true"></i>
                                         </button>
@@ -711,16 +711,16 @@
             $("#exampleTableEvents").bootstrapTable('refresh');
         }
 
-        function btchDeleteMajor(){
+/*        function btchDeleteQuestion(){
             var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
             if(sels.length == 0){
-                layer.msg("未选中专业!");
+                layer.msg("未选中题目!");
                 return ;
             }
 
             var ids = getSelectionsIds(sels);
             swal({
-                        title: "确定删除所选专业吗",
+                        title: "确定删除所选题目吗",
                         text: "删除后将无法恢复，请谨慎操作！",
                         type: "warning",
                         showCancelButton: true,
@@ -735,11 +735,11 @@
                             var params = {"ids":ids,_method:'delete'};
                             $.ajax({
                                 type: "POST",
-                                url: "/v1/major",
+                                url: "/v1/trueOrFalseQuestion",
                                 data: params,
                                 success: function(data){
                                     if(data.status == 201){
-                                        swal(data.message, "您已经永久删除了这些专业。", "success");
+                                        swal(data.message, "您已经永久删除了这些题目。", "success");
                                         $("#exampleTableEvents").bootstrapTable('refresh');
                                     }
                                     else{
@@ -760,7 +760,7 @@
                             swal("已取消", "您取消了删除操作！", "error");
                         }
                     });
-        }
+        }*/
 
         function checkQuestion(){
             var sels = $('#exampleTableEvents').bootstrapTable('getSelections');

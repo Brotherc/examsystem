@@ -104,9 +104,9 @@
                                         <a data-toggle="modal" class="btn btn-outline btn-default" href="list.jsp#modal-form-save">
                                             <i class="glyphicon glyphicon-plus" aria-hidden="true"></i>
                                         </a>
-                                        <button type="button" class="btn btn-outline btn-default" onclick="btchDeleteMajor()">
+<%--                                        <button type="button" class="btn btn-outline btn-default" onclick="btchDeleteClass()">
                                             <i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
-                                        </button>
+                                        </button>--%>
                                     </div>
                                     <table id="exampleTableEvents" data-height="400" data-mobile-responsive="true">
                                     </table>
@@ -218,7 +218,7 @@
             $("#exampleTableEvents").bootstrapTable('refresh');
         }
 
-        function btchDeleteMajor(){
+        /*function btchDeleteClass(){
             var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
             if(sels.length == 0){
                 layer.msg("未选中班级!");
@@ -242,7 +242,7 @@
                             var params = {"ids":ids,_method:'delete'};
                             $.ajax({
                                 type: "POST",
-                                url: "/v1/major",
+                                url: "/v1/class",
                                 data: params,
                                 success: function(data){
                                     if(data.status == 201){
@@ -267,7 +267,7 @@
                             swal("已取消", "您取消了删除操作！", "error");
                         }
                     });
-        }
+        }*/
 
         function btchSaveClass(){
             //表单校验

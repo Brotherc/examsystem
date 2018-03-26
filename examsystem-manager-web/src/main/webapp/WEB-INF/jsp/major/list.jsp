@@ -88,9 +88,9 @@
                                         <button type="button" class="btn btn-outline btn-default" onclick="openUpdateMajorModal()">
                                             <i class="glyphicon glyphicon-pencil" aria-hidden="true"></i>
                                         </button>
-                                        <button type="button" class="btn btn-outline btn-default" onclick="btchDeleteMajor()">
+<%--                                        <button type="button" class="btn btn-outline btn-default" onclick="btchDeleteMajor()">
                                             <i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
-                                        </button>
+                                        </button>--%>
                                     </div>
                                     <table id="exampleTableEvents" data-height="400" data-mobile-responsive="true">
                                     </table>
@@ -225,7 +225,7 @@
             $("#exampleTableEvents").bootstrapTable('refresh');
         }
 
-        function btchDeleteMajor(){
+        /*function btchDeleteMajor(){
             var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
             if(sels.length == 0){
                 layer.msg("未选中专业!");
@@ -274,7 +274,7 @@
                             swal("已取消", "您取消了删除操作！", "error");
                         }
                     });
-        }
+        }*/
 
         function saveMajor(){
             //表单校验
