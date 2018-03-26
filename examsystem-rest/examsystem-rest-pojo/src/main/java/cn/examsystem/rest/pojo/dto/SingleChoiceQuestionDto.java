@@ -1,6 +1,7 @@
 package cn.examsystem.rest.pojo.dto;
 
 import cn.examsystem.rest.pojo.po.SingleChoiceQuestion;
+import cn.examsystem.rest.pojo.po.SingleChoiceQuestionWithBLOBs;
 import cn.examsystem.rest.pojo.po.Sysuser;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
  * Created by Administrator on 2018/2/11.
  * 单选题（包括知识点）
  */
-public class SingleChoiceQuestionDto extends SingleChoiceQuestion{
+public class SingleChoiceQuestionDto extends SingleChoiceQuestionWithBLOBs{
 
     private String courseName;
     private String difficultyName;

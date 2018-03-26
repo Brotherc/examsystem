@@ -344,7 +344,7 @@ public class SingleChoiceQuestionImpl implements SingleChoiceQuestionService {
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_CREATED_TEACHER_ID_NOT_NULL,null);
 
         //id对应题目必须存在
-        SingleChoiceQuestion singleChoiceQuestionDb = singleChoiceQuestionMapper.selectByPrimaryKey(id);
+        SingleChoiceQuestionWithBLOBs singleChoiceQuestionDb = singleChoiceQuestionMapper.selectByPrimaryKey(id);
         if(singleChoiceQuestionDb==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_QUESTION_NOT_EXIST,null);
 
@@ -575,7 +575,7 @@ public class SingleChoiceQuestionImpl implements SingleChoiceQuestionService {
             }
 
             //将该题目添加到系统中
-            SingleChoiceQuestion singleChoiceQuestion=new SingleChoiceQuestion();
+            SingleChoiceQuestionWithBLOBs singleChoiceQuestion=new SingleChoiceQuestionWithBLOBs();
             String questionId = UUIDBuild.getUUID();
             singleChoiceQuestion.setId(questionId);
             singleChoiceQuestion.setContent(content);

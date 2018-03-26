@@ -2,8 +2,10 @@ package cn.examsystem.rest.mapper;
 
 import cn.examsystem.rest.pojo.po.SingleChoiceQuestion;
 import cn.examsystem.rest.pojo.po.SingleChoiceQuestionExample;
-import java.util.List;
+import cn.examsystem.rest.pojo.po.SingleChoiceQuestionWithBLOBs;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface SingleChoiceQuestionMapper {
     int countByExample(SingleChoiceQuestionExample example);
@@ -12,25 +14,25 @@ public interface SingleChoiceQuestionMapper {
 
     int deleteByPrimaryKey(String id);
 
-    int insert(SingleChoiceQuestion record);
+    int insert(SingleChoiceQuestionWithBLOBs record);
 
-    int insertSelective(SingleChoiceQuestion record);
+    int insertSelective(SingleChoiceQuestionWithBLOBs record);
 
-    List<SingleChoiceQuestion> selectByExampleWithBLOBs(SingleChoiceQuestionExample example);
+    List<SingleChoiceQuestionWithBLOBs> selectByExampleWithBLOBs(SingleChoiceQuestionExample example);
 
     List<SingleChoiceQuestion> selectByExample(SingleChoiceQuestionExample example);
 
-    SingleChoiceQuestion selectByPrimaryKey(String id);
+    SingleChoiceQuestionWithBLOBs selectByPrimaryKey(String id);
 
-    int updateByExampleSelective(@Param("record") SingleChoiceQuestion record, @Param("example") SingleChoiceQuestionExample example);
+    int updateByExampleSelective(@Param("record") SingleChoiceQuestionWithBLOBs record, @Param("example") SingleChoiceQuestionExample example);
 
-    int updateByExampleWithBLOBs(@Param("record") SingleChoiceQuestion record, @Param("example") SingleChoiceQuestionExample example);
+    int updateByExampleWithBLOBs(@Param("record") SingleChoiceQuestionWithBLOBs record, @Param("example") SingleChoiceQuestionExample example);
 
     int updateByExample(@Param("record") SingleChoiceQuestion record, @Param("example") SingleChoiceQuestionExample example);
 
-    int updateByPrimaryKeySelective(SingleChoiceQuestion record);
+    int updateByPrimaryKeySelective(SingleChoiceQuestionWithBLOBs record);
 
-    int updateByPrimaryKeyWithBLOBs(SingleChoiceQuestion record);
+    int updateByPrimaryKeyWithBLOBs(SingleChoiceQuestionWithBLOBs record);
 
     int updateByPrimaryKey(SingleChoiceQuestion record);
 }

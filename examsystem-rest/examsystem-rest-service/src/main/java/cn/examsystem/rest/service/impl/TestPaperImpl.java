@@ -644,7 +644,7 @@ public class TestPaperImpl implements TestPaperService {
                     BeanUtils.copyProperties(relation,testPaperSingleChoiceQuestion);
 
                     //查询某一条单选题信息
-                    SingleChoiceQuestion singleChoiceQuestion = singleChoiceQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
+                    SingleChoiceQuestionWithBLOBs singleChoiceQuestion = singleChoiceQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
                     if(singleChoiceQuestion!=null){
                         testPaperSingleChoiceQuestion.setQuestionContent(singleChoiceQuestion.getContent());
                         testPaperSingleChoiceQuestion.setOptionA(singleChoiceQuestion.getOptionA());
@@ -834,7 +834,7 @@ public class TestPaperImpl implements TestPaperService {
                     BeanUtils.copyProperties(relation,testPaperSingleChoiceQuestion);
 
                     //查询具体的单选题信息
-                    SingleChoiceQuestion singleChoiceQuestion = singleChoiceQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
+                    SingleChoiceQuestionWithBLOBs singleChoiceQuestion = singleChoiceQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
                     if(singleChoiceQuestion!=null){
                         testPaperSingleChoiceQuestion.setQuestionContent(singleChoiceQuestion.getContent());
                         testPaperSingleChoiceQuestion.setOptionA(singleChoiceQuestion.getOptionA());
