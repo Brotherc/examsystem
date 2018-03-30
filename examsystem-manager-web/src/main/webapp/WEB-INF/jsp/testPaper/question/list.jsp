@@ -159,9 +159,18 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">学期：</label>
                                 <div class=" col-sm-6">
-                                    <div class="radio i-checks">
+                                    <div class="radio i-checks" id="term_add">
                                         <input type="radio" value="1" name="term" > <i></i> 上
                                         <input type="radio"  value="0" name="term"> <i></i> 下
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">类型：</label>
+                                <div class=" col-sm-6">
+                                    <div class="radio i-checks" id="type_add">
+                                        <input type="radio" value="1" name="type" > <i></i> A
+                                        <input type="radio"  value="0" name="type"> <i></i> B
                                     </div>
                                 </div>
                             </div>
@@ -587,7 +596,8 @@
             var score=$("#score_add").text();
             var courseId=$("#course_add").val();
             var schoolYearId=$("#schoolYear_add").val();
-            var term=$('input:radio:checked').val();
+            var term=$('#term_add input:radio:checked').val();
+            var type=$('#type_add input:radio:checked').val();
 
             var param={};
             param.name=name;
@@ -595,6 +605,7 @@
             param.courseId=courseId;
             param.schoolYearId=schoolYearId;
             param.term=term;
+            param.type=type;
 
             if(singleChoiceQuestions.length!=0){
                 var ids="";

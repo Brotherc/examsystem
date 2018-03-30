@@ -64,6 +64,7 @@
                                 <div class=" float-e-margins ">
                                     <form role="form" class="form-inline " id="testPaper-search-form">
                                         <input type="hidden" name="term" id="term">
+                                        <input type="hidden" name="type" id="type">
                                         <div class="form-group m-l-none" >
                                             <label for="name" class="sr-only">名字</label>
                                             <input type="text" placeholder="请输入名字" id="name" class="form-control">
@@ -96,6 +97,18 @@
                                                 <button type="button" class="btn btn-outline btn-default m-l-sm" onclick="searchData(this,'term')" data-term="">全部</button>
                                                 <button type="button" class="btn btn-outline btn-default m-l-sm" onclick="searchData(this,'term')" data-term="1">上</button>
                                                 <button type="button" class="btn btn-outline btn-default m-l-sm" onclick="searchData(this,'term')" data-term="0">下</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <form role="form" class="form-inline ">
+                                        <div class="form-group">
+                                            <div class=" col-lg-2 m-t-sm">
+                                                <span class="label label-success ">类型</span>
+                                            </div>
+                                            <div class=" col-lg-10 m-t-xs" >
+                                                <button type="button" class="btn btn-outline btn-default m-l-sm" onclick="searchData(this,'type')" data-type="">全部</button>
+                                                <button type="button" class="btn btn-outline btn-default m-l-sm" onclick="searchData(this,'type')" data-type="1">A</button>
+                                                <button type="button" class="btn btn-outline btn-default m-l-sm" onclick="searchData(this,'type')" data-type="0">B</button>
                                             </div>
                                         </div>
                                     </form>
@@ -149,9 +162,18 @@
                             <div class="form-group">
                                 <label class="col-sm-3 control-label">学期：</label>
                                 <div class=" col-sm-6">
-                                    <div class="radio i-checks">
+                                    <div class="radio i-checks" id="term_update">
                                         <input type="radio" value="1" name="term" > <i></i> 上
                                         <input type="radio"  value="0" name="term"> <i></i> 下
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">类型：</label>
+                                <div class=" col-sm-6">
+                                    <div class="radio i-checks" id="type_update">
+                                        <input type="radio" value="1" name="type" > <i></i> A
+                                        <input type="radio"  value="0" name="type"> <i></i> B
                                     </div>
                                 </div>
                             </div>
@@ -360,6 +382,7 @@
             var corseId=sels[0].corseId;
             var schoolYearId=sels[0].schoolYearId;
             var term=sels[0].term;
+            var type=sels[0].type;
 
             //发送ajax请求题目详情
             $.ajax({
@@ -379,7 +402,8 @@
                         $("#schoolYear_update").val(schoolYearId).trigger("chosen:updated");
                         $("#score_update").text(score);
 
-                        $("#testPaper-update-form input[value='"+term+"']").iCheck('check');
+                        $("#term_update input[value='"+term+"']").iCheck('check');
+                        $("#type_update input[value='"+type+"']").iCheck('check');
 
                         //赋值
                         var testPaperDetails=data.data;
@@ -653,13 +677,15 @@
             var name=$("#name_update").val();
             var score=$("#score_update").text();
             var schoolYearId=$("#schoolYear_update").val();
-            var term=$('input:radio:checked').val();
+            var term=$('#term_update input:radio:checked').val();
+            var type=$('#type_update input:radio:checked').val();
 
             var param={};
             param.name=name;
             param.score=score;
             param.schoolYearId=schoolYearId;
             param.term=term;
+            param.type=type;
 
             if(singleChoiceQuestionNum!=null&&singleChoiceQuestionNum!=0){
                 param.singleChoiceQuestionNum=singleChoiceQuestionNum;
@@ -759,7 +785,8 @@
                 name:$("#name").val(),
                 courseId:$("#course").val(),
                 schoolYearId:$("#schoolYear").val(),
-                term:$("#term").val()
+                term:$("#term").val(),
+                type:$("#type").val()
             };
             return temp;
         }
@@ -1014,6 +1041,10 @@
                     },{
                         field: 'name',
                         title: '名字'
+                    },{
+                        field: 'type',
+                        title: '类型',
+                        formatter : ES.formatTestPaperType
                     }, {
                         field: 'score',
                         title: '分数'

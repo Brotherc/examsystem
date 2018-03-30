@@ -62,6 +62,15 @@ var ES = EXAMSYSTEM = {
 		return index + 1;
 	},
 
+    // 显示试卷类型
+    formatTestPaperType : function(value, row, index){
+		if(row.type==1)
+			return "A"
+		else
+        	return "B";
+    },
+
+
 	// 格式换答案
 	formatAnswer : function(value, row, index){
 		if(row.answer)
