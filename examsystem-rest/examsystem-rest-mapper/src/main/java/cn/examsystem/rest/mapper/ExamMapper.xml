@@ -5,6 +5,7 @@
     <id column="id" property="id" jdbcType="VARCHAR" />
     <result column="course_id" property="courseId" jdbcType="VARCHAR" />
     <result column="test_paper_id" property="testPaperId" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="INTEGER" />
     <result column="school_year_id" property="schoolYearId" jdbcType="VARCHAR" />
     <result column="term" property="term" jdbcType="INTEGER" />
     <result column="status" property="status" jdbcType="INTEGER" />
@@ -78,8 +79,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    id, course_id, test_paper_id, school_year_id, term, status, created_teacher_id, part_num, 
-    interval_time, start_time, end_time, time, exam_pwd, invigilate_pwd, created_time, 
+    id, course_id, test_paper_id, type, school_year_id, term, status, created_teacher_id, 
+    part_num, interval_time, start_time, end_time, time, exam_pwd, invigilate_pwd, created_time, 
     updated_time
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="cn.examsystem.rest.pojo.po.ExamExample" >
@@ -114,17 +115,17 @@
   </delete>
   <insert id="insert" parameterType="cn.examsystem.rest.pojo.po.Exam" >
     insert into exam (id, course_id, test_paper_id, 
-      school_year_id, term, status, 
-      created_teacher_id, part_num, interval_time, 
-      start_time, end_time, time, 
-      exam_pwd, invigilate_pwd, created_time, 
-      updated_time)
+      type, school_year_id, term, 
+      status, created_teacher_id, part_num, 
+      interval_time, start_time, end_time, 
+      time, exam_pwd, invigilate_pwd, 
+      created_time, updated_time)
     values (#{id,jdbcType=VARCHAR}, #{courseId,jdbcType=VARCHAR}, #{testPaperId,jdbcType=VARCHAR}, 
-      #{schoolYearId,jdbcType=VARCHAR}, #{term,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
-      #{createdTeacherId,jdbcType=VARCHAR}, #{partNum,jdbcType=INTEGER}, #{intervalTime,jdbcType=INTEGER}, 
-      #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{time,jdbcType=INTEGER}, 
-      #{examPwd,jdbcType=VARCHAR}, #{invigilatePwd,jdbcType=VARCHAR}, #{createdTime,jdbcType=TIMESTAMP}, 
-      #{updatedTime,jdbcType=TIMESTAMP})
+      #{type,jdbcType=INTEGER}, #{schoolYearId,jdbcType=VARCHAR}, #{term,jdbcType=INTEGER}, 
+      #{status,jdbcType=INTEGER}, #{createdTeacherId,jdbcType=VARCHAR}, #{partNum,jdbcType=INTEGER}, 
+      #{intervalTime,jdbcType=INTEGER}, #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, 
+      #{time,jdbcType=INTEGER}, #{examPwd,jdbcType=VARCHAR}, #{invigilatePwd,jdbcType=VARCHAR}, 
+      #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="cn.examsystem.rest.pojo.po.Exam" >
     insert into exam
@@ -137,6 +138,9 @@
       </if>
       <if test="testPaperId != null" >
         test_paper_id,
+      </if>
+      <if test="type != null" >
+        type,
       </if>
       <if test="schoolYearId != null" >
         school_year_id,
@@ -187,6 +191,9 @@
       </if>
       <if test="testPaperId != null" >
         #{testPaperId,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
       </if>
       <if test="schoolYearId != null" >
         #{schoolYearId,jdbcType=VARCHAR},
@@ -247,6 +254,9 @@
       <if test="record.testPaperId != null" >
         test_paper_id = #{record.testPaperId,jdbcType=VARCHAR},
       </if>
+      <if test="record.type != null" >
+        type = #{record.type,jdbcType=INTEGER},
+      </if>
       <if test="record.schoolYearId != null" >
         school_year_id = #{record.schoolYearId,jdbcType=VARCHAR},
       </if>
@@ -296,6 +306,7 @@
     set id = #{record.id,jdbcType=VARCHAR},
       course_id = #{record.courseId,jdbcType=VARCHAR},
       test_paper_id = #{record.testPaperId,jdbcType=VARCHAR},
+      type = #{record.type,jdbcType=INTEGER},
       school_year_id = #{record.schoolYearId,jdbcType=VARCHAR},
       term = #{record.term,jdbcType=INTEGER},
       status = #{record.status,jdbcType=INTEGER},
@@ -321,6 +332,9 @@
       </if>
       <if test="testPaperId != null" >
         test_paper_id = #{testPaperId,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
       </if>
       <if test="schoolYearId != null" >
         school_year_id = #{schoolYearId,jdbcType=VARCHAR},
@@ -368,6 +382,7 @@
     update exam
     set course_id = #{courseId,jdbcType=VARCHAR},
       test_paper_id = #{testPaperId,jdbcType=VARCHAR},
+      type = #{type,jdbcType=INTEGER},
       school_year_id = #{schoolYearId,jdbcType=VARCHAR},
       term = #{term,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},

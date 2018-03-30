@@ -5,6 +5,7 @@
     <id column="id" property="id" jdbcType="VARCHAR" />
     <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="score" property="score" jdbcType="DECIMAL" />
+    <result column="type" property="type" jdbcType="INTEGER" />
     <result column="course_id" property="courseId" jdbcType="VARCHAR" />
     <result column="created_teacher_id" property="createdTeacherId" jdbcType="VARCHAR" />
     <result column="school_year_id" property="schoolYearId" jdbcType="VARCHAR" />
@@ -71,7 +72,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    id, name, score, course_id, created_teacher_id, school_year_id, term, created_time, 
+    id, name, score, type, course_id, created_teacher_id, school_year_id, term, created_time, 
     updated_time
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="cn.examsystem.rest.pojo.po.TestPaperExample" >
@@ -106,13 +107,13 @@
   </delete>
   <insert id="insert" parameterType="cn.examsystem.rest.pojo.po.TestPaper" >
     insert into test_paper (id, name, score, 
-      course_id, created_teacher_id, school_year_id, 
-      term, created_time, updated_time
-      )
+      type, course_id, created_teacher_id, 
+      school_year_id, term, created_time, 
+      updated_time)
     values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{score,jdbcType=DECIMAL}, 
-      #{courseId,jdbcType=VARCHAR}, #{createdTeacherId,jdbcType=VARCHAR}, #{schoolYearId,jdbcType=VARCHAR}, 
-      #{term,jdbcType=INTEGER}, #{createdTime,jdbcType=TIMESTAMP}, #{updatedTime,jdbcType=TIMESTAMP}
-      )
+      #{type,jdbcType=INTEGER}, #{courseId,jdbcType=VARCHAR}, #{createdTeacherId,jdbcType=VARCHAR}, 
+      #{schoolYearId,jdbcType=VARCHAR}, #{term,jdbcType=INTEGER}, #{createdTime,jdbcType=TIMESTAMP}, 
+      #{updatedTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="cn.examsystem.rest.pojo.po.TestPaper" >
     insert into test_paper
@@ -125,6 +126,9 @@
       </if>
       <if test="score != null" >
         score,
+      </if>
+      <if test="type != null" >
+        type,
       </if>
       <if test="courseId != null" >
         course_id,
@@ -154,6 +158,9 @@
       </if>
       <if test="score != null" >
         #{score,jdbcType=DECIMAL},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
       </if>
       <if test="courseId != null" >
         #{courseId,jdbcType=VARCHAR},
@@ -193,6 +200,9 @@
       <if test="record.score != null" >
         score = #{record.score,jdbcType=DECIMAL},
       </if>
+      <if test="record.type != null" >
+        type = #{record.type,jdbcType=INTEGER},
+      </if>
       <if test="record.courseId != null" >
         course_id = #{record.courseId,jdbcType=VARCHAR},
       </if>
@@ -221,6 +231,7 @@
     set id = #{record.id,jdbcType=VARCHAR},
       name = #{record.name,jdbcType=VARCHAR},
       score = #{record.score,jdbcType=DECIMAL},
+      type = #{record.type,jdbcType=INTEGER},
       course_id = #{record.courseId,jdbcType=VARCHAR},
       created_teacher_id = #{record.createdTeacherId,jdbcType=VARCHAR},
       school_year_id = #{record.schoolYearId,jdbcType=VARCHAR},
@@ -239,6 +250,9 @@
       </if>
       <if test="score != null" >
         score = #{score,jdbcType=DECIMAL},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=INTEGER},
       </if>
       <if test="courseId != null" >
         course_id = #{courseId,jdbcType=VARCHAR},
@@ -265,6 +279,7 @@
     update test_paper
     set name = #{name,jdbcType=VARCHAR},
       score = #{score,jdbcType=DECIMAL},
+      type = #{type,jdbcType=INTEGER},
       course_id = #{courseId,jdbcType=VARCHAR},
       created_teacher_id = #{createdTeacherId,jdbcType=VARCHAR},
       school_year_id = #{schoolYearId,jdbcType=VARCHAR},

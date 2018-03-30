@@ -10,6 +10,8 @@ public class TestPaper {
 
     private BigDecimal score;
 
+    private Integer type;
+
     private String courseId;
 
     private String createdTeacherId;
@@ -44,6 +46,14 @@ public class TestPaper {
 
     public void setScore(BigDecimal score) {
         this.score = score;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 
     public String getCourseId() {

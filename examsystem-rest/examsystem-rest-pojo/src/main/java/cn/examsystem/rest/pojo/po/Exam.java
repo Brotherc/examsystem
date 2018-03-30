@@ -9,6 +9,8 @@ public class Exam {
 
     private String testPaperId;
 
+    private Integer type;
+
     private String schoolYearId;
 
     private Integer term;
@@ -57,6 +59,14 @@ public class Exam {
 
     public void setTestPaperId(String testPaperId) {
         this.testPaperId = testPaperId == null ? null : testPaperId.trim();
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 
     public String getSchoolYearId() {
