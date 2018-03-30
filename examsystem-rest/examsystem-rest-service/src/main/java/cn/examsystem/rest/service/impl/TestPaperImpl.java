@@ -75,7 +75,8 @@ public class TestPaperImpl implements TestPaperService {
     private String MESSAGE_TESTPAPER_IS_IN_EXAM;
     @Value("${MESSAGE_QUESTION_NOT_MOVE}")
     private String MESSAGE_QUESTION_NOT_MOVE;
-
+    @Value("${MESSAGE_TYPE_NOT_NULL}")
+    private String MESSAGE_TYPE_NOT_NULL;
 
     @Value("${MESSAGE_POST_SUCCESS}")
     private String MESSAGE_POST_SUCCESS;
@@ -219,6 +220,10 @@ public class TestPaperImpl implements TestPaperService {
             Integer testPaperVoTerm = testPaperVo.getTerm();
             if(testPaperVoTerm!=null)
                 testPaperCriteria.andTermEqualTo(testPaperVoTerm);
+
+            Integer type = testPaperVo.getType();
+            if(type!=null)
+                testPaperCriteria.andTypeEqualTo(type);
         }
 
         return testPaperMapper.selectByExample(testPaperExample);
@@ -249,6 +254,12 @@ public class TestPaperImpl implements TestPaperService {
         Integer term = testPaperDto.getTerm();
         if(term==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TERM_NOT_NULL,null);
+
+        //类型不能为空
+        Integer type = testPaperDto.getType();
+        if(type==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TYPE_NOT_NULL,null);
+
 
         //分数不能为空
         BigDecimal testPaperDtoScore =testPaperDto.getScore();
@@ -470,6 +481,11 @@ public class TestPaperImpl implements TestPaperService {
         if(term==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TERM_NOT_NULL,null);
 
+        //类型不能为空
+        Integer type = testPaperDto.getType();
+        if(type==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TYPE_NOT_NULL,null);
+
         //分数不能为空
         BigDecimal testPaperDtoScore =testPaperDto.getScore();
         if(testPaperDtoScore==null||testPaperDtoScore.equals(0))
@@ -560,6 +576,7 @@ public class TestPaperImpl implements TestPaperService {
         testPaperDb.setScore(testPaperDtoScore);
         testPaperDb.setSchoolYearId(testPaperDtoSchoolYearId);
         testPaperDb.setTerm(term);
+        testPaperDb.setType(type);
         testPaperDto.setUpdatedTime(new Date());
 
         //修改试卷
