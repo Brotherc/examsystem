@@ -1567,7 +1567,7 @@
             uploader = WebUploader.create({
 
                 // swf文件路径
-                swf: 'http://localhost:8081/js/plugins/webuploader/Uploader.swf',
+                swf: 'http://172.16.16.221:8087/js/plugins/webuploader/Uploader.swf',
 
                 // 文件接收服务端。
                 server: '',
