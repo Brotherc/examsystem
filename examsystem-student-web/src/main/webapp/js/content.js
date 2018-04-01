@@ -13,37 +13,37 @@ function $childNode(name) {
 
 function tofirst(){
     if(parent.parent.parent){
-        parent.parent.parent.location='http://localhost:8082/index.html';
+        parent.parent.parent.location='http://172.16.16.221:8088/index.html';
     }else if(parent.parent){
-        parent.parent.location='http://localhost:8082/index.html';
+        parent.parent.location='http://172.16.16.221:8088/index.html';
     }else if(parent){
-        parent.location='http://localhost:8082/index.html';
+        parent.location='http://172.16.16.221:8088/index.html';
     }else{
-        window.location='http://localhost:8082/index.html';
+        window.location='http://172.16.16.221:8088/index.html';
     }
 }
 
 function to500(){
     if(parent.parent.parent){
-        parent.parent.parent.location='http://localhost:8082/500.html';
+        parent.parent.parent.location='http://172.16.16.221:8088/500.html';
     }else if(parent.parent){
-        parent.parent.location='http://localhost:8082/500.html';
+        parent.parent.location='http://172.16.16.221:8088/500.html';
     }else if(parent){
-        parent.location='http://localhost:8082/500.html';
+        parent.location='http://172.16.16.221:8088/500.html';
     }else{
-        window.location='http://localhost:8082/500.html';
+        window.location='http://172.16.16.221:8088/500.html';
     }
 }
 
 function to403(){
     if(parent.parent.parent){
-        parent.parent.parent.location='http://localhost:8082/403.html';
+        parent.parent.parent.location='http://172.16.16.221:8088/403.html';
     }else if(parent.parent){
-        parent.parent.location='http://localhost:8082/403.html';
+        parent.parent.location='http://172.16.16.221:8088/403.html';
     }else if(parent){
-        parent.location='http://localhost:8082/403.html';
+        parent.location='http://172.16.16.221:8088/403.html';
     }else{
-        window.location='http://localhost:8082/403.html';
+        window.location='http://172.16.16.221:8088/403.html';
     }
 }
 

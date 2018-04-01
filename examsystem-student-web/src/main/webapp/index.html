@@ -245,7 +245,7 @@
                 success: function(data){
                     if(data.status == 201){
                         $.session.set('examStudentId', $("#id").val());
-                        location.href = "http://localhost:8082/v1/test/testPaper/"+$("#testPaperId").val();
+                        location.href = "http://172.16.16.221:8088/v1/test/testPaper/"+$("#testPaperId").val();
                     }
                     else{
                         swal(data.message, "无法开始。", "error");
