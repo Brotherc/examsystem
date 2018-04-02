@@ -176,6 +176,11 @@
                                         </form>
                                     </div>
                                     <div class="example">
+                                        <div class="btn-group hidden-xs" id="studentStatusTableEventsToolbar" role="group">
+                                            <button type="button" class="btn btn-outline btn-default" onclick="makeUpExam()">
+                                                <i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
                                         <table id="studentStatusTableEvents" data-height="400" data-mobile-responsive="true">
                                         </table>
                                     </div>
@@ -594,6 +599,62 @@
             }
         };
 
+        function makeUpExam(){
+            var sels = $('#studentStatusTableEvents').bootstrapTable('getSelections');
+            if(sels.length == 0){
+                layer.msg("必须选择一个学生才能安排补考!");
+                return ;
+            }else if(sels.length >1){
+                layer.msg("只能选择一个学生!");
+                return ;
+            }
+
+            var id=sels[0].id;
+
+            swal({
+                    title: "确定为该学生安排补考吗",
+                    text: "确认后该学生将无法继续参加该门考试！",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "是的，安排补考！",
+                    cancelButtonText: "让我再考虑一下…",
+                    closeOnConfirm: false,
+                    closeOnCancel: false
+                },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        var params = {_method:'put',status:3};
+                        $.ajax({
+                            type: "POST",
+                            url: "/v1/exam/student/"+id+"/status",
+                            data: params,
+                            success: function(data){
+                                if(data.status == 201){
+                                    swal(data.message, "您已经成功为该学生安排补考。", "success");
+                                    $("#studentStatusTableEvents").bootstrapTable('refresh');
+                                }
+                                else{
+                                    swal(data.message, "无法为该学生安排补考。", "error");
+                                }
+                            },
+                            error:function(XMLHttpRequest, textStatus, errorThrown){
+                                var status=XMLHttpRequest.status;
+                                if(status==403){
+                                    to403();
+                                }else if(status==500){
+                                    to500();
+                                }
+                            }
+                        });
+
+                    } else {
+                        swal("已取消", "您取消了补考操作！", "error");
+                    }
+                });
+
+        }
+
         (function () {
 
 
@@ -619,7 +680,6 @@
                 showColumns: true,
                 iconSize: 'outline',
                 idField:'id',
-                toolbar: '#exampleTableEventsToolbar',
                 queryParams:queryParams,
                 icons: {
                     refresh: 'glyphicon-repeat',
@@ -676,6 +736,7 @@
                 showColumns: true,
                 iconSize: 'outline',
                 idField:'id',
+                toolbar: '#studentStatusTableEventsToolbar',
                 queryParams:studentQueryParams,
                 icons: {
                     refresh: 'glyphicon-repeat',
@@ -686,6 +747,9 @@
                     {
                         field: 'id',
                         visible:false
+                    },                    {
+                        field: 'state',
+                        checkbox:true
                     },{
                         field : 'num',
                         title : '序号',

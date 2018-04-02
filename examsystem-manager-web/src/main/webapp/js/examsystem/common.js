@@ -54,6 +54,8 @@ var ES = EXAMSYSTEM = {
             return "进行中";
         else if(row.status==2)
         	return "已考";
+        else if(row.status==3)
+        	return "补考";
     },
 
 

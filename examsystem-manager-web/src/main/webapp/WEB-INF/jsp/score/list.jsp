@@ -24,6 +24,7 @@
     <link href="/css/animate.css" rel="stylesheet">
     <link href="/css/plugins/webuploader/webuploader.css" rel="stylesheet">
     <link href="/css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="/css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
 
     <!-- Sweet Alert -->
     <link href="/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
@@ -216,6 +217,37 @@
 
                                         </div>
                                     </div>
+
+
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 修改分数modal -->
+    <div id="modal-form-updateScore" class="modal fade" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="row">
+                        <form class="form-horizontal" id="score-update-form">
+                            <input type="hidden" id="exam_student_id" value="">
+                            <input type="hidden" name="_method" value="put">
+                            <input type="hidden" id="testPaperQuestionId" value="">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">分数：</label>
+                                <div class="col-sm-6 " >
+                                    <input type="text" class="form-control" data-mask="9.99" placeholder="" id="score_update" name="score">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-6">
+                                    <button data-toggle="button" class="btn btn-primary btn-outline" type="button" onclick="updateQuestionScore()">修改</button>
                                 </div>
                             </div>
                         </form>
@@ -251,6 +283,9 @@
 
     <!-- Sweet alert -->
     <script src="/js/plugins/sweetalert/sweetalert.min.js"></script>
+
+    <!-- Input Mask-->
+    <script src="/js/plugins/jasny/jasny-bootstrap.min.js"></script>
 
     <!-- Bootstrap table -->
     <script src="/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
@@ -427,6 +462,9 @@
                 });
             },
             "click #openScoreDetailsModal":function (e,value,row,index) {
+
+                $("#exam_student_id").val(row.id);
+
 /*                var studentId=row.studentStudentId;
                 var studentName=row.studentName;
                 var studentClassId=row.studentClassId;
@@ -505,6 +543,8 @@
                                     html+='</div>';
                                     html+='<p>得分：'+testPaper.singleChoiceQuestionAnswerScore[(index+1)]+'</p>';
 
+                                    html+='<button class="btn btn-primary center-block" type="button" id="btn_singleChoiceQuestion'+(index+1)+'" value="'+question.id+'" onclick="openUpdateQuestionScore(this)">修改分数</button>';
+
                                     html+='</div></div>';
                                 });
                                 html+='</div></div></div></div></div></div></div></div></form></div>';
@@ -554,6 +594,9 @@
                                     html+='×';
                                     html+='</label></div>';
                                     html+='<p>得分：'+testPaper.trueOrFalseQuestionAnswerScore[(index+1)]+'</p>';
+
+
+                                    html+='<button class="btn btn-primary center-block" type="button" id="btn_trueOrFalseQuestion'+(index+1)+'" value="'+question.id+'" onclick="openUpdateQuestionScore(this)">修改分数</button>';
                                     html+='</div></div>';
                                 });
                                 html+="</div></div></div></div></div></div></div></div></form></div>";
@@ -601,6 +644,7 @@
 
                                     html+='<p>得分：'+testPaper.fillInBlankQuestionAnswerScore[(index+1)]+'</p>';
 
+                                    html+='<button class="btn btn-primary center-block" type="button" id="btn_fillInBlankQuestion'+(index+1)+'" value="'+question.id+'" onclick="openUpdateQuestionScore(this)">修改分数</button>';
                                     html+='</div></div></div></div>';
                                 });
 
@@ -624,6 +668,8 @@
                                     }else if(answer=='D'){
                                         $("#singleChoiceQuestion"+index+"D").attr("checked","checked");
                                     }
+
+
 
                                 });
                             }
@@ -669,6 +715,49 @@
 
             }
         };
+
+        function openUpdateQuestionScore(e) {
+            $("#testPaperQuestionId").val($(e).val());
+            $("#modal-form-updateScore").modal('show');
+        }
+
+        function updateQuestionScore(){
+
+            var score=$("#score_update").val();
+
+            if(score==""){
+                layer.msg("分数不能为空");
+                return ;
+            }
+
+            var examStudentId=$("#exam_student_id").val();
+            var testPaperQuestionId=$("#testPaperQuestionId").val();
+
+            $.ajax({
+                type: "POST",
+                url: "/v1/score/exam/student/"+examStudentId+"/testPaperQuestion/"+testPaperQuestionId,
+                data: decodeURIComponent($("#score-update-form").serialize().replace(/\+/g,"")),
+                success: function(data){
+                    if(data.status == 201){
+                        $("#modal-form-updateScore").modal('hide');
+                        $("#modal-form-StudentScoreDetails").modal('hide');
+                        swal(data.message, "您已经成功修改了分数。", "success");
+                        $("#studentScoreTableEvents").bootstrapTable('refresh');
+                    }
+                    else{
+                        swal("修改失败",data.message, "error");
+                    }
+                },
+                error:function(XMLHttpRequest, textStatus, errorThrown){
+                    var status=XMLHttpRequest.status;
+                    if(status==403){
+                        to403();
+                    }else if(status==500){
+                        to500();
+                    }
+                }
+            });
+        }
 
         (function () {
 
