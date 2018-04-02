@@ -109,6 +109,11 @@ public class ExamController {
         return examService.updateExamStudentPartOrder(examStudentRelationId,examStudentRelation.getPartOrder());
     }
 
+    @PutMapping("/v1/exam/student/{examStudentRelationId}/status")
+    public ResultInfo updateExamStudentStatus(@PathVariable String examStudentRelationId, @RequestBody ExamStudentRelation examStudentRelation) throws Exception{
+        return examService.updateExamStudentStatus(examStudentRelationId,examStudentRelation.getStatus());
+    }
+
     @PutMapping("/v1/exam/{examId}/student/{studentId}")
     public ResultInfo updateStudent(@PathVariable String examId,@PathVariable String studentId,@RequestBody Student student) throws Exception{
         return examService.updateExamStudent(examId,studentId,student);

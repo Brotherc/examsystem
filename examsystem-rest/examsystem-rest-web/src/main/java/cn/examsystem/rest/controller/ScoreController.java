@@ -3,14 +3,12 @@ package cn.examsystem.rest.controller;
 import cn.examsystem.common.pojo.ResultInfo;
 import cn.examsystem.rest.pojo.dto.ExamStudentRelationDto;
 import cn.examsystem.rest.pojo.dto.TestPaperDto;
+import cn.examsystem.rest.pojo.po.ExamstudentAnswer;
 import cn.examsystem.rest.pojo.vo.ExamStudentRelationVo;
 import cn.examsystem.rest.service.ScoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -44,5 +42,10 @@ public class ScoreController {
         TestPaperDto testPaperDto = scoreService.getTestPaperByExamStudent(examStudentId);
         ResultInfo resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,testPaperDto);
         return resultInfo;
+    }
+
+    @PutMapping("/v1/score/exam/student/{examStudentId}/testPaperQuestion/{testPaperQuestionId}")
+    public ResultInfo updateTestPaperQuestionScore(@PathVariable String examStudentId, @PathVariable String testPaperQuestionId,@RequestBody ExamstudentAnswer examstudentAnswer) throws Exception{
+        return scoreService.updateTestPaperQuestionScore(examStudentId,testPaperQuestionId,examstudentAnswer.getScore());
     }
 }
