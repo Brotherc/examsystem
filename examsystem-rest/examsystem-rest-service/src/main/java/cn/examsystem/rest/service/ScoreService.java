@@ -5,6 +5,7 @@ import cn.examsystem.rest.pojo.dto.ExamStudentRelationDto;
 import cn.examsystem.rest.pojo.dto.TestPaperDto;
 import cn.examsystem.rest.pojo.vo.ExamStudentRelationVo;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -20,4 +21,8 @@ public interface ScoreService {
 
     //查询考试学生的试卷答题信息
     public TestPaperDto getTestPaperByExamStudent(String examStudentId) throws Exception;
+
+    //修改某个学生对应某门考试中某道题目分数
+    public ResultInfo updateTestPaperQuestionScore(String examStudentId, String testPaperQuestionId, BigDecimal score) throws Exception;
+
 }

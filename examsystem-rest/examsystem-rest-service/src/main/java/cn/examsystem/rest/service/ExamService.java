@@ -51,6 +51,9 @@ public interface ExamService {
     //修改考试学生场次
     public ResultInfo updateExamStudentPartOrder(String examStudentRelationId,Integer partOrdeer) throws Exception;
 
+    //修改考试学生状态（安排补考）
+    public ResultInfo updateExamStudentStatus(String examStudentRelationId,Integer status) throws Exception;
+
     //查询某门考试未添加的正常状态的学生
     public List<Student> listStudentNoExistExam(String examId,StudentVo studentVo) throws Exception;
 
