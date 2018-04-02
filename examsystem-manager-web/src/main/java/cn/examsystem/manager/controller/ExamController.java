@@ -237,6 +237,20 @@ public class ExamController {
         return resultInfo;
     }
 
+    @PutMapping("/v1/exam/student/{examStudentRelationId}/status")
+    public ResultInfo updateExamStudentStatus(@PathVariable String examStudentRelationId, ExamStudentRelation examStudentRelation) throws Exception{
+
+        ResultInfo resultInfo;
+        try {
+            //调用rest服务
+            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+EXAM_URL+EXAM_STUDENT_URL+"/{examStudentRelationId}/status",HttpMethod.PUT,examStudentRelation,ResultInfo.class,new Object[]{examStudentRelationId});
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
+        }
+        return resultInfo;
+    }
+
     @PutMapping("/v1/exam/{examId}/student/{studentId}")
     public ResultInfo updateStudent(@PathVariable String examId,@PathVariable String studentId, Student student) throws Exception{
 

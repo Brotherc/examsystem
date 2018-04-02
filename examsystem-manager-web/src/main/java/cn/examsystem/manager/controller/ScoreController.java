@@ -2,6 +2,7 @@ package cn.examsystem.manager.controller;
 
 import cn.examsystem.common.pojo.ResultInfo;
 import cn.examsystem.manager.utils.RestTemplateUtils;
+import cn.examsystem.rest.pojo.po.ExamstudentAnswer;
 import cn.examsystem.rest.pojo.vo.ExamStudentRelationVo;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +32,9 @@ public class ScoreController {
     private String SCORE_STUDENT_URL;
     @Value("${SCORE_TESTPAPER_URL}")
     private String SCORE_TESTPAPER_URL;
+    @Value("${SCORE_TESTPAPERQUESTION_URL}")
+    private String SCORE_TESTPAPERQUESTION_URL;
+
 
     @Value("${MESSAGE_GET_FAIL}")
     private String MESSAGE_GET_FAIL;
@@ -94,13 +98,27 @@ public class ScoreController {
         try{
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(REST_BASE_URL + SCORE_URL+SCORE_EXAM_URL+SCORE_STUDENT_URL+"/{examId}"+SCORE_TESTPAPER_URL, HttpMethod.GET, ResultInfo.class,new Object[]{examStudentId});
+            resultInfo = RestTemplateUtils.exchange(REST_BASE_URL + SCORE_URL+SCORE_EXAM_URL+SCORE_STUDENT_URL+"/{examStudentId}"+SCORE_TESTPAPER_URL, HttpMethod.GET, ResultInfo.class,new Object[]{examStudentId});
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_GET_FAIL,null);
         }
 
+        return resultInfo;
+    }
+
+    @PutMapping("/v1/score/exam/student/{examStudentId}/testPaperQuestion/{testPaperQuestionId}")
+    public ResultInfo updateTestPaperQuestionScore(@PathVariable String examStudentId, @PathVariable String testPaperQuestionId, ExamstudentAnswer examstudentAnswer) throws Exception{
+
+        ResultInfo resultInfo;
+        try {
+            //调用rest服务
+            resultInfo = RestTemplateUtils.exchange(REST_BASE_URL + SCORE_URL+SCORE_EXAM_URL+SCORE_STUDENT_URL+"/{examStudentId}"+SCORE_TESTPAPERQUESTION_URL+"/{testPaperQuestionId}", HttpMethod.PUT,examstudentAnswer, ResultInfo.class,new Object[]{examStudentId,testPaperQuestionId});
+        }catch (Exception e){
+            e.printStackTrace();
+            return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
+        }
         return resultInfo;
     }
 }
