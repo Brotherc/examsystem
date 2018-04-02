@@ -122,6 +122,11 @@ public class ExamImpl implements ExamService {
     @Value("${MESSAGE_STUDENT_STUDENTID_NOT_REPEAT}")
     private String MESSAGE_STUDENT_STUDENTID_NOT_REPEAT;
 
+    @Value("${MESSAGE_STUDENT_EXAM_STATUS_NOT_NULL}")
+    private String MESSAGE_STUDENT_EXAM_STATUS_NOT_NULL;
+    @Value("${MESSAGE_STUDENT_EXAM_STATUS_ILLEGAL}")
+    private String MESSAGE_STUDENT_EXAM_STATUS_ILLEGAL;
+
     @Value("${DICTINFO_EXAM_NOT_START_CODE}")
     private String DICTINFO_EXAM_NOT_START_CODE;
     @Value("${DICTINFO_EXAM_IS_PROCEED_CODE}")
@@ -1023,6 +1028,38 @@ public class ExamImpl implements ExamService {
         examStudentRelation.setPartOrder(partOrdeer);
         examStudentRelation.setUpdatedTime(new Date());
         examStudentRelationMapper.updateByPrimaryKey(examStudentRelation);
+        return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_PUT_SUCCESS,null);
+    }
+
+    @Override
+    public ResultInfo updateExamStudentStatus(String examStudentRelationId, Integer status) throws Exception {
+
+        //id对应的考试学生关系存在
+        ExamStudentRelation examStudentRelation = examStudentRelationMapper.selectByPrimaryKey(examStudentRelationId);
+        if(examStudentRelation==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_STUDENT_NOT_EXIST,null);
+
+        //id不允许为空
+        if(StringUtils.isBlank(examStudentRelationId))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_STUDENT_ID_NOT_NULL,null);
+
+        //状态不能为空
+        if(status==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_STUDENT_EXAM_STATUS_NOT_NULL,null);
+
+        //只允许更新正在考试的考试学生的状态
+        if(examStudentRelation!=null){
+            if(!examStudentRelation.getStatus().equals(new Integer(DICTINFO_STUDENT_EXAM_IS_PROCEED_CODE)))
+                return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_STUDENT_EXAM_STATUS_ILLEGAL,null);
+        }
+
+        examStudentRelation.setStatus(status);
+        examStudentRelation.setUpdatedTime(new Date());
+        examStudentRelationMapper.updateByPrimaryKey(examStudentRelation);
+
+        //清除缓存中有关该学生的考试答题信息
+        jedisClient.del(examStudentRelationId);
+
         return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_PUT_SUCCESS,null);
     }
 

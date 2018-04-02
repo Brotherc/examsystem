@@ -50,6 +50,12 @@ public class ScoreImpl implements ScoreService {
     private String MESSAGE_EXAM_ID_NOT_NULL;
     @Value("${MESSAGE_EXAM_NOT_EXIST}")
     private String MESSAGE_EXAM_NOT_EXIST;
+    @Value("${MESSAGE_EXAM_STUDENT_ID_NOT_NULL}")
+    private String MESSAGE_EXAM_STUDENT_ID_NOT_NULL;
+    @Value("${MESSAGE_TESTPAPER_QUESTION_ID_NOT_NULL}")
+    private String MESSAGE_TESTPAPER_QUESTION_ID_NOT_NULL;
+    @Value("${MESSAGE_SCORE_NOT_NULL}")
+    private String MESSAGE_SCORE_NOT_NULL;
 
     @Value("${DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE}")
     private String DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE;
@@ -59,6 +65,9 @@ public class ScoreImpl implements ScoreService {
     private String DICTINFO_FILLINBLANKQUESTION_TYPE_CODE;
     @Value("${DICTINFO_MATCHER_IS_NOT_ORDER_CODE}")
     private String DICTINFO_MATCHER_IS_NOT_ORDER_CODE;
+
+    @Value("${DICTINFO_STUDENT_EXAM_IS_END_CODE}")
+    private String DICTINFO_STUDENT_EXAM_IS_END_CODE;
 
 
     @Value("${MESSAGE_PUT_SUCCESS}")
@@ -86,10 +95,11 @@ public class ScoreImpl implements ScoreService {
         if(examDb==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_NOT_EXIST,null);
 
-        //查询该考试下的所有考试学生
+        //查询该门考试下的所有参加并完成考试学生
         ExamStudentRelationExample examStudentRelationExample=new ExamStudentRelationExample();
         ExamStudentRelationExample.Criteria examStudentCriteria = examStudentRelationExample.createCriteria();
         examStudentCriteria.andExamIdEqualTo(examId);
+        examStudentCriteria.andStatusEqualTo(new Integer(DICTINFO_STUDENT_EXAM_IS_END_CODE));
         List<ExamStudentRelation> examStudentRelationList = examStudentRelationMapper.selectByExample(examStudentRelationExample);
 
         for(ExamStudentRelation relation:examStudentRelationList){
@@ -426,5 +436,53 @@ System.out.println(testPaperDto.getFillInBlankQuestions().get(0));
         }
 
         return testPaperDto;
+    }
+
+    @Override
+    public ResultInfo updateTestPaperQuestionScore(String examStudentId, String testPaperQuestionId, BigDecimal score) throws Exception {
+
+        //考试学生id不能为空
+        if(StringUtils.isBlank(examStudentId))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_STUDENT_ID_NOT_NULL,null);
+
+        //试卷题目id不能为空
+        if(StringUtils.isBlank(testPaperQuestionId))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_TESTPAPER_QUESTION_ID_NOT_NULL,null);
+
+        //分数不能为空
+        if(score==null)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_SCORE_NOT_NULL,null);
+
+        //查询学生对应答案
+        ExamstudentAnswerExample examstudentAnswerExample=new ExamstudentAnswerExample();
+        ExamstudentAnswerExample.Criteria answerExampleCriteria = examstudentAnswerExample.createCriteria();
+        answerExampleCriteria.andExamStudentIdEqualTo(examStudentId);
+        answerExampleCriteria.andTestpaperQuestionIdEqualTo(testPaperQuestionId);
+        List<ExamstudentAnswer> examstudentAnswerList = examstudentAnswerMapper.selectByExample(examstudentAnswerExample);
+
+        if(!CollectionUtils.isEmpty(examstudentAnswerList)){
+
+            ExamstudentAnswer examstudentAnswer = examstudentAnswerList.get(0);
+
+            //修改题目学生答案分数
+            BigDecimal scoreDb = examstudentAnswer.getScore();//原先分数
+
+            BigDecimal scoreSubtract = score.subtract(scoreDb);//分数差
+
+            examstudentAnswer.setScore(score);
+            examstudentAnswer.setUpdatedTime(new Date());
+            examstudentAnswerMapper.updateByPrimaryKey(examstudentAnswer);
+
+            //修改学生对应这门考试分数
+            ExamStudentRelation examStudentRelation = examStudentRelationMapper.selectByPrimaryKey(examStudentId);
+
+            if(examStudentRelation!=null){
+                examStudentRelation.setScore(examStudentRelation.getScore().add(scoreSubtract));//试卷原先分数+分数差
+                examStudentRelation.setUpdatedTime(new Date());
+                examStudentRelationMapper.updateByPrimaryKey(examStudentRelation);
+            }
+        }
+
+        return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_PUT_SUCCESS,null);
     }
 }
