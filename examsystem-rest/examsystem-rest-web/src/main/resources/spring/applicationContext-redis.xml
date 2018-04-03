@@ -6,15 +6,15 @@
 		>
 	
 	<!-- 连接redis单机版 -->
-<!-- 	<bean id="jedisClientPool" class="cn.brotherchun.bcshop.common.jedis.JedisClientPool">
+ 	<bean id="jedisClientPool" class="cn.examsystem.common.jedis.JedisClientPool">
 		<property name="jedisPool" ref="jedisPool"></property>
 	</bean>
 	<bean id="jedisPool" class="redis.clients.jedis.JedisPool">
-		<constructor-arg name="host" value="192.168.181.131"/>
+		<constructor-arg name="host" value="172.16.16.221"/>
 		<constructor-arg name="port" value="6379"/>
-	</bean> -->
+	</bean>
 	<!-- 连接redis集群 -->
-	<bean id="jedisClientCluster" class="cn.examsystem.common.jedis.JedisClientCluster">
+<!--	<bean id="jedisClientCluster" class="cn.examsystem.common.jedis.JedisClientCluster">
 		<property name="jedisCluster" ref="jedisCluster"/>
 	</bean>
 	<bean id="jedisCluster" class="redis.clients.jedis.JedisCluster">
@@ -46,5 +46,5 @@
 				</bean> 
 			</set>
 		</constructor-arg>
-	</bean>
+	</bean>-->
 </beans>
