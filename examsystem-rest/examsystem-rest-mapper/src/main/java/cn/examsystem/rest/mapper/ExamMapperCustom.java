@@ -8,9 +8,9 @@ import cn.examsystem.rest.pojo.vo.ExamStudentRelationVo;
 import java.util.List;
 
 public interface ExamMapperCustom {
-    List<ExamDto> listExam(Exam exam);
+    List<ExamDto> listExam(Exam exam) throws Exception;
 
-    List<ExamStudentRelationDto> listExamStudent(ExamStudentRelationVo examStudentRelationVo);
+    List<ExamStudentRelationDto> listExamStudent(ExamStudentRelationVo examStudentRelationVo) throws Exception;
 
-    List<ExamStudentRelationDto> listInvigilationExamStudent(ExamStudentRelationVo examStudentRelationVo);
+    List<ExamStudentRelationDto> listInvigilationExamStudent(ExamStudentRelationVo examStudentRelationVo) throws Exception;
 }
