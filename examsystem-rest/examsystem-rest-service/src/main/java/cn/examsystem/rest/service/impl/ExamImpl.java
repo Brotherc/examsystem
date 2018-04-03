@@ -126,6 +126,9 @@ public class ExamImpl implements ExamService {
     private String MESSAGE_STUDENT_EXAM_STATUS_NOT_NULL;
     @Value("${MESSAGE_STUDENT_EXAM_STATUS_ILLEGAL}")
     private String MESSAGE_STUDENT_EXAM_STATUS_ILLEGAL;
+    @Value("${MESSAGE_STUDENT_EXAM_IS_MAKE_UP}")
+    private String MESSAGE_STUDENT_EXAM_IS_MAKE_UP;
+
 
     @Value("${DICTINFO_EXAM_NOT_START_CODE}")
     private String DICTINFO_EXAM_NOT_START_CODE;
@@ -144,6 +147,8 @@ public class ExamImpl implements ExamService {
     private String DICTINFO_STUDENT_EXAM_IS_PROCEED_CODE;
     @Value("${DICTINFO_STUDENT_EXAM_IS_END_CODE}")
     private String DICTINFO_STUDENT_EXAM_IS_END_CODE;
+    @Value("${DICTINFO_STUDENT_EXAM_IS_MAKE_UP_CODE}")
+    private String DICTINFO_STUDENT_EXAM_IS_MAKE_UP_CODE;
 
     @Value("${REDIS_KEY_EXAM_STUDENT_IS_PROCEEDED}")
     private String REDIS_KEY_EXAM_STUDENT_IS_PROCEEDED;
@@ -1182,6 +1187,10 @@ public class ExamImpl implements ExamService {
         //如果存在正在进行的考试，但学生已考完
         if(examStudentRelation!=null&&examStudentRelation.getStatus().equals(new Integer(DICTINFO_STUDENT_EXAM_IS_END_CODE)))
             return new ResultInfo(ResultInfo.STATUS_RESULT_NOT_FOUND,MESSAGE_STUDENT_EXAM_IS_END,null);
+
+        //如果存在正在进行的考试，但学生被安排至补考
+        if(examStudentRelation!=null&&examStudentRelation.getStatus().equals(new Integer(DICTINFO_STUDENT_EXAM_IS_MAKE_UP_CODE)))
+            return new ResultInfo(ResultInfo.STATUS_RESULT_NOT_FOUND,MESSAGE_STUDENT_EXAM_IS_MAKE_UP,null);
 
         Student student=studentMapper.selectByPrimaryKey(studentId);
 
