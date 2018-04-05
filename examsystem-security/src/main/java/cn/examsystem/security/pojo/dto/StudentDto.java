@@ -15,6 +15,8 @@ import java.util.List;
  */
 public class StudentDto extends Student implements UserDetails{
 
+    private Boolean isShowPracticeModule;
+
     private String username;
 
     /**
@@ -76,5 +78,13 @@ public class StudentDto extends Student implements UserDetails{
 
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
+    }
+
+    public Boolean getShowPracticeModule() {
+        return isShowPracticeModule;
+    }
+
+    public void setShowPracticeModule(Boolean showPracticeModule) {
+        isShowPracticeModule = showPracticeModule;
     }
 }
