@@ -21,6 +21,9 @@ Date.prototype.format = function(format){
 
 var ES = EXAMSYSTEM = {
 
+	ip:"172.16.16.221",
+	//ip:"localhost",
+
 	formatSeconds: function(value){
 		var theTime = parseInt(value);// 秒
 		var theTime1 = 0;// 分

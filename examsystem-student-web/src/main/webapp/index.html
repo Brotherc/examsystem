@@ -34,7 +34,7 @@
                         <div class="col-sm-8">
                             <h3><strong>练习</strong></h3>
                             <p><i class="fa fa-tag"></i> 模拟练习</p>
-                            <button class="btn btn-outline btn-success  dim" type="button"><i class="fa fa-pencil"></i><span class="bold m-l-md">进入</span>
+                            <button class="btn btn-outline btn-success  dim" type="button" id="btn_practice"><i class="fa fa-pencil"></i><span class="bold m-l-md">进入</span>
                             </button>
                         </div>
                         <div class="clearfix"></div>
@@ -145,6 +145,16 @@
     <!--jQuery session-->
     <script src="/js/plugins/jquery-session/jquery.session.js"></script>
 
+    <script type="text/javascript">
+        $.get("/v1/user/details/module", function (data) {
+            var isShowPracticeModule=data.data;
+
+            if(!isShowPracticeModule){
+                $("#btn_practice").attr("disabled",true);
+            }
+        });
+    </script>
+
     <script>
         function getExam() {
             $.ajax({
@@ -245,7 +255,7 @@
                 success: function(data){
                     if(data.status == 201){
                         $.session.set('examStudentId', $("#id").val());
-                        location.href = "http://172.16.16.221:8088/v1/test/testPaper/"+$("#testPaperId").val();
+                        location.href = "http://"+ES.ip+":8088/v1/test/testPaper/"+$("#testPaperId").val();
                     }
                     else{
                         swal(data.message, "无法开始。", "error");

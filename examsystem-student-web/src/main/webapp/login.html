@@ -91,6 +91,7 @@
     <script src="/js/jquery.min.js?v=2.1.4"></script>
     <script src="/js/bootstrap.min.js?v=3.3.6"></script>
     <script src="/js/plugins/layer/layer.min.js"></script>
+    <script src="/js/examsystem/common.js"></script>
 
 
     <script type="text/javascript">
@@ -114,7 +115,7 @@
                         layer.msg(data.message);
                         $("#imageCode").trigger("click");
                     } else {
-                        location.href = "http://172.16.16.221:8088";
+                        location.href = "http://"+ES.ip+":8088";
                     }
                 });
             },

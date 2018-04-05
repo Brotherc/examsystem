@@ -7,43 +7,46 @@
 
 var $parentNode = window.parent.document;
 
+//var ip="localhost";
+var ip="172.16.16.221";
+
 function $childNode(name) {
     return window.frames[name]
 }
 
 function tofirst(){
     if(parent.parent.parent){
-        parent.parent.parent.location='http://172.16.16.221:8088/index.html';
+        parent.parent.parent.location='http://'+ip+':8088/index.html';
     }else if(parent.parent){
-        parent.parent.location='http://172.16.16.221:8088/index.html';
+        parent.parent.location='http://'+ip+':8088/index.html';
     }else if(parent){
-        parent.location='http://172.16.16.221:8088/index.html';
+        parent.location='http://'+ip+':8088/index.html';
     }else{
-        window.location='http://172.16.16.221:8088/index.html';
+        window.location='http://'+ip+':8088/index.html';
     }
 }
 
 function to500(){
     if(parent.parent.parent){
-        parent.parent.parent.location='http://172.16.16.221:8088/500.html';
+        parent.parent.parent.location='http://'+ip+':8088/500.html';
     }else if(parent.parent){
-        parent.parent.location='http://172.16.16.221:8088/500.html';
+        parent.parent.location='http://'+ip+':8088/500.html';
     }else if(parent){
-        parent.location='http://172.16.16.221:8088/500.html';
+        parent.location='http://'+ip+':8088/500.html';
     }else{
-        window.location='http://172.16.16.221:8088/500.html';
+        window.location='http://'+ip+':8088/500.html';
     }
 }
 
 function to403(){
     if(parent.parent.parent){
-        parent.parent.parent.location='http://172.16.16.221:8088/403.html';
+        parent.parent.parent.location='http://'+ip+':8088/403.html';
     }else if(parent.parent){
-        parent.parent.location='http://172.16.16.221:8088/403.html';
+        parent.parent.location='http://'+ip+':8088/403.html';
     }else if(parent){
-        parent.location='http://172.16.16.221:8088/403.html';
+        parent.location='http://'+ip+':8088/403.html';
     }else{
-        window.location='http://172.16.16.221:8088/403.html';
+        window.location='http://'+ip+':8088/403.html';
     }
 }
 

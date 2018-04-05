@@ -446,7 +446,7 @@
                                                     success: function(data){
                                                         if(data.status == 201){
                                                             layer.msg("提交成功");
-                                                            location.href = "http://172.16.16.221:8088";
+                                                            location.href = "http://"+ES.ip+":8088";
                                                         }
                                                         else{
                                                             layer.msg("提交失败");
