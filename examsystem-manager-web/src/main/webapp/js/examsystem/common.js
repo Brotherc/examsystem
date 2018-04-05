@@ -20,6 +20,10 @@ Date.prototype.format = function(format){
 };
 
 var ES = EXAMSYSTEM = {
+
+	ip:"172.16.16.221",
+	//ip:"localhost",
+
 	// 编辑器参数
 	kingEditorParams : {
 		//指定上传文件参数名称
