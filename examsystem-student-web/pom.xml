@@ -80,7 +80,7 @@
                     <url>http://172.16.16.221:8088/manager/text</url>
                     <username>tomcat</username>
                     <password>tomcat</password>
-                    <update>true</update>
+<!--                    <update>true</update>-->
                 </configuration>
             </plugin>
         </plugins>
