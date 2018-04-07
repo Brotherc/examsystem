@@ -6,10 +6,7 @@ import cn.examsystem.common.utils.JsonUtils;
 import cn.examsystem.common.utils.RandomUtils;
 import cn.examsystem.common.utils.UUIDBuild;
 import cn.examsystem.rest.mapper.*;
-import cn.examsystem.rest.pojo.dto.TestPaperDto;
-import cn.examsystem.rest.pojo.dto.TestPaperFillInBlankQuestion;
-import cn.examsystem.rest.pojo.dto.TestPaperSingleChoiceQuestion;
-import cn.examsystem.rest.pojo.dto.TestPaperTrueOrFalseQuestion;
+import cn.examsystem.rest.pojo.dto.*;
 import cn.examsystem.rest.pojo.po.*;
 import cn.examsystem.rest.pojo.vo.TestPaperVo;
 import cn.examsystem.rest.service.TestPaperService;
@@ -91,6 +88,9 @@ public class TestPaperImpl implements TestPaperService {
     private String DICTINFO_TRUEORFALSEQUESTION_TYPE_CODE;
     @Value("${DICTINFO_FILLINBLANKQUESTION_TYPE_CODE}")
     private String DICTINFO_FILLINBLANKQUESTION_TYPE_CODE;
+    @Value("${DICTINFO_PROGRAMQUESTION_TYPE_CODE}")
+    private String DICTINFO_PROGRAMQUESTION_TYPE_CODE;
+
     @Value("${DICTINFO_EXAM_IS_END_CODE}")
     private String DICTINFO_EXAM_IS_END_CODE;
     @Value("${DICTINFO_EXAM_IS_PROCEED_CODE}")
@@ -102,12 +102,17 @@ public class TestPaperImpl implements TestPaperService {
     private String REDIS_KEY_TRUE_OR_FALSE_QUESTION_ORDER;
     @Value("${REDIS_KEY_FILL_IN_BLANK_QUESTION_ORDER}")
     private String REDIS_KEY_FILL_IN_BLANK_QUESTION_ORDER;
+    @Value("${REDIS_KEY_PROGRAM_QUESTION_ORDER}")
+    private String REDIS_KEY_PROGRAM_QUESTION_ORDER;
     @Value("${REDIS_KEY_SINGLE_CHOICE_QUESTION_ANSWER}")
     private String REDIS_KEY_SINGLE_CHOICE_QUESTION_ANSWER;
     @Value("${REDIS_KEY_TRUE_OR_FALSE_QUESTION_ANSWER}")
     private String REDIS_KEY_TRUE_OR_FALSE_QUESTION_ANSWER;
     @Value("${REDIS_KEY_FILL_IN_BLANK_QUESTION_ANSWER}")
     private String REDIS_KEY_FILL_IN_BLANK_QUESTION_ANSWER;
+    @Value("${REDIS_KEY_PROGRAM_QUESTION_ANSWER}")
+    private String REDIS_KEY_PROGRAM_QUESTION_ANSWER;
+
 
     @Autowired
     private JedisClient jedisClient;
@@ -126,6 +131,8 @@ public class TestPaperImpl implements TestPaperService {
     private TrueOrFalseQuestionMapper trueOrFalseQuestionMapper;
     @Autowired
     private FillInBlankQuestionMapper fillInBlankQuestionMapper;
+    @Autowired
+    private ProgramQuestionMapper programQuestionMapper;
     @Autowired
     private TestpaperQuestionRelationMapper testpaperQuestionRelationMapper;
     @Autowired
@@ -194,6 +201,16 @@ public class TestPaperImpl implements TestPaperService {
                     questionNum+=fillInBlankQuestionMapper.selectByPrimaryKey(relation.getQuestionId()).getBlankNum();
                 }
                 testPaperDto.setFillInBlankQuestionNum(questionNum);
+            }
+            //程序题
+            TestpaperQuestionRelationExample programQuestionRelationExample=new TestpaperQuestionRelationExample();
+            TestpaperQuestionRelationExample.Criteria programQuestionRelationCriteria = programQuestionRelationExample.createCriteria();
+            programQuestionRelationCriteria.andTestPaperIdEqualTo(id);
+            programQuestionRelationCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_PROGRAMQUESTION_TYPE_CODE));
+            List<TestpaperQuestionRelation> programQuestionRelationList = testpaperQuestionRelationMapper.selectByExample(programQuestionRelationExample);
+            if(!CollectionUtils.isEmpty(programQuestionRelationList)){
+                testPaperDto.setProgramQuestionNum(programQuestionRelationList.size());
+                testPaperDto.setProgramQuestionScore(programQuestionRelationList.get(0).getQuestionScore());
             }
         }
         return testPaperDto;
@@ -301,7 +318,22 @@ public class TestPaperImpl implements TestPaperService {
             }
         }
 
-        if(CollectionUtils.isEmpty(singleIdsListCustom)&&CollectionUtils.isEmpty(trueOrFalseIdsListCustom)&&CollectionUtils.isEmpty(fillIdsListCustom))
+        String programQuestionIds = testPaperDto.getProgramQuestionIds();
+
+        List<String> programIdsListCustom = new ArrayList<>();
+        if(!StringUtils.isBlank(programQuestionIds)){
+            String[] programIdsArr=programQuestionIds.split(",");
+            System.out.println("--------------------------"+programIdsArr);
+            for(String id:programIdsArr){
+                if(!StringUtils.isBlank(id))
+                    programIdsListCustom.add(id.trim());
+            }
+        }
+        for(String s:programIdsListCustom){
+            System.out.println(s);
+        }
+
+        if(CollectionUtils.isEmpty(singleIdsListCustom)&&CollectionUtils.isEmpty(trueOrFalseIdsListCustom)&&CollectionUtils.isEmpty(fillIdsListCustom)&&CollectionUtils.isEmpty(programIdsListCustom))
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_QUESTION_ID_NOT_NULL,null);
 
         BigDecimal singleChoiceQuestionSumScore=new BigDecimal(0);
@@ -379,6 +411,17 @@ public class TestPaperImpl implements TestPaperService {
             fillInblankQuestionSumScore=new BigDecimal(blankNum).multiply(fillInBlankQuestionScore);
         }
 
+        BigDecimal programQuestionSumScore=new BigDecimal(0);
+
+        BigDecimal programQuestionScore=null;
+        if(!CollectionUtils.isEmpty(programIdsListCustom)){
+            programQuestionScore = testPaperDto.getProgramQuestionScore();
+            if(programQuestionScore==null||programQuestionScore.equals(0))
+                return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_SCORE_NOT_NULL,null);
+
+            programQuestionSumScore=new BigDecimal(programIdsListCustom.size()).multiply(programQuestionScore);
+        }
+
         //创建题目教师id不能为空
         String CreatedTeacherId = testPaperDto.getCreatedTeacherId();
         if(StringUtils.isBlank(CreatedTeacherId))
@@ -400,8 +443,7 @@ public class TestPaperImpl implements TestPaperService {
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_CREATED_TEACHER_NOT_EXIST,null);
 
         //试卷总分与题目分数总分一样
-        BigDecimal questionSumScore=singleChoiceQuestionSumScore.add(trueOrFalseQuestionSumScore);
-        questionSumScore=questionSumScore.add(fillInblankQuestionSumScore);
+        BigDecimal questionSumScore=singleChoiceQuestionSumScore.add(trueOrFalseQuestionSumScore).add(fillInblankQuestionSumScore).add(programQuestionSumScore);
         System.out.println("试卷："+testPaperDtoScore);
         System.out.println("题目："+questionSumScore);
         if(testPaperDtoScore.compareTo(questionSumScore)!=0)
@@ -421,6 +463,8 @@ public class TestPaperImpl implements TestPaperService {
         saveTestPaperRelation(testPaperId,DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE,singleIdsListCustom,singleChoiceQuestionScore);
 
         saveTestPaperRelation(testPaperId,DICTINFO_TRUEORFALSEQUESTION_TYPE_CODE,trueOrFalseIdsListCustom,trueOrFalseQuestionScore);
+
+        saveTestPaperRelation(testPaperId,DICTINFO_PROGRAMQUESTION_TYPE_CODE,programIdsListCustom,programQuestionScore);
 
         for(int i=0;i<fillInBlankQuestionList.size();i++){
             TestpaperQuestionRelation testpaperQuestionRelation=fillInBlankQuestionList.get(i);
@@ -499,8 +543,9 @@ public class TestPaperImpl implements TestPaperService {
         Integer singleChoiceQuestionNum = testPaperDto.getSingleChoiceQuestionNum();
         Integer trueOrFalseQuestionNum = testPaperDto.getTrueOrFalseQuestionNum();
         Integer fillInBlankQuestionNum = testPaperDto.getFillInBlankQuestionNum();
+        Integer programQuestionNum = testPaperDto.getProgramQuestionNum();
 
-        if(singleChoiceQuestionNum==null&&trueOrFalseQuestionNum==null&&fillInBlankQuestionNum==null)
+        if(singleChoiceQuestionNum==null&&trueOrFalseQuestionNum==null&&fillInBlankQuestionNum==null&&programQuestionNum==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_QUESTION_NUM_NOT_NULL,null);
 
         //只有该试卷创建教师才允许修改试卷
@@ -552,6 +597,19 @@ public class TestPaperImpl implements TestPaperService {
             fillInBlankRelationList = testpaperQuestionRelationMapper.selectByExample(testpaperQuestionRelationExample);
         }
 
+        List<TestpaperQuestionRelation> programRelationList=null;
+        BigDecimal programScore=testPaperDto.getProgramQuestionScore();
+        if(programQuestionNum!=null){
+            if(programScore==null||programScore.equals(0))
+                return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_SCORE_NOT_NULL,null);
+
+            TestpaperQuestionRelationExample testpaperQuestionRelationExample=new TestpaperQuestionRelationExample();
+            TestpaperQuestionRelationExample.Criteria relationCriteria = testpaperQuestionRelationExample.createCriteria();
+            relationCriteria.andTestPaperIdEqualTo(id);
+            relationCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_PROGRAMQUESTION_TYPE_CODE));
+            programRelationList = testpaperQuestionRelationMapper.selectByExample(testpaperQuestionRelationExample);
+        }
+
         //试卷总分与题目分数总分一样
         BigDecimal questionScore=new BigDecimal(0);
         if(!CollectionUtils.isEmpty(singleChoiceRelationList))
@@ -569,6 +627,10 @@ public class TestPaperImpl implements TestPaperService {
             questionScore=questionScore.add(new BigDecimal(blankNum).multiply(fillInBlankScore));
         }
 
+        if(!CollectionUtils.isEmpty(programRelationList))
+            questionScore=questionScore.add(new BigDecimal(programRelationList.size()).multiply(programScore));
+
+
         if(testPaperDtoScore.compareTo(questionScore)!=0)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_SCORE_NOT_SAME,null);
 
@@ -577,7 +639,7 @@ public class TestPaperImpl implements TestPaperService {
         testPaperDb.setSchoolYearId(testPaperDtoSchoolYearId);
         testPaperDb.setTerm(term);
         testPaperDb.setType(type);
-        testPaperDto.setUpdatedTime(new Date());
+        testPaperDb.setUpdatedTime(new Date());
 
         //修改试卷
         testPaperMapper.updateByPrimaryKey(testPaperDb);
@@ -586,6 +648,7 @@ public class TestPaperImpl implements TestPaperService {
         if(!CollectionUtils.isEmpty(singleChoiceRelationList)){
             for(TestpaperQuestionRelation relation:singleChoiceRelationList){
                 relation.setQuestionScore(singleChoiceScore);
+                relation.setUpdatedTime(new Date());
                 testpaperQuestionRelationMapper.updateByPrimaryKey(relation);
             }
         }
@@ -594,7 +657,7 @@ public class TestPaperImpl implements TestPaperService {
             for(TestpaperQuestionRelation relation:fillInBlankRelationList){
                 FillInBlankQuestion fillInBlankQuestion = fillInBlankQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
                 relation.setQuestionScore(fillInBlankScore.multiply(new BigDecimal(fillInBlankQuestion.getBlankNum())));
-
+                relation.setUpdatedTime(new Date());
                 testpaperQuestionRelationMapper.updateByPrimaryKey(relation);
             }
         }
@@ -602,6 +665,15 @@ public class TestPaperImpl implements TestPaperService {
         if(!CollectionUtils.isEmpty(trueOrFalseRelationList)){
             for(TestpaperQuestionRelation relation:trueOrFalseRelationList){
                 relation.setQuestionScore(trueOrFalseScore);
+                relation.setUpdatedTime(new Date());
+                testpaperQuestionRelationMapper.updateByPrimaryKey(relation);
+            }
+        }
+
+        if(!CollectionUtils.isEmpty(programRelationList)){
+            for(TestpaperQuestionRelation relation:programRelationList){
+                relation.setQuestionScore(programScore);
+                relation.setUpdatedTime(new Date());
                 testpaperQuestionRelationMapper.updateByPrimaryKey(relation);
             }
         }
@@ -806,6 +878,67 @@ public class TestPaperImpl implements TestPaperService {
             testPaperDto.setFillInBlankQuestions(fillInBlankQuestionListCustom);
 
 
+
+
+            //试卷中程序题信息
+            List<TestPaperProgramQuestion> programQuestionList=new ArrayList<>();
+
+            //查询该试卷程序题信息
+            TestpaperQuestionRelationExample testPaperProgramQuestionExample=new TestpaperQuestionRelationExample();
+            TestpaperQuestionRelationExample.Criteria programQuestionCriteria = testPaperProgramQuestionExample.createCriteria();
+            programQuestionCriteria.andTestPaperIdEqualTo(id);
+            programQuestionCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_PROGRAMQUESTION_TYPE_CODE));
+            testPaperProgramQuestionExample.setOrderByClause("question_order");
+            List<TestpaperQuestionRelation> testPaperProgramQuestionList = testpaperQuestionRelationMapper.selectByExample(testPaperProgramQuestionExample);
+
+
+            if(!CollectionUtils.isEmpty(testPaperProgramQuestionList)){
+                for(int i=0;i<testPaperProgramQuestionList.size();i++){
+                    TestpaperQuestionRelation relation=testPaperProgramQuestionList.get(i);
+
+                    //构造试卷程序题信息
+                    TestPaperProgramQuestion testPaperProgramQuestion=new TestPaperProgramQuestion();
+                    BeanUtils.copyProperties(relation,testPaperProgramQuestion);
+
+                    //查询某一条程序题信息
+                    ProgramQuestionWithBLOBs programQuestion = programQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
+                    if(programQuestion!=null){
+                        testPaperProgramQuestion.setQuestionContent(programQuestion.getDescription());
+                        testPaperProgramQuestion.setQuestionInputDescription(programQuestion.getInputDescription());
+                        testPaperProgramQuestion.setQuestionOutputDescription(programQuestion.getOutputDescription());
+                        testPaperProgramQuestion.setQuestionTimeLimit(programQuestion.getTimeLimit());
+                        testPaperProgramQuestion.setQuestionMemoryLimit(programQuestion.getMemoryLimit());
+                    }
+                    programQuestionList.add(testPaperProgramQuestion);
+                }
+            }
+
+
+            //为题目打乱顺序
+            List<Integer> programQuestionOrder=new ArrayList<>();
+            //如果缓存中有直接获取顺序
+            String programQuestionJson = jedisClient.hget(examStudentId, REDIS_KEY_PROGRAM_QUESTION_ORDER);
+
+            if(!StringUtils.isBlank(programQuestionJson)){
+                programQuestionOrder= JsonUtils.jsonToList(programQuestionJson,Integer.class);
+            }else{
+                programQuestionOrder=RandomUtils.getDiffNO(programQuestionList.size());
+
+                //把顺序添加至缓存中
+                jedisClient.hset(examStudentId,REDIS_KEY_PROGRAM_QUESTION_ORDER,JsonUtils.objectToJson(programQuestionOrder));
+            }
+
+            List<TestPaperProgramQuestion> programQuestionListCustom=new ArrayList<>();
+
+            for(Integer order:programQuestionOrder){
+                programQuestionListCustom.add(programQuestionList.get(order-1));
+            }
+
+            testPaperDto.setProgramQuestions(programQuestionListCustom);
+
+
+
+
             //加载学生试卷中题目答案
 
             //获取单选题答案
@@ -822,6 +955,12 @@ public class TestPaperImpl implements TestPaperService {
             String fillInBlankQuestionAnswer = jedisClient.hget(examStudentId, REDIS_KEY_FILL_IN_BLANK_QUESTION_ANSWER);
             if(!StringUtils.isBlank(fillInBlankQuestionAnswer))
                 testPaperDto.setFillInBlankQuestionAnswer(JsonUtils.jsonToMap(fillInBlankQuestionAnswer,Integer.class,List.class));
+
+            //获取程序题答案
+            String programQuestionAnswer = jedisClient.hget(examStudentId, REDIS_KEY_PROGRAM_QUESTION_ANSWER);
+            if(!StringUtils.isBlank(programQuestionAnswer))
+                testPaperDto.setProgramQuestionAnswer(JsonUtils.jsonToMap(programQuestionAnswer,Integer.class,String.class));
+
         }
 
 
@@ -919,6 +1058,33 @@ public class TestPaperImpl implements TestPaperService {
                 fillInBlankQuestions.add(relation.getQuestionOrder()-1,testPaperFillInBlankQuestion);
             }
             testPaperDto.setFillInBlankQuestions(fillInBlankQuestions);
+        }
+
+        //查询该试卷程序题目
+        TestpaperQuestionRelationExample programQuestionRelationExample=new TestpaperQuestionRelationExample();
+        TestpaperQuestionRelationExample.Criteria programQuestionCriteria = programQuestionRelationExample.createCriteria();
+        programQuestionCriteria.andTestPaperIdEqualTo(testPaperId);
+        programQuestionCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_PROGRAMQUESTION_TYPE_CODE));
+        programQuestionRelationExample.setOrderByClause("question_order");
+        List<TestpaperQuestionRelation> programQuestionRelationList = testpaperQuestionRelationMapper.selectByExample(programQuestionRelationExample);
+
+
+        if(!CollectionUtils.isEmpty(programQuestionRelationList)){
+            List<TestPaperProgramQuestion> programQuestions=new ArrayList<>();
+
+            for(TestpaperQuestionRelation relation:programQuestionRelationList){
+
+                TestPaperProgramQuestion testPaperProgramQuestion=new TestPaperProgramQuestion();
+                BeanUtils.copyProperties(relation,testPaperProgramQuestion);
+
+                //查询具体的程序题信息
+                ProgramQuestionWithBLOBs programQuestion = programQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
+                if(programQuestion!=null){
+                    testPaperProgramQuestion.setQuestionContent(programQuestion.getDescription());
+                }
+                programQuestions.add(relation.getQuestionOrder()-1,testPaperProgramQuestion);
+            }
+            testPaperDto.setProgramQuestions(programQuestions);
         }
 
         return testPaperDto;

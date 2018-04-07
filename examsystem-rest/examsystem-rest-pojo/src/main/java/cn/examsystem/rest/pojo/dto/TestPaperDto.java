@@ -18,6 +18,7 @@ public class TestPaperDto extends TestPaper{
     private Integer singleChoiceQuestionNum;
     private Integer trueOrFalseQuestionNum;
     private Integer fillInBlankQuestionNum;
+    private Integer programQuestionNum;
 
     private String singleChoiceQuestionIds;
     private BigDecimal singleChoiceQuestionScore;
@@ -28,13 +29,18 @@ public class TestPaperDto extends TestPaper{
     private String fillInBlankQuestionIds;
     private BigDecimal fillInBlankQuestionScore;
 
+    private String programQuestionIds;
+    private BigDecimal programQuestionScore;
+
     private List<TestPaperSingleChoiceQuestion> singleChoiceQuestions;
     private List<TestPaperTrueOrFalseQuestion> trueOrFalseQuestions;
     private List<TestPaperFillInBlankQuestion> fillInBlankQuestions;
+    private List<TestPaperProgramQuestion> programQuestions;
 
     private Map<Integer,String> singleChoiceQuestionAnswer;
     private Map<Integer,String> trueOrFalseQuestionAnswer;
     private Map<Integer,List> fillInBlankQuestionAnswer;
+    private Map<Integer,String> programQuestionAnswer;
 
     private Map<Integer,BigDecimal> singleChoiceQuestionAnswerScore;
     private Map<Integer,BigDecimal> trueOrFalseQuestionAnswerScore;
@@ -198,5 +204,45 @@ public class TestPaperDto extends TestPaper{
 
     public void setFillInBlankQuestionAnswerScore(Map<Integer, BigDecimal> fillInBlankQuestionAnswerScore) {
         this.fillInBlankQuestionAnswerScore = fillInBlankQuestionAnswerScore;
+    }
+
+    public Integer getProgramQuestionNum() {
+        return programQuestionNum;
+    }
+
+    public void setProgramQuestionNum(Integer programQuestionNum) {
+        this.programQuestionNum = programQuestionNum;
+    }
+
+    public String getProgramQuestionIds() {
+        return programQuestionIds;
+    }
+
+    public void setProgramQuestionIds(String programQuestionIds) {
+        this.programQuestionIds = programQuestionIds;
+    }
+
+    public BigDecimal getProgramQuestionScore() {
+        return programQuestionScore;
+    }
+
+    public void setProgramQuestionScore(BigDecimal programQuestionScore) {
+        this.programQuestionScore = programQuestionScore;
+    }
+
+    public List<TestPaperProgramQuestion> getProgramQuestions() {
+        return programQuestions;
+    }
+
+    public void setProgramQuestions(List<TestPaperProgramQuestion> programQuestions) {
+        this.programQuestions = programQuestions;
+    }
+
+    public Map<Integer, String> getProgramQuestionAnswer() {
+        return programQuestionAnswer;
+    }
+
+    public void setProgramQuestionAnswer(Map<Integer, String> programQuestionAnswer) {
+        this.programQuestionAnswer = programQuestionAnswer;
     }
 }
