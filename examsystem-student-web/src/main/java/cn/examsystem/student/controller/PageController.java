@@ -38,12 +38,16 @@ public class PageController {
     private String MODEL_KEY_TRUEORFALSEQUESTIONS;
     @Value("${MODEL_KEY_FILLINBLANKQUESTIONS}")
     private String MODEL_KEY_FILLINBLANKQUESTIONS;
+    @Value("${MODEL_KEY_PROGRAMQUESTIONS}")
+    private String MODEL_KEY_PROGRAMQUESTIONS;
     @Value("${MODEL_KEY_SINGLECHOICEQUESTION_ANSWER}")
     private String MODEL_KEY_SINGLECHOICEQUESTION_ANSWER;
     @Value("${MODEL_KEY_TRUEORFALSEQUESTION_ANSWER}")
     private String MODEL_KEY_TRUEORFALSEQUESTION_ANSWER;
     @Value("${MODEL_KEY_FILLINBLANKQUESTION_ANSWER}")
     private String MODEL_KEY_FILLINBLANKQUESTION_ANSWER;
+    @Value("${MODEL_KEY_PROGRAMQUESTION_ANSWER}")
+    private String MODEL_KEY_PROGRAMQUESTION_ANSWER;
     @Value("${MODEL_KEY_EXAM_STUDENT_REMAIN_TIME}")
     private String MODEL_KEY_EXAM_STUDENT_REMAIN_TIME;
     @Value("${MODEL_KEY_EXAM_STUDENT_START_TIME}")
@@ -94,10 +98,12 @@ public class PageController {
         model.addAttribute(MODEL_KEY_SINGLECHOICEQUESTIONS,testPaperMap.get("singleChoiceQuestions"));
         model.addAttribute(MODEL_KEY_TRUEORFALSEQUESTIONS,testPaperMap.get("trueOrFalseQuestions"));
         model.addAttribute(MODEL_KEY_FILLINBLANKQUESTIONS,testPaperMap.get("fillInBlankQuestions"));
+        model.addAttribute(MODEL_KEY_PROGRAMQUESTIONS,testPaperMap.get("programQuestions"));
 
         model.addAttribute(MODEL_KEY_SINGLECHOICEQUESTION_ANSWER,testPaperMap.get("singleChoiceQuestionAnswer"));
         model.addAttribute(MODEL_KEY_TRUEORFALSEQUESTION_ANSWER,testPaperMap.get("trueOrFalseQuestionAnswer"));
         model.addAttribute(MODEL_KEY_FILLINBLANKQUESTION_ANSWER,testPaperMap.get("fillInBlankQuestionAnswer"));
+        model.addAttribute(MODEL_KEY_PROGRAMQUESTION_ANSWER,testPaperMap.get("programQuestionAnswer"));
 
         model.addAttribute(MODEL_KEY_EXAM_STUDENT,examStudentRelationDto);
         model.addAttribute(MODEL_KEY_TESTPAPER,testPaperMap);
