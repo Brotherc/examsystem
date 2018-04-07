@@ -17,6 +17,8 @@
     <link href="/css/font-awesome.css?v=4.4.0" rel="stylesheet">
     <link href="/css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
     <link href="/css/animate.css" rel="stylesheet">
+    <link href="/css/plugins/codemirror/codemirror.css" rel="stylesheet">
+    <link href="/css/plugins/codemirror/ambiance.css" rel="stylesheet">
     <link href="/css/style.css?v=4.1.0" rel="stylesheet">
     <link href="/css/plugins/toastr/toastr.min.css" rel="stylesheet">
 
@@ -70,6 +72,10 @@
                                         </c:if>
                                         <c:if test="${not empty fillInBlankQuestions}">
                                             <li class=""><a data-toggle="tab" href="list.jsp#tab-2">填空题</a>
+                                            </li>
+                                        </c:if>
+                                        <c:if test="${not empty programQuestions}">
+                                            <li class=""><a data-toggle="tab" href="list.jsp#tab-3">程序题</a>
                                             </li>
                                         </c:if>
                                     </ul>
@@ -277,6 +283,79 @@
                                             </form>
                                         </div>
                                     </c:if>
+                                    <c:if test="${not empty programQuestions}">
+                                        <div id="tab-3" class="tab-pane ">
+                                            <form id="programQuestions-form">
+                                                <input type="hidden" name="programQuestionNum" value="${fn:length(programQuestions)}">
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div class="wrapper wrapper-content">
+                                                            <div class="row animated fadeInRight">
+                                                                <div class="col-sm-12">
+                                                                    <div class="ibox float-e-margins">
+<%--                                                                        <div class="text-center float-e-margins p-md">
+                                                                            <span>预览：</span>
+                                                                            <a href="#" class="btn btn-xs btn-primary" id="l">浅色</a>
+                                                                            <a href="#" class="btn btn-xs btn-primary" id="k">深色</a>
+                                                                            <a href="#" class="btn btn-xs btn-primary" id="i">布局切换</a>
+                                                                        </div>--%>
+                                                                        <div class="" >
+
+                                                                            <div  class="vertical-container light-timeline">
+
+                                                                                <c:forEach items="${programQuestions}" var="question" varStatus="vs">
+                                                                                    <div class="vertical-timeline-block">
+                                                                                        <div class="vertical-timeline-icon navy-bg">
+                                                                                            <i class="">${vs.count}</i>
+                                                                                        </div>
+
+                                                                                        <div class="vertical-timeline-content gray-bg">
+                                                                                            <p>题目描述：${question.questionContent}
+                                                                                            </p>
+                                                                                            <p>输入描述：${question.questionInputDescription}
+                                                                                            </p>
+                                                                                            <p>输出描述：${question.questionOutputDescription}
+                                                                                            </p>
+                                                                                            <p>时间限制：${question.questionTimeLimit}
+                                                                                            </p>
+                                                                                            <p>空间限制：${question.questionMemoryLimit}
+                                                                                            </p>
+<%--                                                                                            <div class="checkbox checkbox-success checkbox-circle">
+                                                                                                <input id="trueOrFalseQuestion${vs.count}-1" value="1" type="radio" name="trueOrFalseQuestionAnswer[${vs.count}]">
+                                                                                                <label for="trueOrFalseQuestion${vs.count}-1">
+                                                                                                    √
+                                                                                                </label>
+                                                                                            </div>
+                                                                                            <div class="checkbox checkbox-success checkbox-circle">
+                                                                                                <input id="trueOrFalseQuestion${vs.count}-0" value="0" type="radio" name="trueOrFalseQuestionAnswer[${vs.count}]">
+                                                                                                <label for="trueOrFalseQuestion${vs.count}-0">
+                                                                                                    ×
+                                                                                                </label>
+                                                                                            </div>--%>
+                                                                                            <textarea id="programQuestion${vs.count}" class="code" name="programQuestionAnswer[${vs.count}]"></textarea>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                </c:forEach>
+                                                                            </div>
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <button class="btn btn-primary center-block" type="button" onclick="saveProgramQuestion()"><i class="fa fa-check"></i>&nbsp;保存</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </c:if>
                                 </div>
                                 <hr>
 
@@ -348,10 +427,25 @@
         </script>
     </c:if>
 
+    <c:if test="${not empty programQuestionAnswer }">
+        <script type="text/javascript">
+            function initProgramQuestionAnswer() {
+                <c:forEach var="answer" items="${programQuestionAnswer }">
+                console.log("${answer.value}");
+                $("#programQuestion${answer.key}").val("${answer.value}");
+                </c:forEach>
+            }
+        </script>
+    </c:if>
+
     <!-- 全局js -->
     <script src="/js/jquery.min.js?v=2.1.4"></script>
     <script src="/js/bootstrap.min.js?v=3.3.6"></script>
     <script src="/js/plugins/layer/layer.min.js"></script>
+
+    <!-- CodeMirror -->
+    <script src="/js/plugins/codemirror/codemirror.js"></script>
+    <script src="/js/plugins/codemirror/mode/javascript/javascript.js"></script>
 
     <!-- 自定义js -->
     <script src="/js/examsystem/common.js"></script>
@@ -359,7 +453,24 @@
     <!-- Toastr script -->
     <script src="/js/plugins/toastr/toastr.min.js"></script>
 
+
+    <style>
+        .CodeMirror {
+            height: 500px;
+        }
+    </style>
+
     <script>
+
+        $.each($(".code"),function(index,obj){
+            CodeMirror.fromTextArea(obj, {
+                lineNumbers: true,
+                matchBrackets: true,
+                styleActiveLine: true,
+                theme: "ambiance"
+            });
+        });
+
 
         function checkTime(i){
             if(i<10){
@@ -416,6 +527,9 @@
 
         if(typeof (initFillInBlankQuestionAnswer)=="function")
             initFillInBlankQuestionAnswer();
+
+        if(typeof (initProgramQuestionAnswer)=="function")
+            initProgramQuestionAnswer();
     </script>
 
     <script>
@@ -542,6 +656,30 @@
                 type: "POST",
                 url: "/v1/test/fillInBlankQuestion/answer",
                 data: decodeURIComponent($("#fillInBlankQuestions-form").serialize().replace(/\+/g,"")),
+                success: function(data){
+                    if(data.status == 201){
+                        layer.msg("保存成功");
+                    }
+                    else{
+                        layer.msg("保存失败");
+                    }
+                },
+                error:function(XMLHttpRequest, textStatus, errorThrown){
+                    var status=XMLHttpRequest.status;
+                    if(status==403){
+                        to403();
+                    }else if(status==500){
+                        to500();
+                    }
+                }
+            });
+        }
+
+        function saveProgramQuestion() {
+            $.ajax({
+                type: "POST",
+                url: "/v1/test/programQuestion/answer",
+                data: decodeURIComponent($("#programQuestions-form").serialize().replace(/\+/g,"")),
                 success: function(data){
                     if(data.status == 201){
                         layer.msg("保存成功");

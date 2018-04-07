@@ -7,8 +7,8 @@
 
 var $parentNode = window.parent.document;
 
-//var ip="localhost";
-var ip="172.16.16.221";
+var ip="localhost";
+//var ip="172.16.16.221";
 
 function $childNode(name) {
     return window.frames[name]
