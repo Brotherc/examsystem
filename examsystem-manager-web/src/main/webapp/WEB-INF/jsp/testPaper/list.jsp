@@ -198,6 +198,13 @@
                                     <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 每个空分数</span>
                                 </div>
                             </div>
+                            <div class="form-group " id="programQuestion">
+                                <label class="col-sm-3 control-label">程序题：</label>
+                                <div class=" col-sm-6">
+                                    <input type="text" class="form-control" data-mask="9.9" placeholder="" id="programScore_update" name="programScore">
+                                    <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 每道题分数</span>
+                                </div>
+                            </div>
                             <div class="form-group " >
                                 <label class="col-sm-3 control-label">总分：</label>
                                 <div class=" col-sm-6">
@@ -330,6 +337,7 @@
         var singleChoiceQuestionNum=0;
         var trueOrFalseQuestionNum=0;
         var fillInBlankQuestionNum=0;
+        var programQuestionNum=0;
 
         $("#course").val("${course.id}").trigger("chosen:updated");
 
@@ -411,16 +419,20 @@
                         singleChoiceQuestionNum=testPaperDetails.singleChoiceQuestionNum;
                         trueOrFalseQuestionNum=testPaperDetails.trueOrFalseQuestionNum;
                         fillInBlankQuestionNum=testPaperDetails.fillInBlankQuestionNum;
+                        programQuestionNum=testPaperDetails.programQuestionNum;
 
                         $("#singleChoiceQuestion").show();
                         $("#trueOrFalseQuestion").show();
                         $("#fillInBlankQuestion").show();
+                        $("#programQuestion").show();
                         $("#testPaper-update-form input[name='singleChoiceScore']").val("0.0");
                         $("#testPaper-update-form input[name='trueOrFalseScore']").val("0.0");
                         $("#testPaper-update-form input[name='fillInBlankScore']").val("0.0");
+                        $("#testPaper-update-form input[name='programScore']").val("0.0");
                         var singleChoiceQuestionScore=testPaperDetails.singleChoiceQuestionScore;
                         var trueOrFalseQuestionScore=testPaperDetails.trueOrFalseQuestionScore;
                         var fillInBlankQuestionScore=testPaperDetails.fillInBlankQuestionScore;
+                        var programQuestionScore=testPaperDetails.programQuestionScore;
                         if(singleChoiceQuestionScore==null)
                             $("#singleChoiceQuestion").hide();
                         else
@@ -435,6 +447,12 @@
                             $("#fillInBlankQuestion").hide()
                         else
                             $("#testPaper-update-form input[name='fillInBlankScore']").val(fillInBlankQuestionScore.toFixed(1));
+
+                        if(programQuestionScore==null)
+                            $("#programQuestion").hide()
+                        else
+                            $("#testPaper-update-form input[name='programScore']").val(programQuestionScore.toFixed(1));
+
 
                         $("#modal-form-update").modal('show');
                     }
@@ -523,7 +541,6 @@
                         go=false;
                         return;
                     }else{
-                        alert($(checkedQuestions).children().val());
                         questionId=$(checkedQuestions).children().val();
                     }
                 }
@@ -592,7 +609,6 @@
                         return;
                     }
                     else{
-                        alert($(checkedQuestions).children().val());
                         questionId=$(checkedQuestions).children().val();
                     }
                 }
@@ -670,6 +686,15 @@
                 }
             }
 
+            var programScore;
+            if(programQuestionNum!=null&&programQuestionNum!=0){
+                programScore=$("#testPaper-update-form [name=programScore]").val();
+                if(programScore==""||programScore=="0.0"){
+                    layer.msg("分数不能为空或0!");
+                    return ;
+                }
+            }
+
             //构造请求参数
             //添加试卷
 
@@ -698,6 +723,10 @@
             if(fillInBlankQuestionNum!=null&&fillInBlankQuestionNum!=0){
                 param.fillInBlankQuestionNum=fillInBlankQuestionNum;
                 param.fillInBlankQuestionScore=fillInBlankScore;
+            }
+            if(programQuestionNum!=null&&programQuestionNum!=0){
+                param.programQuestionNum=programQuestionNum;
+                param.programQuestionScore=programScore;
             }
             param._method='put';
 
@@ -938,6 +967,30 @@
 
                                     $("#content_questions").append(html);
                                 }
+                                if(testPaperDetails.programQuestions!=null){
+                                    $("#nav_tabs_questions").append('<li class=""><a data-toggle="tab" href="list.jsp#tab-3">程序题</a> </li>');
+
+                                    var html="";
+                                    html+='<div id="tab-3" class="tab-pane">';
+                                    html+='<div class="panel-body">';
+                                    html+='<div class="row">';
+                                    html+='<div class="col-lg-12" id="question-3">';
+
+                                    $.each(testPaperDetails.programQuestions,function (index,question) {
+                                        var id=question.id;
+                                        var content=question.questionContent;
+
+                                        html+='<div class="ibox"><div class="ibox-content"><input type="checkbox" value="'+id+'" name="" class="i-checks" />';
+
+                                        html+='<p>'+content+'</p>';
+
+                                        html+='</div></div>';
+                                    });
+
+                                    html+='</div></div></div></div>';
+
+                                    $("#content_questions").append(html);
+                                }
                             }
 
                             $($("#nav_tabs_questions").children().get(0)).addClass("active");
@@ -973,12 +1026,13 @@
                 var singleChoiceScore=$(this).val();
                 var fillInBlankScore=$("#testPaper-update-form input[name='fillInBlankScore']").val();
                 var trueOrFalseScore=$("#testPaper-update-form input[name='trueOrFalseScore']").val();
+                var programScore=$("#testPaper-update-form input[name='programScore']").val();
 
                 if(singleChoiceScore!=""){
-                    $("#score_update").text(trueOrFalseQuestionNum*parseFloat(trueOrFalseScore)+singleChoiceQuestionNum*parseFloat(singleChoiceScore)+fillInBlankQuestionNum*parseFloat(fillInBlankScore));
+                    $("#score_update").text(trueOrFalseQuestionNum*parseFloat(trueOrFalseScore)+singleChoiceQuestionNum*parseFloat(singleChoiceScore)+fillInBlankQuestionNum*parseFloat(fillInBlankScore)+programQuestionNum*parseFloat(programScore));
                 }
                 else{
-                    $("#score_update").text(trueOrFalseQuestionNum*parseFloat(trueOrFalseScore)+fillInBlankQuestionNum*parseFloat(fillInBlankScore));
+                    $("#score_update").text(trueOrFalseQuestionNum*parseFloat(trueOrFalseScore)+fillInBlankQuestionNum*parseFloat(fillInBlankScore)+programQuestionNum*parseFloat(programScore));
                 }
             });
             $("#testPaper-update-form input[name='trueOrFalseScore']").change(function () {
@@ -986,12 +1040,13 @@
                 var trueOrFalseScore=$(this).val();
                 var fillInBlankScore=$("#testPaper-update-form input[name='fillInBlankScore']").val();
                 var singleChoiceScore=$("#testPaper-update-form input[name='singleChoiceScore']").val();
+                var programScore=$("#testPaper-update-form input[name='programScore']").val();
 
                 if(trueOrFalseScore!=""){
-                    $("#score_update").text(trueOrFalseQuestionNum*parseFloat(trueOrFalseScore)+singleChoiceQuestionNum*parseFloat(singleChoiceScore)+fillInBlankQuestionNum*parseFloat(fillInBlankScore));
+                    $("#score_update").text(trueOrFalseQuestionNum*parseFloat(trueOrFalseScore)+singleChoiceQuestionNum*parseFloat(singleChoiceScore)+fillInBlankQuestionNum*parseFloat(fillInBlankScore)+programQuestionNum*parseFloat(programScore));
                 }
                 else{
-                    $("#score_update").text(singleChoiceQuestionNum*parseFloat(singleChoiceScore)+fillInBlankQuestionNum*parseFloat(fillInBlankScore));
+                    $("#score_update").text(singleChoiceQuestionNum*parseFloat(singleChoiceScore)+fillInBlankQuestionNum*parseFloat(fillInBlankScore)+programQuestionNum*parseFloat(programScore));
                 }
             });
             $("#testPaper-update-form input[name='fillInBlankScore']").change(function () {
@@ -999,12 +1054,27 @@
                 var fillInBlankScore=$(this).val();
                 var singleChoiceScore=$("#testPaper-update-form input[name='singleChoiceScore']").val();
                 var trueOrFalseScore=$("#testPaper-update-form input[name='trueOrFalseScore']").val();
+                var programScore=$("#testPaper-update-form input[name='programScore']").val();
 
                 if(fillInBlankScore!=""){
-                    $("#score_update").text(trueOrFalseQuestionNum*parseFloat(trueOrFalseScore)+singleChoiceQuestionNum*parseFloat(singleChoiceScore)+fillInBlankQuestionNum*parseFloat(fillInBlankScore));
+                    $("#score_update").text(trueOrFalseQuestionNum*parseFloat(trueOrFalseScore)+singleChoiceQuestionNum*parseFloat(singleChoiceScore)+fillInBlankQuestionNum*parseFloat(fillInBlankScore)+programQuestionNum*parseFloat(programScore));
                 }
                 else{
-                    $("#score_update").text(trueOrFalseQuestionNum*parseFloat(trueOrFalseScore)+singleChoiceQuestionNum*parseFloat(singleChoiceScore));
+                    $("#score_update").text(trueOrFalseQuestionNum*parseFloat(trueOrFalseScore)+singleChoiceQuestionNum*parseFloat(singleChoiceScore)+programQuestionNum*parseFloat(programScore));
+                }
+            });
+            $("#testPaper-update-form input[name='programScore']").change(function () {
+
+                var programScore=$(this).val();
+                var fillInBlankScore=$("#testPaper-update-form input[name='fillInBlankScore']").val();
+                var singleChoiceScore=$("#testPaper-update-form input[name='singleChoiceScore']").val();
+                var trueOrFalseScore=$("#testPaper-update-form input[name='trueOrFalseScore']").val();
+
+                if(programScore!=""){
+                    $("#score_update").text(trueOrFalseQuestionNum*parseFloat(trueOrFalseScore)+singleChoiceQuestionNum*parseFloat(singleChoiceScore)+fillInBlankQuestionNum*parseFloat(fillInBlankScore)+programQuestionNum*parseFloat(programScore));
+                }
+                else{
+                    $("#score_update").text(singleChoiceQuestionNum*parseFloat(singleChoiceScore)+fillInBlankQuestionNum*parseFloat(fillInBlankScore)+trueOrFalseQuestionNum*parseFloat(trueOrFalseScore));
                 }
             });
 

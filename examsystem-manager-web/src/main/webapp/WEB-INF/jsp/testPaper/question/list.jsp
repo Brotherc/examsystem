@@ -112,6 +112,9 @@
                             <h4 class="example-title">填空题</h4>
                             <table id="fillInBlankTableEvents" data-height="400" data-mobile-responsive="true">
                             </table>
+                            <h4 class="example-title">程序题</h4>
+                            <table id="programTableEvents" data-height="400" data-mobile-responsive="true">
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -193,6 +196,13 @@
                                 <div class=" col-sm-6">
                                     <input type="text" class="form-control" data-mask="9.9" placeholder="" name="fillInBlankScore">
                                     <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 每个空分数</span>
+                                </div>
+                            </div>
+                            <div class="form-group " id="programQuestion">
+                                <label class="col-sm-3 control-label">程序题：</label>
+                                <div class=" col-sm-6">
+                                    <input type="text" class="form-control" data-mask="9.9" placeholder="" name="programScore">
+                                    <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 每道题分数</span>
                                 </div>
                             </div>
                             <div class="form-group " >
@@ -561,6 +571,7 @@
             var singleChoiceQuestions=$("#question-0 .i-checks");
             var trueOrFalseQuestions=$("#question-1 .i-checks");
             var fillInBlankQuestions=$("#question-2 .i-checks");
+            var programQuestions=$("#question-3 .i-checks");
 
             var singleChoiceScore;
             if(singleChoiceQuestions.length!=0){
@@ -584,6 +595,15 @@
             if(fillInBlankQuestions.length!=0){
                 fillInBlankScore=$("#testPaper-add-form [name=fillInBlankScore]").val();
                 if(fillInBlankScore==""||fillInBlankScore=="0.0"){
+                    layer.msg("分数不能为空或0!");
+                    return ;
+                }
+            }
+
+            var programScore;
+            if(programQuestions.length!=0){
+                programScore=$("#testPaper-add-form [name=programScore]").val();
+                if(programScore==""||programScore=="0.0"){
                     layer.msg("分数不能为空或0!");
                     return ;
                 }
@@ -640,6 +660,17 @@
                 param.fillInBlankQuestionIds=ids;
                 param.fillInBlankQuestionScore=fillInBlankScore;
             }
+            if(programQuestions.length!=0){
+                var ids="";
+                $.each(programQuestions,function(index,question){
+                    var id=$(question).val();
+                    if(index==0)
+                        ids+=id;
+                    else ids+=","+id;
+                });
+                param.programQuestionIds=ids;
+                param.programQuestionScore=programScore;
+            }
 
             $.ajax({
                 type: "POST",
@@ -654,6 +685,7 @@
                         $("#question-0").children().remove();
                         $("#question-1").children().remove();
                         $("#question-2").children().remove();
+                        $("#question-3").children().remove();
                         $("#small-chat span").text(0);
                     }
                     else{
@@ -675,8 +707,9 @@
             var singleChoiceQuestions=$("#question-0").children();
             var trueOrFalseQuestions=$("#question-1").children();
             var fillInBlankQuestions=$("#question-2").children();
+            var programQuestions=$("#question-3").children();
             //如果试题篮中没有试题，则不允许组卷
-            if(singleChoiceQuestions.length==0&&trueOrFalseQuestions.length==0&&fillInBlankQuestions.length==0){
+            if(singleChoiceQuestions.length==0&&trueOrFalseQuestions.length==0&&fillInBlankQuestions.length==0&&programQuestions.length==0){
                 layer.msg("试题篮中没有试题，请先选题");
                 return;
             }
@@ -695,9 +728,11 @@
             $("#singleChoiceQuestion").show();
             $("#trueOrFalseQuestion").show();
             $("#fillInBlankQuestion").show();
+            $("#programQuestion").show();
             $("#testPaper-add-form input[name='singleChoiceScore']").val("0.0");
             $("#testPaper-add-form input[name='trueOrFalseScore']").val("0.0");
             $("#testPaper-add-form input[name='fillInBlankScore']").val("0.0");
+            $("#testPaper-add-form input[name='programScore']").val("0.0");
 
             //根据用户试题篮所选题型，生成对应题型分数的录入框
 
@@ -709,6 +744,9 @@
 
             if(fillInBlankQuestions.length==0)
                 $("#fillInBlankQuestion").hide();
+
+            if(programQuestions.length==0)
+                $("#programQuestion").hide();
 
 
 
@@ -832,6 +870,8 @@
                     url+="trueOrFalseQuestion/";
                 else if(type==2)
                     url+="fillInBlankQuestion/";
+                else if(type==3)
+                    url+="programQuestion/";
                 //发送ajax请求题目详情
                 $.ajax({
                     type: "GET",
@@ -882,6 +922,8 @@
 
                                 $("#modal-form-details-special").modal('show');
 
+                            }else if(type==3){//程序题
+
                             }else{//非填空题
                                 $("#course_details_general").text(questionDetails.courseName);
                                 $("#difficulty_details_general").text(questionDetails.difficultyName);
@@ -911,7 +953,11 @@
             },
             "click #chooseQuestion":function (e,value,row,index) {
                 var type=row.type;
-                var content=row.content;
+                var content;
+                if(type==3)
+                    content=row.description;
+                else
+                    content=row.content;
                 var id=row.id;
 
                 var repate=false;
@@ -937,97 +983,134 @@
                 else if(type==2)
                     url+="fillInBlankQuestion/";
                 //发送ajax请求题目详情
-                $.ajax({
-                    type: "GET",
-                    url: url+row.id,
-                    data: null,
-                    success: function(data){
-                        if(data.status == 200){
 
-                            //赋值
-                            var questionDetails=data.data;
+                if(type==3){
 
-                            if(type==0){//选择题
-                                var difficultyName=questionDetails.difficultyName;
-                                var optionA=questionDetails.optionA;
-                                var optionB=questionDetails.optionB;
-                                var optionC=questionDetails.optionC;
-                                var optionD=questionDetails.optionD;
+                    var html="";
 
-                                var html='<div class="ibox"><div class="ibox-content"><input type="checkbox" value="'+id+'" name="" class="i-checks" />';
-
-                                html+='<p>'+content+'</p><p>A:'+optionA+'</p><p>B:'+optionB+'</p><p>C:'+optionC+'</p><p>D:'+optionD+'</p>';
-                                html+='<div class="row"><div class="col-md-6"><h5>知识点：</h5>';
-                                if(questionDetails.knowledgePoints!=null){
-                                    $.each(questionDetails.knowledgePoints,function (index,knowledgePoint) {
-                                        if(index==0)
-                                            html+='<button class="btn btn-success btn-xs" type="button">'+knowledgePoint+'</button>';
-                                        else
-                                            html+='<button class="btn btn-white btn-xs" type="button">'+knowledgePoint+'</button>';
-                                    });
-                                }
-                                html+='</div><div class="col-md-6"><div class="small text-right"><h5>难度：</h5><div><i class="fa fa-flash"> </i>'+difficultyName+'</div>';
-                                html+='</div></div></div>';
-
-                                $("#question-"+type).append(html);
+                    html='<div class="ibox"><div class="ibox-content"><input type="checkbox" value="'+id+'"  name="" class="i-checks" />';
 
 
+                    html+='<p>'+content+'</p>';
+                    html+='<div class="row"><div class="col-md-6"><h5>知识点：</h5>';
 
-                                var num=$("#small-chat span").text();
-                                $("#small-chat span").text(parseInt(num)+1);
+                    var knowledgePoints=questionDetails.knowledgePoints;
 
-                            }else{//非选择题
-                                var difficultyName=questionDetails.difficultyName;
-
-                                var html="";
-
-                                if(type==2){//填空题
-                                    var blank=questionDetails.blankNum;
-                                    html='<div class="ibox"><div class="ibox-content"><input type="checkbox" value="'+id+'" data-blank="'+blank+'" name="" class="i-checks" />';
-                                }else{
-                                    html='<div class="ibox"><div class="ibox-content"><input type="checkbox" value="'+id+'"  name="" class="i-checks" />';
-                                }
-
-                                html+='<p>'+content+'</p>';
-                                html+='<div class="row"><div class="col-md-6"><h5>知识点：</h5>';
-
-                                var knowledgePoints=questionDetails.knowledgePoints;
-
-                                if(knowledgePoints!=null){
-                                    $.each(knowledgePoints,function (index,knowledgePoint) {
-                                        if(index==0)
-                                            html+='<button class="btn btn-success btn-xs" type="button">'+knowledgePoint+'</button>';
-                                        else
-                                            html+='<button class="btn btn-white btn-xs" type="button">'+knowledgePoint+'</button>';
-                                    });
-                                }
-
-                                html+='</div><div class="col-md-6"><div class="small text-right"><h5>难度：</h5><div><i class="fa fa-flash"> </i>'+difficultyName+'</div>';
-                                html+='</div></div></div>';
-
-                                $("#question-"+type).append(html);
-
-                                var num=$("#small-chat span").text();
-                                $("#small-chat span").text(parseInt(num)+1);
-                            }
-                            $('.i-checks').iCheck({
-                                checkboxClass: 'icheckbox_square-green',
-                                radioClass: 'iradio_square-green',
-                            });
-                        }
-                        else{
-                            swal("查看失败",data.message, "error");
-                        }
-                    },
-                    error:function(XMLHttpRequest, textStatus, errorThrown){
-                        var status=XMLHttpRequest.status;
-                        if(status==403){
-                            to403();
-                        }else if(status==500){
-                            to500();
-                        }
+                    if(knowledgePoints!=null){
+                        $.each(knowledgePoints,function (index,knowledgePoint) {
+                            if(index==0)
+                                html+='<button class="btn btn-success btn-xs" type="button">'+knowledgePoint+'</button>';
+                            else
+                                html+='<button class="btn btn-white btn-xs" type="button">'+knowledgePoint+'</button>';
+                        });
                     }
-                });
+
+                    html+='</div><div class="col-md-6"><div class="small text-right"><h5>难度：</h5><div><i class="fa fa-flash"> </i></div>';
+                    html+='</div></div></div>';
+
+                    $("#question-"+type).append(html);
+
+                    var num=$("#small-chat span").text();
+                    $("#small-chat span").text(parseInt(num)+1);
+
+                    $('.i-checks').iCheck({
+                        checkboxClass: 'icheckbox_square-green',
+                        radioClass: 'iradio_square-green',
+                    });
+                }else{
+                    $.ajax({
+                        type: "GET",
+                        url: url+row.id,
+                        data: null,
+                        success: function(data){
+                            if(data.status == 200){
+
+                                //赋值
+                                var questionDetails=data.data;
+
+                                if(type==0){//选择题
+                                    var difficultyName=questionDetails.difficultyName;
+                                    var optionA=questionDetails.optionA;
+                                    var optionB=questionDetails.optionB;
+                                    var optionC=questionDetails.optionC;
+                                    var optionD=questionDetails.optionD;
+
+                                    var html='<div class="ibox"><div class="ibox-content"><input type="checkbox" value="'+id+'" name="" class="i-checks" />';
+
+                                    html+='<p>'+content+'</p><p>A:'+optionA+'</p><p>B:'+optionB+'</p><p>C:'+optionC+'</p><p>D:'+optionD+'</p>';
+                                    html+='<div class="row"><div class="col-md-6"><h5>知识点：</h5>';
+                                    if(questionDetails.knowledgePoints!=null){
+                                        $.each(questionDetails.knowledgePoints,function (index,knowledgePoint) {
+                                            if(index==0)
+                                                html+='<button class="btn btn-success btn-xs" type="button">'+knowledgePoint+'</button>';
+                                            else
+                                                html+='<button class="btn btn-white btn-xs" type="button">'+knowledgePoint+'</button>';
+                                        });
+                                    }
+                                    html+='</div><div class="col-md-6"><div class="small text-right"><h5>难度：</h5><div><i class="fa fa-flash"> </i>'+difficultyName+'</div>';
+                                    html+='</div></div></div>';
+
+                                    $("#question-"+type).append(html);
+
+
+
+                                    var num=$("#small-chat span").text();
+                                    $("#small-chat span").text(parseInt(num)+1);
+
+                                }else{//非选择题
+                                    var difficultyName=questionDetails.difficultyName;
+
+                                    var html="";
+
+                                    if(type==2){//填空题
+                                        var blank=questionDetails.blankNum;
+                                        html='<div class="ibox"><div class="ibox-content"><input type="checkbox" value="'+id+'" data-blank="'+blank+'" name="" class="i-checks" />';
+                                    }else{
+                                        html='<div class="ibox"><div class="ibox-content"><input type="checkbox" value="'+id+'"  name="" class="i-checks" />';
+                                    }
+
+                                    html+='<p>'+content+'</p>';
+                                    html+='<div class="row"><div class="col-md-6"><h5>知识点：</h5>';
+
+                                    var knowledgePoints=questionDetails.knowledgePoints;
+
+                                    if(knowledgePoints!=null){
+                                        $.each(knowledgePoints,function (index,knowledgePoint) {
+                                            if(index==0)
+                                                html+='<button class="btn btn-success btn-xs" type="button">'+knowledgePoint+'</button>';
+                                            else
+                                                html+='<button class="btn btn-white btn-xs" type="button">'+knowledgePoint+'</button>';
+                                        });
+                                    }
+
+                                    html+='</div><div class="col-md-6"><div class="small text-right"><h5>难度：</h5><div><i class="fa fa-flash"> </i>'+difficultyName+'</div>';
+                                    html+='</div></div></div>';
+
+                                    $("#question-"+type).append(html);
+
+                                    var num=$("#small-chat span").text();
+                                    $("#small-chat span").text(parseInt(num)+1);
+                                }
+                                $('.i-checks').iCheck({
+                                    checkboxClass: 'icheckbox_square-green',
+                                    radioClass: 'iradio_square-green',
+                                });
+                            }
+                            else{
+                                swal("查看失败",data.message, "error");
+                            }
+                        },
+                        error:function(XMLHttpRequest, textStatus, errorThrown){
+                            var status=XMLHttpRequest.status;
+                            if(status==403){
+                                to403();
+                            }else if(status==500){
+                                to500();
+                            }
+                        }
+                    });
+                }
+
             }
         };
 
@@ -1039,10 +1122,12 @@
                 var trueOrFalseQuestions=$("#question-1").children().length;
                 var fillInBlankQuestions=$("#question-2 .i-checks");
                 var singleChoiceQuestions=$("#question-0").children().length;
+                var programQuestions=$("#question-3").children().length;
 
                 var singleChoiceScore=$(this).val();
                 var fillInBlankScore=$("#testPaper-add-form input[name='fillInBlankScore']").val();
                 var trueOrFalseScore=$("#testPaper-add-form input[name='trueOrFalseScore']").val();
+                var programScore=$("#testPaper-add-form input[name='programScore']").val();
                 var fillInBlankSumScore=0;
 
                 $.each(fillInBlankQuestions,function(index,question){
@@ -1050,20 +1135,22 @@
                 });
 
                 if(singleChoiceScore!=""){
-                    $("#score_add").text(trueOrFalseQuestions*parseFloat(trueOrFalseScore)+singleChoiceQuestions*parseFloat(singleChoiceScore)+fillInBlankSumScore);
+                    $("#score_add").text(trueOrFalseQuestions*parseFloat(trueOrFalseScore)+singleChoiceQuestions*parseFloat(singleChoiceScore)+fillInBlankSumScore+programQuestions*parseFloat(programScore));
                 }
                 else{
-                    $("#score_add").text(trueOrFalseQuestions*parseFloat(trueOrFalseScore)+fillInBlankSumScore);
+                    $("#score_add").text(trueOrFalseQuestions*parseFloat(trueOrFalseScore)+fillInBlankSumScore+programQuestions*parseFloat(programScore));
                 }
             });
             $("#testPaper-add-form input[name='trueOrFalseScore']").change(function () {
                 var trueOrFalseQuestions=$("#question-1").children().length;
                 var fillInBlankQuestions=$("#question-2 .i-checks");
                 var singleChoiceQuestions=$("#question-0").children().length;
+                var programQuestions=$("#question-3").children().length;
 
                 var trueOrFalseScore=$(this).val();
                 var fillInBlankScore=$("#testPaper-add-form input[name='fillInBlankScore']").val();
                 var singleChoiceScore=$("#testPaper-add-form input[name='singleChoiceScore']").val();
+                var programScore=$("#testPaper-add-form input[name='programScore']").val();
                 var fillInBlankSumScore=0;
 
                 $.each(fillInBlankQuestions,function(index,question){
@@ -1071,20 +1158,22 @@
                 });
 
                 if(trueOrFalseScore!=""){
-                    $("#score_add").text(trueOrFalseQuestions*parseFloat(trueOrFalseScore)+singleChoiceQuestions*parseFloat(singleChoiceScore)+fillInBlankSumScore);
+                    $("#score_add").text(trueOrFalseQuestions*parseFloat(trueOrFalseScore)+singleChoiceQuestions*parseFloat(singleChoiceScore)+fillInBlankSumScore+programQuestions*parseFloat(programScore));
                 }
                 else{
-                    $("#score_add").text(singleChoiceQuestions*parseFloat(singleChoiceScore)+fillInBlankSumScore);
+                    $("#score_add").text(singleChoiceQuestions*parseFloat(singleChoiceScore)+fillInBlankSumScore+programQuestions*parseFloat(programScore));
                 }
             });
             $("#testPaper-add-form input[name='fillInBlankScore']").change(function () {
                 var trueOrFalseQuestions=$("#question-1").children().length;
                 var fillInBlankQuestions=$("#question-2 .i-checks");
                 var singleChoiceQuestions=$("#question-0").children().length;
+                var programQuestions=$("#question-3").children().length;
 
                 var fillInBlankScore=$(this).val();
                 var singleChoiceScore=$("#testPaper-add-form input[name='singleChoiceScore']").val();
                 var trueOrFalseScore=$("#testPaper-add-form input[name='trueOrFalseScore']").val();
+                var programScore=$("#testPaper-add-form input[name='programScore']").val();
 
                 if(fillInBlankScore!=""){
 
@@ -1093,10 +1182,33 @@
                         fillInBlankSumScore+=parseInt($(question).attr("data-blank"))*fillInBlankScore;
                     });
 
-                    $("#score_add").text(trueOrFalseQuestions*parseFloat(trueOrFalseScore)+singleChoiceQuestions*parseFloat(singleChoiceScore)+fillInBlankSumScore);
+                    $("#score_add").text(trueOrFalseQuestions*parseFloat(trueOrFalseScore)+singleChoiceQuestions*parseFloat(singleChoiceScore)+fillInBlankSumScore+programQuestions*parseFloat(programScore));
                 }
                 else{
-                    $("#score_add").text(trueOrFalseQuestions*parseFloat(trueOrFalseScore)+singleChoiceQuestions*parseFloat(singleChoiceScore));
+                    $("#score_add").text(trueOrFalseQuestions*parseFloat(trueOrFalseScore)+singleChoiceQuestions*parseFloat(singleChoiceScore)+programQuestions*parseFloat(programScore));
+                }
+            });
+            $("#testPaper-add-form input[name='programScore']").change(function () {
+                var trueOrFalseQuestions=$("#question-1").children().length;
+                var fillInBlankQuestions=$("#question-2 .i-checks");
+                var singleChoiceQuestions=$("#question-0").children().length;
+                var programQuestions=$("#question-3").children().length;
+
+                var programScore=$(this).val();
+                var fillInBlankScore=$("#testPaper-add-form input[name='fillInBlankScore']").val();
+                var singleChoiceScore=$("#testPaper-add-form input[name='singleChoiceScore']").val();
+                var trueOrFalseScore=$("#testPaper-add-form input[name='trueOrFalseScore']").val();
+                var fillInBlankSumScore=0;
+
+                $.each(fillInBlankQuestions,function(index,question){
+                    fillInBlankSumScore+=parseInt($(question).attr("data-blank"))*fillInBlankScore;
+                });
+
+                if(programScore!=""){
+                    $("#score_add").text(trueOrFalseQuestions*parseFloat(trueOrFalseScore)+singleChoiceQuestions*parseFloat(singleChoiceScore)+fillInBlankSumScore+programQuestions*parseFloat(programScore));
+                }
+                else{
+                    $("#score_add").text(singleChoiceQuestions*parseFloat(singleChoiceScore)+fillInBlankSumScore+trueOrFalseQuestions*parseFloat(trueOrFalseScore));
                 }
             });
 
@@ -1302,6 +1414,48 @@
                         field: 'isChecked',
                         visible:false
                     }, {
+                        field: 'detailds',
+                        title: '详情',
+                        events:operateEvents,
+                        formatter:addDetailsButton
+                    }
+                ]
+            });
+
+
+            $('#programTableEvents').bootstrapTable({
+                url: "/v1/programQuestion",
+                search: false,
+                pagination: true,
+                showRefresh: true,
+                showToggle: true,
+                showColumns: true,
+                cardView:true,
+                iconSize: 'outline',
+                idField:'id',
+                queryParams:queryParams,
+                icons: {
+                    refresh: 'glyphicon-repeat',
+                    toggle: 'glyphicon-list-alt',
+                    columns: 'glyphicon-list'
+                },
+                columns: [
+                    {
+                        field: 'id',
+                        visible:false
+                    },{
+                        field: 'tittle',
+                        title: '标题'
+                    },{
+                        field: 'description',
+                        title: '题目描述'
+                    }, {
+                        field: 'inputDescription',
+                        title: '输入描述'
+                    }, {
+                        field: 'outputDescription',
+                        title: '输出描述'
+                    },{
                         field: 'detailds',
                         title: '详情',
                         events:operateEvents,
