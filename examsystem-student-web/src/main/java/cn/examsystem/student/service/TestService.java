@@ -16,4 +16,8 @@ public interface TestService {
 
     //保存学生试卷填空题答题信息至缓存中
     public ResultInfo saveFillInBlankQuestionAnswer(String examStudentId, TestPaperDto testPaperDto ) throws Exception;
+
+    //保存学生试卷程序题答题信息至缓存中
+    public ResultInfo saveProgramQuestionAnswer(String examStudentId, TestPaperDto testPaperDto ) throws Exception;
+
 }

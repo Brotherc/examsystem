@@ -32,6 +32,9 @@ public class TestImpl implements TestService {
     private String REDIS_KEY_TRUE_OR_FALSE_QUESTION_ANSWER;
     @Value("${REDIS_KEY_FILL_IN_BLANK_QUESTION_ANSWER}")
     private String REDIS_KEY_FILL_IN_BLANK_QUESTION_ANSWER;
+    @Value("${REDIS_KEY_PROGRAM_QUESTION_ANSWER}")
+    private String REDIS_KEY_PROGRAM_QUESTION_ANSWER;
+
 
     @Value("${MESSAGE_SAVE_SUCCESS}")
     private String MESSAGE_SAVE_SUCCESS;
@@ -117,6 +120,38 @@ public class TestImpl implements TestService {
                 redisMap.put(i, list);
             }
             jedisClient.hset(examStudentId, REDIS_KEY_FILL_IN_BLANK_QUESTION_ANSWER, JsonUtils.objectToJson(redisMap));
+        }
+
+        return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_SAVE_SUCCESS,null);
+    }
+
+    @Override
+    public ResultInfo saveProgramQuestionAnswer(String examStudentId, TestPaperDto testPaperDto) throws Exception {
+        //程序题数量不能为空
+        Integer programQuestionNum = testPaperDto.getProgramQuestionNum();
+        if(programQuestionNum!=null){
+            //学生试卷程序题答题信息
+            Map<Integer, String> programQuestionAnswer = testPaperDto.getProgramQuestionAnswer();
+
+
+            Map< Integer, String> redisMap=new LinkedHashMap<Integer, String>();
+            //如果用户没写就提交，设置答案全为空
+
+            //如果用户全写了，则中间为null的答案设置为“”
+
+            if(programQuestionAnswer==null||programQuestionAnswer.size()<1){
+                for(int i=1;i<=programQuestionNum;i++){
+                    redisMap.put(i, "");
+                }
+            }else{
+                for(int i=1;i<=programQuestionNum;i++){
+                    String answer = programQuestionAnswer.get(i);
+                    if(StringUtils.isBlank(answer))
+                        answer="";
+                    redisMap.put(i, answer);
+                }
+            }
+            jedisClient.hset(examStudentId, REDIS_KEY_PROGRAM_QUESTION_ANSWER, JsonUtils.objectToJson(redisMap));
         }
 
         return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_SAVE_SUCCESS,null);
