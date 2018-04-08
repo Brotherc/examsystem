@@ -310,15 +310,15 @@
                                                                                         </div>
 
                                                                                         <div class="vertical-timeline-content gray-bg">
-                                                                                            <p>题目描述：${question.questionContent}
+                                                                                            <p><strong>题目描述</strong>：${question.questionContent}
                                                                                             </p>
-                                                                                            <p>输入描述：${question.questionInputDescription}
+                                                                                            <p><strong>输入描述</strong>：${question.questionInputDescription}
                                                                                             </p>
-                                                                                            <p>输出描述：${question.questionOutputDescription}
+                                                                                            <p><strong>输出描述</strong>：${question.questionOutputDescription}
                                                                                             </p>
-                                                                                            <p>时间限制：${question.questionTimeLimit}
+                                                                                            <p><strong>时间限制</strong>：${question.questionTimeLimit}
                                                                                             </p>
-                                                                                            <p>空间限制：${question.questionMemoryLimit}
+                                                                                            <p><strong>空间限制</strong>：${question.questionMemoryLimit}
                                                                                             </p>
 <%--                                                                                            <div class="checkbox checkbox-success checkbox-circle">
                                                                                                 <input id="trueOrFalseQuestion${vs.count}-1" value="1" type="radio" name="trueOrFalseQuestionAnswer[${vs.count}]">
@@ -332,7 +332,8 @@
                                                                                                     ×
                                                                                                 </label>
                                                                                             </div>--%>
-                                                                                            <textarea id="programQuestion${vs.count}" class="code" name="programQuestionAnswer[${vs.count}]"></textarea>
+<textarea id="programQuestion${vs.count}" class="code" name="programQuestionAnswer[${vs.count}]" value="">
+</textarea>
                                                                                         </div>
                                                                                     </div>
 
@@ -427,16 +428,6 @@
         </script>
     </c:if>
 
-    <c:if test="${not empty programQuestionAnswer }">
-        <script type="text/javascript">
-            function initProgramQuestionAnswer() {
-                <c:forEach var="answer" items="${programQuestionAnswer }">
-                console.log("${answer.value}");
-                $("#programQuestion${answer.key}").val("${answer.value}");
-                </c:forEach>
-            }
-        </script>
-    </c:if>
 
     <!-- 全局js -->
     <script src="/js/jquery.min.js?v=2.1.4"></script>
@@ -457,16 +448,20 @@
     <style>
         .CodeMirror {
             height: 500px;
+            z-index: 999;
         }
     </style>
 
     <script>
 
+        var arr=[$(".code").length];
+
         $.each($(".code"),function(index,obj){
-            CodeMirror.fromTextArea(obj, {
+            arr[index]=CodeMirror.fromTextArea(obj, {
                 lineNumbers: true,
                 matchBrackets: true,
                 styleActiveLine: true,
+                autofocus:true,
                 theme: "ambiance"
             });
         });
@@ -504,7 +499,6 @@
             if(leftTime!=0)
                 leftTime=leftTime-1000;
             var temLeftTime=Math.round(leftTime/1000);
-            console.log(temLeftTime);
             if(temLeftTime==10||temLeftTime==5){
                 //弹出倒计时提示提交卷显示框
                 toastr.success(temLeftTime+"秒后将自动提交试卷")
@@ -528,8 +522,30 @@
         if(typeof (initFillInBlankQuestionAnswer)=="function")
             initFillInBlankQuestionAnswer();
 
-        if(typeof (initProgramQuestionAnswer)=="function")
-            initProgramQuestionAnswer();
+        $.ajax({
+            type: "GET",
+            url: "/v1/test/programQuestion/answer",
+            success: function(data){
+                if(data.status == 200){
+                    $.each(data.data,function(index,obj){
+                        console.log(obj);
+                        arr[index-1].setValue(obj);
+                    });
+                }
+                else{
+                    layer.msg("您的程序题答题信息加载失败");
+                }
+            },
+            error:function(XMLHttpRequest, textStatus, errorThrown){
+                var status=XMLHttpRequest.status;
+                if(status==403){
+                    to403();
+                }else if(status==500){
+                    to500();
+                }
+            }
+        });
+
     </script>
 
     <script>
@@ -554,16 +570,39 @@
                                         data: decodeURIComponent($("#fillInBlankQuestions-form").serialize().replace(/\+/g,"")),
                                         success: function(data){
                                             if(data.status == 201){
+
+                                                $.each($(".code"),function(index,obj){
+
+                                                    console.log(arr[index].getValue());
+
+                                                    $(obj).val(arr[index].getValue());
+                                                });
+
                                                 $.ajax({
                                                     type: "POST",
-                                                    url: "/v1/test/testPaper/"+"${examStudent.testPaperId}",
+                                                    url: "/v1/test/programQuestion/answer",
+                                                    data: decodeURIComponent($("#programQuestions-form").serialize()),
                                                     success: function(data){
                                                         if(data.status == 201){
-                                                            layer.msg("提交成功");
-                                                            location.href = "http://"+ES.ip+":8088";
+                                                            $.ajax({
+                                                                type: "POST",
+                                                                url: "/v1/test/testPaper/"+"${examStudent.testPaperId}",
+                                                                success: function(data){
+                                                                    if(data.status == 201){
+                                                                        layer.msg("提交成功");
+                                                                        location.href = "http://"+ES.ip+":8088";
+                                                                    }
+                                                                    else{
+                                                                        layer.msg("提交失败");
+                                                                    }
+                                                                },
+                                                                error:function(XMLHttpRequest, textStatus, errorThrown){
+                                                                    layer.msg("程序题保存失败");
+                                                                }
+                                                            });
                                                         }
                                                         else{
-                                                            layer.msg("提交失败");
+                                                            layer.msg("程序题保存失败");
                                                         }
                                                     },
                                                     error:function(XMLHttpRequest, textStatus, errorThrown){
@@ -676,10 +715,18 @@
         }
 
         function saveProgramQuestion() {
+
+            $.each($(".code"),function(index,obj){
+
+                console.log(arr[index].getValue());
+
+                $(obj).val(arr[index].getValue());
+            });
+
             $.ajax({
                 type: "POST",
                 url: "/v1/test/programQuestion/answer",
-                data: decodeURIComponent($("#programQuestions-form").serialize().replace(/\+/g,"")),
+                data: decodeURIComponent($("#programQuestions-form").serialize()),
                 success: function(data){
                     if(data.status == 201){
                         layer.msg("保存成功");
