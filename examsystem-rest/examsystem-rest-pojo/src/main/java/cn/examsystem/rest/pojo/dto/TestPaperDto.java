@@ -45,6 +45,7 @@ public class TestPaperDto extends TestPaper{
     private Map<Integer,BigDecimal> singleChoiceQuestionAnswerScore;
     private Map<Integer,BigDecimal> trueOrFalseQuestionAnswerScore;
     private Map<Integer,BigDecimal> fillInBlankQuestionAnswerScore;
+    private Map<Integer,BigDecimal> programQuestionAnswerScore;
 
     public String getSingleChoiceQuestionIds() {
         return singleChoiceQuestionIds;
@@ -244,5 +245,13 @@ public class TestPaperDto extends TestPaper{
 
     public void setProgramQuestionAnswer(Map<Integer, String> programQuestionAnswer) {
         this.programQuestionAnswer = programQuestionAnswer;
+    }
+
+    public Map<Integer, BigDecimal> getProgramQuestionAnswerScore() {
+        return programQuestionAnswerScore;
+    }
+
+    public void setProgramQuestionAnswerScore(Map<Integer, BigDecimal> programQuestionAnswerScore) {
+        this.programQuestionAnswerScore = programQuestionAnswerScore;
     }
 }
