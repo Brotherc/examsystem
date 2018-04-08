@@ -58,6 +58,10 @@ public class PageController {
     @Value("${MODEL_KEY_TESTPAPER}")
     private String MODEL_KEY_TESTPAPER;
 
+    @Value("${SESSION_KEY_EXAM_STUDENT_PROGRAM_ANSWER}")
+    private String SESSION_KEY_EXAM_STUDENT_PROGRAM_ANSWER;
+
+
     @GetMapping("/v1/test/testPaper/{testPaperId}")
     public String toTestPaperPage(@PathVariable String testPaperId, HttpSession session, Model model) throws Exception{
 
@@ -103,7 +107,9 @@ public class PageController {
         model.addAttribute(MODEL_KEY_SINGLECHOICEQUESTION_ANSWER,testPaperMap.get("singleChoiceQuestionAnswer"));
         model.addAttribute(MODEL_KEY_TRUEORFALSEQUESTION_ANSWER,testPaperMap.get("trueOrFalseQuestionAnswer"));
         model.addAttribute(MODEL_KEY_FILLINBLANKQUESTION_ANSWER,testPaperMap.get("fillInBlankQuestionAnswer"));
-        model.addAttribute(MODEL_KEY_PROGRAMQUESTION_ANSWER,testPaperMap.get("programQuestionAnswer"));
+
+        session.setAttribute(SESSION_KEY_EXAM_STUDENT_PROGRAM_ANSWER,testPaperDto.getProgramQuestionAnswer());
+        System.out.println(testPaperDto.getProgramQuestionAnswer());
 
         model.addAttribute(MODEL_KEY_EXAM_STUDENT,examStudentRelationDto);
         model.addAttribute(MODEL_KEY_TESTPAPER,testPaperMap);

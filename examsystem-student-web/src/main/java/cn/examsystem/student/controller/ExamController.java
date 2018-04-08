@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2018/1/28.
@@ -43,6 +44,8 @@ public class ExamController {
 
     @Value("${SESSION_KEY_EXAM_STUDENT}")
     private String SESSION_KEY_EXAM_STUDENT;
+    @Value("${SESSION_KEY_EXAM_STUDENT_PROGRAM_ANSWER}")
+    private String SESSION_KEY_EXAM_STUDENT_PROGRAM_ANSWER;
 
     @Value("${MESSAGE_GET_FAIL}")
     private String MESSAGE_GET_FAIL;
@@ -52,6 +55,9 @@ public class ExamController {
     private String MESSAGE_SAVE_FAIL;
     @Value("${MESSAGE_UPDATE_FAIL}")
     private String MESSAGE_UPDATE_FAIL;
+    @Value("${MESSAGE_GET_SUCCESS}")
+    private String MESSAGE_GET_SUCCESS;
+
 
     @Autowired
     private TestService testService;
@@ -167,6 +173,15 @@ System.out.println(examStudentRelationDto.getIsLocal());
 
     }
 
+    @PostMapping("/v1/test/programQuestion/answer")
+    public ResultInfo saveProgramQuestionAnswer(HttpSession session, TestPaperDto testPaperDto) throws Exception{
+
+        System.out.println(testPaperDto.getProgramQuestionAnswer());
+
+        ExamStudentRelationDto examStudentRelationDto = (ExamStudentRelationDto)session.getAttribute(SESSION_KEY_EXAM_STUDENT);
+        return testService.saveProgramQuestionAnswer(examStudentRelationDto.getId(),testPaperDto);
+    }
+
     @PostMapping("/v1/test/testPaper/{testPaperId}")
     public ResultInfo submitTestPape(HttpSession session, @PathVariable String testPaperId,HttpServletRequest request,HttpServletResponse response) throws Exception{
 
@@ -195,5 +210,13 @@ System.out.println(examStudentRelationDto.getIsLocal());
         }
         return resultInfo;
 
+    }
+
+    @GetMapping("/v1/test/programQuestion/answer")
+    public ResultInfo getProgramQuestionAnswer(HttpSession session, HttpServletRequest request) throws Exception{
+
+        Map<Integer, String> programQuestionAnswerMap= (Map<Integer, String>) session.getAttribute(SESSION_KEY_EXAM_STUDENT_PROGRAM_ANSWER);
+
+        return new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,programQuestionAnswerMap);
     }
 }
