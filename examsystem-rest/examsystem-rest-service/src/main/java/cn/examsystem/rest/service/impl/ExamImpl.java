@@ -173,12 +173,16 @@ public class ExamImpl implements ExamService {
     private String REDIS_KEY_TRUE_OR_FALSE_QUESTION_ORDER;
     @Value("${REDIS_KEY_FILL_IN_BLANK_QUESTION_ORDER}")
     private String REDIS_KEY_FILL_IN_BLANK_QUESTION_ORDER;
+    @Value("${REDIS_KEY_PROGRAM_QUESTION_ORDER}")
+    private String REDIS_KEY_PROGRAM_QUESTION_ORDER;
     @Value("${REDIS_KEY_SINGLE_CHOICE_QUESTION_ANSWER}")
     private String REDIS_KEY_SINGLE_CHOICE_QUESTION_ANSWER;
     @Value("${REDIS_KEY_TRUE_OR_FALSE_QUESTION_ANSWER}")
     private String REDIS_KEY_TRUE_OR_FALSE_QUESTION_ANSWER;
     @Value("${REDIS_KEY_FILL_IN_BLANK_QUESTION_ANSWER}")
     private String REDIS_KEY_FILL_IN_BLANK_QUESTION_ANSWER;
+    @Value("${REDIS_KEY_PROGRAM_QUESTION_ANSWER}")
+    private String REDIS_KEY_PROGRAM_QUESTION_ANSWER;
 
     @Value("${DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE}")
     private String DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE;
@@ -186,7 +190,8 @@ public class ExamImpl implements ExamService {
     private String DICTINFO_TRUEORFALSEQUESTION_TYPE_CODE;
     @Value("${DICTINFO_FILLINBLANKQUESTION_TYPE_CODE}")
     private String DICTINFO_FILLINBLANKQUESTION_TYPE_CODE;
-
+    @Value("${DICTINFO_PROGRAMQUESTION_TYPE_CODE}")
+    private String DICTINFO_PROGRAMQUESTION_TYPE_CODE;
 
     @Autowired
     private JedisClient jedisClient;
@@ -1397,6 +1402,14 @@ public class ExamImpl implements ExamService {
             fillInBlankQuestionAnswer = JsonUtils.jsonToMap(jedisClient.hget(examStudentRelationId, REDIS_KEY_FILL_IN_BLANK_QUESTION_ANSWER), Integer.class, List.class);
         }
 
+        String programQuestionOrderJson = jedisClient.hget(examStudentRelationId, REDIS_KEY_PROGRAM_QUESTION_ORDER);
+        List<Integer> programQuestionOrderList=null;
+        Map<Integer, String> programQuestionAnswer=null;
+        if(!StringUtils.isBlank(programQuestionOrderJson)){
+            programQuestionOrderList = JsonUtils.jsonToList(programQuestionOrderJson, Integer.class);
+            programQuestionAnswer = JsonUtils.jsonToMap(jedisClient.hget(examStudentRelationId, REDIS_KEY_PROGRAM_QUESTION_ANSWER), Integer.class, String.class);
+        }
+
         int index=1;
 
         if(!CollectionUtils.isEmpty(singleChoiceQuestionOrderList))
@@ -1530,6 +1543,50 @@ public class ExamImpl implements ExamService {
                 examstudentAnswer.setStudentAnswer(json);
 
                 System.out.println(examstudentAnswer.getTestpaperQuestionId());
+
+                examstudentAnswerMapper.insert(examstudentAnswer);
+                index++;
+            }
+
+        index=1;
+
+        if(!CollectionUtils.isEmpty(programQuestionOrderList))
+            for(Integer i:programQuestionOrderList){
+
+                //程序题提交
+                ExamstudentAnswer examstudentAnswer=new ExamstudentAnswer();
+                //设置id
+                String studentAnswerId = UUIDBuild.getUUID();
+                examstudentAnswer.setId(studentAnswerId);
+                //设置考试学生id
+                examstudentAnswer.setExamStudentId(examStudentRelationId);
+                //设置答案
+                System.out.println("程序题答案"+programQuestionAnswer.get(index));
+                if(programQuestionAnswer==null||StringUtils.isBlank(programQuestionAnswer.get(index)))
+                    examstudentAnswer.setStudentAnswer("");
+                else
+                    examstudentAnswer.setStudentAnswer(programQuestionAnswer.get(index));
+                //设置分数初始为0分
+                examstudentAnswer.setScore(new BigDecimal(0));
+                //设置为未评分
+                examstudentAnswer.setIsGraded(false);
+                examstudentAnswer.setCreatedTime(new Date());
+                examstudentAnswer.setUpdatedTime(new Date());
+
+
+                //设置试卷题目id
+                //查询该题目对应原先试卷的哪一道题目
+                TestpaperQuestionRelationExample testpaperQuestionRelationExample=new TestpaperQuestionRelationExample();
+                TestpaperQuestionRelationExample.Criteria questionCriteria = testpaperQuestionRelationExample.createCriteria();
+                questionCriteria.andTestPaperIdEqualTo(testPaperId);
+                questionCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_PROGRAMQUESTION_TYPE_CODE));
+                questionCriteria.andQuestionOrderEqualTo(i);
+
+                List<TestpaperQuestionRelation> testpaperQuestionRelationList = testpaperQuestionRelationMapper.selectByExample(testpaperQuestionRelationExample);
+
+                if(!CollectionUtils.isEmpty(testpaperQuestionRelationList)){
+                    examstudentAnswer.setTestpaperQuestionId(testpaperQuestionRelationList.get(0).getId());
+                }
 
                 examstudentAnswerMapper.insert(examstudentAnswer);
                 index++;

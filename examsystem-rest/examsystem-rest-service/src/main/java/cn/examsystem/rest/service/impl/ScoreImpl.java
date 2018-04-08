@@ -44,6 +44,8 @@ public class ScoreImpl implements ScoreService {
     private QuestionMatcherRelationMapper questionMatcherRelationMapper;
     @Autowired
     private TestPaperMapper testPaperMapper;
+    @Autowired
+    private ProgramQuestionMapper programQuestionMapper;
 
 
     @Value("${MESSAGE_EXAM_ID_NOT_NULL}")
@@ -63,6 +65,9 @@ public class ScoreImpl implements ScoreService {
     private String DICTINFO_TRUEORFALSEQUESTION_TYPE_CODE;
     @Value("${DICTINFO_FILLINBLANKQUESTION_TYPE_CODE}")
     private String DICTINFO_FILLINBLANKQUESTION_TYPE_CODE;
+    @Value("${DICTINFO_PROGRAMQUESTION_TYPE_CODE}")
+    private String DICTINFO_PROGRAMQUESTION_TYPE_CODE;
+
     @Value("${DICTINFO_MATCHER_IS_NOT_ORDER_CODE}")
     private String DICTINFO_MATCHER_IS_NOT_ORDER_CODE;
 
@@ -380,6 +385,41 @@ System.out.println(studentAnswer);
 
                     testPaperDto.setFillInBlankQuestions(fillInBlankQuestionList);
 
+
+                    //试卷中程序题信息
+                    List<TestPaperProgramQuestion> programQuestionList=new ArrayList<>();
+
+                    //查询该试卷程序题信息
+                    TestpaperQuestionRelationExample testPaperProgramQuestionExample=new TestpaperQuestionRelationExample();
+                    TestpaperQuestionRelationExample.Criteria programQuestionCriteria = testPaperProgramQuestionExample.createCriteria();
+                    programQuestionCriteria.andTestPaperIdEqualTo(exam.getTestPaperId());
+                    programQuestionCriteria.andQuestionTypeEqualTo(new Integer(DICTINFO_PROGRAMQUESTION_TYPE_CODE));
+                    testPaperProgramQuestionExample.setOrderByClause("question_order");
+                    List<TestpaperQuestionRelation> testPaperProgramQuestionList = testpaperQuestionRelationMapper.selectByExample(testPaperProgramQuestionExample);
+
+
+                    if(!CollectionUtils.isEmpty(testPaperProgramQuestionList)){
+                        for(int i=0;i<testPaperProgramQuestionList.size();i++){
+                            TestpaperQuestionRelation relation=testPaperProgramQuestionList.get(i);
+
+                            //构造试卷程序题信息
+                            TestPaperProgramQuestion testPaperProgramQuestion=new TestPaperProgramQuestion();
+                            BeanUtils.copyProperties(relation,testPaperProgramQuestion);
+
+                            //查询某一条程序题信息
+                            ProgramQuestionWithBLOBs programQuestion = programQuestionMapper.selectByPrimaryKey(relation.getQuestionId());
+                            if(programQuestion!=null){
+                                testPaperProgramQuestion.setQuestionContent(programQuestion.getDescription());
+                            }
+                            programQuestionList.add(testPaperProgramQuestion);
+                        }
+                    }
+
+                    testPaperDto.setProgramQuestions(programQuestionList);
+
+
+
+
 System.out.println(testPaperDto.getFillInBlankQuestions().get(0));
 
                     //加载学生试卷中题目答案
@@ -390,11 +430,13 @@ System.out.println(testPaperDto.getFillInBlankQuestions().get(0));
 
                     Map<Integer, String> singleChoiceQuestionAnswer=new HashMap<>();
                     Map<Integer, String> trueOrFalseQuestionAnswer=new HashMap<>();
+                    Map<Integer, String> programQuestionAnswer=new HashMap<>();
                     Map<Integer, List> fillInBlankQuestionAnswer=new HashMap<>();
 
                     Map<Integer, BigDecimal> singleChoiceQuestionAnswerScore=new HashMap<>();
                     Map<Integer, BigDecimal> trueOrFalseQuestionAnswerScore=new HashMap<>();
                     Map<Integer, BigDecimal> fillInBlankQuestionAnswerScore=new HashMap<>();
+                    Map<Integer, BigDecimal> programQuestionAnswerScore=new HashMap<>();
 
 
                     for(ExamstudentAnswer studentAnswer:examstudentAnswerList){
@@ -418,14 +460,20 @@ System.out.println(testPaperDto.getFillInBlankQuestions().get(0));
                             fillInBlankQuestionAnswer.put(testPaperQuestion.getQuestionOrder(),list);
                             fillInBlankQuestionAnswerScore.put(testPaperQuestion.getQuestionOrder(),studentAnswer.getScore());
                         }
+                        if(testPaperQuestion.getQuestionType().equals(new Integer(DICTINFO_PROGRAMQUESTION_TYPE_CODE))){//程序题
+                            programQuestionAnswer.put(testPaperQuestion.getQuestionOrder(),studentAnswer.getStudentAnswer());
+                            programQuestionAnswerScore.put(testPaperQuestion.getQuestionOrder(),studentAnswer.getScore());
+                        }
                     }
                     testPaperDto.setSingleChoiceQuestionAnswer(singleChoiceQuestionAnswer);
                     testPaperDto.setTrueOrFalseQuestionAnswer(trueOrFalseQuestionAnswer);
                     testPaperDto.setFillInBlankQuestionAnswer(fillInBlankQuestionAnswer);
+                    testPaperDto.setProgramQuestionAnswer(programQuestionAnswer);
 
                     testPaperDto.setSingleChoiceQuestionAnswerScore(singleChoiceQuestionAnswerScore);
                     testPaperDto.setTrueOrFalseQuestionAnswerScore(trueOrFalseQuestionAnswerScore);
                     testPaperDto.setFillInBlankQuestionAnswerScore(fillInBlankQuestionAnswerScore);
+                    testPaperDto.setProgramQuestionAnswerScore(programQuestionAnswerScore);
 
                     System.out.println(testPaperDto.getSingleChoiceQuestionAnswer());
                     System.out.println(testPaperDto.getTrueOrFalseQuestionAnswer());
