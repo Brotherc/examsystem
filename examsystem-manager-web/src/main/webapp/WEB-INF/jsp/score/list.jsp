@@ -499,10 +499,8 @@
                                 html+='<div class="col-sm-12">';
                                 html+='<div class="ibox float-e-margins">';
                                 html+='<div class="text-center float-e-margins p-md">';
-                                html+='<span>预览：</span>';
-                                html+='<a href="#" class="btn btn-xs btn-primary" id="lightVersion">浅色</a>';
-                                html+='<a href="#" class="btn btn-xs btn-primary" id="darkVersion">深色</a>';
-                                html+='<a href="#" class="btn btn-xs btn-primary" id="leftVersion">布局切换</a>';
+                                html+='<span>每道题目分数：</span>';
+                                html+='<a href="#" class="btn btn-xs btn-success">'+testPaper.singleChoiceQuestions[0].questionScore+'</a>';
                                 html+='</div>';
                                 html+='<div class="" id="ibox-content">';
 
@@ -564,10 +562,8 @@
                                 html+='<div class="col-sm-12">';
                                 html+='<div class="ibox float-e-margins">';
                                 html+='<div class="text-center float-e-margins p-md">';
-                                html+='<span>预览：</span>';
-                                html+='<a href="#" class="btn btn-xs btn-primary" id="l">浅色</a>';
-                                html+='<a href="#" class="btn btn-xs btn-primary" id="k">深色</a>';
-                                html+='<a href="#" class="btn btn-xs btn-primary" id="i">布局切换</a>';
+                                html+='<span>每道题目分数：</span>';
+                                html+='<a href="#" class="btn btn-xs btn-success">'+testPaper.trueOrFalseQuestions[0].questionScore+'</a>';
                                 html+='</div>';
                                 html+='<div class="" >';
                                 html+='<div  class="vertical-container light-timeline">';
@@ -617,10 +613,8 @@
                                 html+='<div class="col-sm-12">';
                                 html+='<div class="ibox float-e-margins">';
                                 html+='<div class="text-center float-e-margins p-md">';
-                                html+='<span>预览：</span>';
-                                html+='<a href="#" class="btn btn-xs btn-primary" id="al">浅色</a>';
-                                html+='<a href="#" class="btn btn-xs btn-primary" id="kx">深色</a>';
-                                html+='<a href="#" class="btn btn-xs btn-primary" id="ib">布局切换</a>';
+                                html+='<span>每个空分数：</span>';
+                                html+='<a href="#" class="btn btn-xs btn-success">'+parseFloat(testPaper.fillInBlankQuestions[0].questionScore)/parseFloat(testPaper.fillInBlankQuestions[0].blankNum)+'</a>';
                                 html+='</div>';
                                 html+='<div class="" >';
                                 html+='<div  class="vertical-container light-timeline">';
@@ -649,6 +643,51 @@
                                 });
 
                                 html+='</div></div></div></div></div></div></div></div></form></div>';
+
+                                $("#content_questions").append(html);
+                            }
+                            if(testPaper.programQuestions!=null){
+                                $("#nav_tabs_questions").append('<li class=""><a data-toggle="tab" href="list.jsp#tab-3">程序题</a> </li>');
+
+                                var html='';
+
+                                var programQuestions=testPaper.programQuestions;
+                                console.log(programQuestions);
+                                html+='<div id="tab-3" class="tab-pane ">';
+                                html+='  <form id="programQuestions-form">';
+                                html+='<div class="row">';
+                                html+='<div class="col-sm-12">';
+                                html+='<div class="wrapper wrapper-content">';
+                                html+='<div class="row animated fadeInRight">';
+                                html+='<div class="col-sm-12">';
+                                html+='<div class="ibox float-e-margins">';
+                                html+='<div class="text-center float-e-margins p-md">';
+                                html+='<span>每道题目分数：</span>';
+                                html+='<a href="#" class="btn btn-xs btn-success">'+testPaper.programQuestions[0].questionScore+'</a>';
+                                html+='</div>';
+                                html+='<div class="" >';
+                                html+='<div  class="vertical-container light-timeline">';
+
+                                $.each(testPaper.programQuestions,function (index,question) {
+
+                                    html+='<div class="vertical-timeline-block">';
+                                    html+='<div class="vertical-timeline-icon navy-bg">';
+                                    html+='<i class="">'+(index+1)+'</i>';
+                                    html+='</div>';
+
+                                    html+='<div class="vertical-timeline-content gray-bg">';
+                                    html+='<p>'+question.questionContent;
+                                    html+='</p>';
+                                    html+='<textarea disabled="disabled" id="programQuestion'+(index+1)+'" style="resize: none;width: 100%;height: 200px" ></textarea>';
+
+
+                                    html+='<p>得分：'+testPaper.programQuestionAnswerScore[(index+1)]+'</p>';
+
+
+                                    html+='<button class="btn btn-primary center-block" type="button" id="btn_programQuestion'+(index+1)+'" value="'+question.id+'" onclick="openUpdateQuestionScore(this)">修改分数</button>';
+                                    html+='</div></div>';
+                                });
+                                html+="</div></div></div></div></div></div></div></div></form></div>";
 
                                 $("#content_questions").append(html);
                             }
@@ -692,6 +731,12 @@
                                         $("#fillInBlankQuestion"+index+"-"+(i+1)).val(q[i]);
                                     }
 
+                                });
+                            }
+
+                            if(testPaper.programQuestionAnswer!=null){
+                                $.each(testPaper.programQuestionAnswer,function (index,answer) {
+                                    $("#programQuestion"+index).text(answer);
                                 });
                             }
 
