@@ -30,6 +30,7 @@
 	<mvc:resources location="/fonts/" mapping="/fonts/**"/>
 	<mvc:resources location="/img/" mapping="/img/**"/>
 	<mvc:resources location="/plugins/" mapping="/plugins/**"/>
+	<mvc:resources location="/template/" mapping="/template/**"/>
 	<bean
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="prefix" value="/WEB-INF/jsp/" />
