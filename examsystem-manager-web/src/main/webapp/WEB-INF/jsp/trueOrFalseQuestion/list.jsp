@@ -310,6 +310,7 @@
                 </div>
                 <div class="modal-body">
                     <div id="uploader" class="wu-example">
+                        <a href="/template/examsystem_trueOrFalse.xls" target="_self">模板下载</a>
                         <!--用来存放文件信息-->
                         <div id="thelist" class="uploader-list"></div>
                         <div id="picker">选择文件</div>
