@@ -484,7 +484,7 @@
                         if(data.status == 200){
                             var testPaper=data.data;
 
-                            if(testPaper.singleChoiceQuestions!=null){
+                            if(testPaper.singleChoiceQuestions!=null&&testPaper.singleChoiceQuestions.length!=0){
 
                                 $("#nav_tabs_questions").append('<li class=""><a data-toggle="tab" href="list.jsp#tab-0">单选题</a> </li>');
 
@@ -548,7 +548,7 @@
                                 html+='</div></div></div></div></div></div></div></div></form></div>';
                                 $("#content_questions").append(html);
                             }
-                            if(testPaper.trueOrFalseQuestions!=null){
+                            if(testPaper.trueOrFalseQuestions!=null&&testPaper.trueOrFalseQuestions.length!=0){
                                 $("#nav_tabs_questions").append('<li class=""><a data-toggle="tab" href="list.jsp#tab-1">判断题</a> </li>');
 
                                 var html='';
@@ -599,7 +599,7 @@
 
                                 $("#content_questions").append(html);
                             }
-                            if(testPaper.fillInBlankQuestions!=null){
+                            if(testPaper.fillInBlankQuestions!=null&&testPaper.fillInBlankQuestions.length!=0){
                                 $("#nav_tabs_questions").append('<li class=""><a data-toggle="tab" href="list.jsp#tab-2">填空题</a> </li>');
 
                                 var html="";
@@ -646,7 +646,7 @@
 
                                 $("#content_questions").append(html);
                             }
-                            if(testPaper.programQuestions!=null){
+                            if(testPaper.programQuestions!=null&&testPaper.programQuestions.length!=0){
                                 $("#nav_tabs_questions").append('<li class=""><a data-toggle="tab" href="list.jsp#tab-3">程序题</a> </li>');
 
                                 var html='';

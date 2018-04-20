@@ -314,7 +314,7 @@
                         <!--用来存放文件信息-->
                         <div id="thelist" class="uploader-list"></div>
                         <div id="picker">选择文件</div>
-                        <span class="help-block m-b-none"><i class="fa fa-info-circle"></i>默认导进来的题目为审核通过,题目所属课程在操作教师任课范围之内,支持.xlsx和.xls后缀文件</span>
+                        <span class="help-block m-b-none"><i class="fa fa-info-circle"></i>默认导进来的题目为审核通过,题目所属课程在操作教师任课范围之内,支持.xlsx和.xls后缀文件，如果添加的题目内容存在像&lt;&gt;等html转义字符或存在代码，则请不要通过excel导入，否则题目内容在页面显示可能会不完整</span>
                     </div>
                 </div>
                 <div class="modal-footer">
