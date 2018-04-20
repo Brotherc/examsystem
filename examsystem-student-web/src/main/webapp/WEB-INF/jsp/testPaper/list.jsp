@@ -94,12 +94,12 @@
                                                             <div class="row animated fadeInRight">
                                                                 <div class="col-sm-12">
                                                                     <div class="ibox float-e-margins">
-                                                                        <div class="text-center float-e-margins p-md">
+<%--                                                                        <div class="text-center float-e-margins p-md">
                                                                             <span>预览：</span>
                                                                             <a href="#" class="btn btn-xs btn-primary" id="lightVersion">浅色</a>
                                                                             <a href="#" class="btn btn-xs btn-primary" id="darkVersion">深色</a>
                                                                             <a href="#" class="btn btn-xs btn-primary" id="leftVersion">布局切换</a>
-                                                                        </div>
+                                                                        </div>--%>
                                                                         <div class="" id="ibox-content">
 
                                                                             <div id="vertical-timeline" class="vertical-container light-timeline">
@@ -170,12 +170,6 @@
                                                             <div class="row animated fadeInRight">
                                                                 <div class="col-sm-12">
                                                                     <div class="ibox float-e-margins">
-                                                                        <div class="text-center float-e-margins p-md">
-                                                                            <span>预览：</span>
-                                                                            <a href="#" class="btn btn-xs btn-primary" id="l">浅色</a>
-                                                                            <a href="#" class="btn btn-xs btn-primary" id="k">深色</a>
-                                                                            <a href="#" class="btn btn-xs btn-primary" id="i">布局切换</a>
-                                                                        </div>
                                                                         <div class="" >
 
                                                                             <div  class="vertical-container light-timeline">
@@ -234,12 +228,6 @@
                                                             <div class="row animated fadeInRight">
                                                                 <div class="col-sm-12">
                                                                     <div class="ibox float-e-margins">
-                                                                        <div class="text-center float-e-margins p-md">
-                                                                            <span>预览：</span>
-                                                                            <a href="#" class="btn btn-xs btn-primary" id="al">浅色</a>
-                                                                            <a href="#" class="btn btn-xs btn-primary" id="kx">深色</a>
-                                                                            <a href="#" class="btn btn-xs btn-primary" id="ib">布局切换</a>
-                                                                        </div>
                                                                         <div class="" >
 
                                                                             <div  class="vertical-container light-timeline">
