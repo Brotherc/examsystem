@@ -42,6 +42,11 @@
         <!--认证通过的用户访问没权限时显示的页面-->
         <security:access-denied-handler error-page="/403.html"/>
 
+        <!--保证登录用户只能一个-->
+        <security:session-management >
+            <security:concurrency-control max-sessions="1" expired-url="/login.html" error-if-maximum-exceeded="true"></security:concurrency-control>
+        </security:session-management>
+
         <!--自定义过滤器-->
         <security:custom-filter ref="validateCodeFilter" before="FORM_LOGIN_FILTER"/>
         <security:custom-filter ref="securityInterceptor" before="FILTER_SECURITY_INTERCEPTOR"/>
