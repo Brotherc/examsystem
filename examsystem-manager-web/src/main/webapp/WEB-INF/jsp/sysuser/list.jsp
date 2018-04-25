@@ -217,7 +217,7 @@
                                 <label class="col-sm-3 control-label">密码：</label>
                                 <div class="col-sm-6">
                                     <input type="password" class="form-control" name="password" maxlength="8"  placeholder="密码" >
-                                    <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 如需修改密码，请填写该项</span>
+                                    <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 如需修改密码，请填写该项,为空则密码不进行修改，与原密码一样</span>
                                 </div>
                             </div>
                             <div class="form-group " >

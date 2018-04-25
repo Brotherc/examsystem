@@ -1409,6 +1409,12 @@
                     },{
                         field: 'statusName',
                         title: '状态'
+                    },{
+                        field: 'examPwd',
+                        title: '考试密码'
+                    },{
+                        field: 'invigilatePwd',
+                        title: '监考密码'
                     }, {
                         field: 'startTime',
                         title: '开考时间',

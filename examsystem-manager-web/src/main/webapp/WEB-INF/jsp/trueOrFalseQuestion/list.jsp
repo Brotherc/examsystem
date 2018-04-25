@@ -766,24 +766,14 @@
         function checkQuestion(){
             var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
             if(sels.length == 0){
-                layer.msg("必须选择一个题目才能审核!");
-                return ;
-            }else if(sels.length >1){
-                layer.msg("只能选择一个题目!");
+                layer.msg("必须至少选择一个题目才能审核!");
                 return ;
             }
 
-            var isChecked=sels[0].isChecked;
-            var id=sels[0].id;
+            var ids = getSelectionsIds(sels);
 
-            var title="";
-            if(isChecked){
-                title="确定不让该题目通过审核吗"
-            }else{
-                title="确定让该题目通过审核吗"
-            }
             swal({
-                        title: title,
+                        title: "确定审核通过所选题目吗",
                         text: "请谨慎操作！",
                         type: "warning",
                         showCancelButton: true,
@@ -795,18 +785,18 @@
                     },
                     function (isConfirm) {
                         if (isConfirm) {
-                            var params = {_method:'put',questionType:'1'};
+                            var params = {_method:'put',questionIds:ids};
                             $.ajax({
                                 type: "POST",
-                                url: "/v1/checker/question/"+id,
+                                url: "/v1/checker/question/1",
                                 data: params,
                                 success: function(data){
                                     if(data.status == 201){
-                                        swal(data.message, "您已经审核了该题目。", "success");
+                                        swal(data.message, "您已经审核通过了所选题目。", "success");
                                         $("#exampleTableEvents").bootstrapTable('refresh');
                                     }
                                     else{
-                                        swal(data.message, "无法审核该题目。", "error");
+                                        swal(data.message, "无法审核通过所选题目。", "error");
                                     }
                                 },
                                 error:function(XMLHttpRequest, textStatus, errorThrown){
