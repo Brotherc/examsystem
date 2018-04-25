@@ -18,9 +18,9 @@ public class CheckerController {
     @Autowired
     private CheckerService checkerService;
 
-    @PutMapping("/v1/checker/question/{id}")
-    public ResultInfo checkQuestion(@PathVariable String id,@RequestBody String questionType) throws Exception{
+    @PutMapping("/v1/checker/question/{questionType}")
+    public ResultInfo checkQuestion(@PathVariable String questionType,@RequestBody String[] questionIds) throws Exception{
         System.out.println(questionType);
-        return checkerService.checkQuestion(id,questionType);
+        return checkerService.checkQuestion(questionIds,questionType);
     }
 }
