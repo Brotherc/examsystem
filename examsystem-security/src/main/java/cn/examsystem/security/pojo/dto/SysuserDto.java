@@ -77,4 +77,8 @@ public class SysuserDto extends Sysuser implements UserDetails{
     public void setEnabled(boolean enabled) {
         isEnabled = enabled;
     }
+
+    public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
+        this.authorities = authorities;
+    }
 }
