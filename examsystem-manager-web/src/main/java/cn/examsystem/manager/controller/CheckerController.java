@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -25,14 +26,14 @@ public class CheckerController {
     @Value("${MESSAGE_UPDATE_FAIL}")
     private String MESSAGE_UPDATE_FAIL;
 
-    @PutMapping("/v1/checker/question/{id}")
-    public ResultInfo checkQuestion(@PathVariable String id, String questionType) throws Exception{
+    @PutMapping("/v1/checker/question/{questionType}")
+    public ResultInfo checkQuestion(@PathVariable String questionType,@RequestParam(value = "questionIds[]") String[] questionIds) throws Exception{
 
         ResultInfo resultInfo;
         System.out.println(questionType);
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+CHECKER_URL+CHECKER_QUESTION_URL+"/{id}",HttpMethod.PUT,questionType,ResultInfo.class,new Object[]{id});
+            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+CHECKER_URL+CHECKER_QUESTION_URL+"/{questionType}",HttpMethod.PUT,questionIds,ResultInfo.class,new Object[]{questionType});
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
