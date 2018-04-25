@@ -8,5 +8,5 @@ import cn.examsystem.common.pojo.ResultInfo;
  */
 public interface CheckerService {
     //审核题目
-    public ResultInfo checkQuestion(String id,String questionType) throws Exception;
+    public ResultInfo checkQuestion(String[] questionIds,String questionType) throws Exception;
 }
