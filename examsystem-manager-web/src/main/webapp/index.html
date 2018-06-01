@@ -262,15 +262,23 @@
 
     <script src="/js/plugins/labjs-7.x-1.8/labjs.min.js"></script>
 
+    <script src="/js/plugins/layer/layer.min.js"></script>
+    <script src="/js/examsystem/common.js"></script>
+    <script src="/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+    <script src="/js/plugins/pace/pace.min.js"></script>
+    <script src="/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+
+
     <script type="text/javascript">
             $.get("/v1/user/details", function (data) {
                 var menus=data.data.menus;
 
                 var menulist ='';
-                menulist+='<li>';
+
 
                 $.each(menus, function(i, n) {//外层循环处理一级菜单
-
+                    menulist+='<li>';
                     var two_menus=n.menus;
 
                     menulist+='<a href="#"><i class="fa '+n.icon+'"></i><span class="nav-label">'+n.name+'</span><span class="fa arrow"></span></a>';
@@ -282,9 +290,10 @@
                     });
 
                     menulist += '</ul>';
+                    menulist += '</li>';
                 });
 
-                menulist += '</li>';
+
                 //id为side-menu后面追加
                 $("#side-menu").append(menulist);
 
@@ -312,16 +321,10 @@
                 roles=roles.replace("ROLE_ADMIN","管理员");
 
                 $("#role_details").html(roles);
-
                 $LAB
-                        .script("js/plugins/pace/pace.min.js")
-                        .script("js/plugins/metisMenu/jquery.metisMenu.js")
-                        .script("js/plugins/layer/layer.min.js")
-                        .script("js/examsystem/common.js")
-                        .script("js/bootstrap.min.js?v=3.3.6")
-                        .script("js/plugins/slimscroll/jquery.slimscroll.min.js")
                         .script("js/hplus.js?v=4.1.0")
                         .script("js/contabs.js");
+
             });
 
             function openUpdateSysuser() {
