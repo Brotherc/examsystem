@@ -4,12 +4,16 @@ import cn.examsystem.common.jedis.JedisClient;
 import cn.examsystem.common.pojo.ResultInfo;
 import cn.examsystem.common.utils.*;
 import cn.examsystem.rest.mapper.*;
-import cn.examsystem.rest.pojo.dto.*;
+import cn.examsystem.rest.pojo.dto.ClassDto;
+import cn.examsystem.rest.pojo.dto.ExamDto;
+import cn.examsystem.rest.pojo.dto.ExamStudentRelationDto;
+import cn.examsystem.rest.pojo.dto.StudentDto;
 import cn.examsystem.rest.pojo.po.Class;
 import cn.examsystem.rest.pojo.po.*;
 import cn.examsystem.rest.pojo.vo.ClassVo;
 import cn.examsystem.rest.pojo.vo.ExamStudentRelationVo;
 import cn.examsystem.rest.pojo.vo.StudentVo;
+import cn.examsystem.rest.quartz.ExamQuartz;
 import cn.examsystem.rest.service.ExamService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +21,8 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +31,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
+
+import static org.quartz.JobBuilder.newJob;
 
 /**
  * Created by Administrator on 2018/1/30.
@@ -1143,8 +1151,8 @@ public class ExamImpl implements ExamService {
         examMapper.updateByPrimaryKey(examDb);
 
         //启动一个定时器，在最后一个场次结束时，修改考试状态
-        //定时器延长启动时间：考试时长+（场次-1）*间隔时间
-        Timer timer=new Timer();
+        //定时器启动时间：考试结束时间+（场次-1）*间隔时间
+  /*      Timer timer=new Timer();
         final Exam examTimer=examDb;
         System.out.println(examDb.getTime()+(examDb.getPartNum()-1)*examDb.getIntervalTime());
         timer.schedule(new TimerTask() {
@@ -1154,8 +1162,37 @@ public class ExamImpl implements ExamService {
                 examTimer.setStatus(new Integer(DICTINFO_EXAM_IS_END_CODE));
                 examTimer.setUpdatedTime(new Date());
                 examMapper.updateByPrimaryKey(examTimer);
+
             }
-        },(examDb.getTime()+(examDb.getPartNum()-1)*examDb.getIntervalTime())*1000);
+        },(examDb.getTime()+(examDb.getPartNum()-1)*examDb.getIntervalTime())*1000);*/
+
+        Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
+        String triggerName="trigger"+UUIDBuild.getUUID();
+        String groupName="group"+UUIDBuild.getUUID();
+        //定义一个Trigger
+        Trigger trigger = TriggerBuilder.newTrigger()
+                .withIdentity(triggerName, groupName) //定义name/group
+                .startAt(DateUtil.getDateAfterSeconds(examDb.getEndTime(),Long.valueOf((examDb.getPartNum()-1)*examDb.getIntervalTime())))//设置定时器起始时间
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule() //使用SimpleTrigger
+                )
+                .build();
+
+        JobDataMap map=new JobDataMap();
+        map.put("exam",examDb);
+        map.put("examMapper",examMapper);
+        map.put("code",DICTINFO_EXAM_IS_END_CODE);
+
+        //定义一个JobDetail
+        JobDetail job = newJob(ExamQuartz.class) //定义Job类为HelloQuartz类，这是真正的执行逻辑所在
+                .withIdentity(triggerName, groupName) //定义name/group
+                .setJobData(map)
+                .build();
+
+        scheduler.scheduleJob(job, trigger);
+
+        if (!scheduler.isShutdown()) {
+            scheduler.start();
+        }
 
         return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_PUT_SUCCESS,null);
 
