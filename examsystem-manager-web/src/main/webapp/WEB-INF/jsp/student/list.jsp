@@ -108,9 +108,9 @@
                                         <button type="button" class="btn btn-outline btn-default" onclick="openUpdateStudentModal()">
                                             <i class="glyphicon glyphicon-pencil" aria-hidden="true"></i>
                                         </button>
-                                        <button type="button" class="btn btn-outline btn-default" onclick="btchDeleteMajor()">
+<%--                                        <button type="button" class="btn btn-outline btn-default" onclick="btchDeleteStudent()">
                                             <i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
-                                        </button>
+                                        </button>--%>
                                     </div>
                                     <table id="exampleTableEvents" data-height="400" data-mobile-responsive="true">
                                     </table>
@@ -287,16 +287,16 @@
             $("#exampleTableEvents").bootstrapTable('refresh');
         }
 
-        function btchDeleteMajor(){
+        function btchDeleteStudent(){
             var sels = $('#exampleTableEvents').bootstrapTable('getSelections');
             if(sels.length == 0){
-                layer.msg("未选中专业!");
+                layer.msg("未选中学生!");
                 return ;
             }
 
             var ids = getSelectionsIds(sels);
             swal({
-                        title: "确定删除所选专业吗",
+                        title: "确定删除所选学生吗",
                         text: "删除后将无法恢复，请谨慎操作！",
                         type: "warning",
                         showCancelButton: true,
@@ -311,15 +311,15 @@
                             var params = {"ids":ids,_method:'delete'};
                             $.ajax({
                                 type: "POST",
-                                url: "/v1/major",
+                                url: "/v1/student",
                                 data: params,
                                 success: function(data){
                                     if(data.status == 201){
-                                        swal(data.message, "您已经永久删除了这些专业。", "success");
+                                        swal(data.message, "您已经永久删除了这些学生。", "success");
                                         $("#exampleTableEvents").bootstrapTable('refresh');
                                     }
                                     else{
-                                        swal(data.message, "无法删除这些专业。", "error");
+                                        swal(data.message, "无法删除这些学生。", "error");
                                     }
                                 },
                                 error:function(XMLHttpRequest, textStatus, errorThrown){
