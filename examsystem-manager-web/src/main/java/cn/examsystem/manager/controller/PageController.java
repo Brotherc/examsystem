@@ -10,6 +10,7 @@ import cn.examsystem.rest.pojo.vo.SchoolYearVo;
 import cn.examsystem.rest.pojo.vo.SysuserVo;
 import cn.examsystem.rest.pojo.vo.TestPaperVo;
 import cn.examsystem.security.pojo.dto.SysuserDto;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,10 +22,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpSession;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static cn.examsystem.common.utils.UrlUtils.expandURL;
 
@@ -260,7 +258,11 @@ public class PageController {
 
         //保存到前台
         model.addAttribute(MODEL_KEY_COURSES,courseList);
-        model.addAttribute(MODEL_KEY_COURSE,courseList.get(0));
+
+        if(!CollectionUtils.isEmpty(courseList))
+            model.addAttribute(MODEL_KEY_COURSE,courseList.get(0));
+        else
+            model.addAttribute(MODEL_KEY_COURSE,null);
 
         return "knowledgePonit/list";
     }
@@ -309,7 +311,10 @@ public class PageController {
 
         //保存到前台
         model.addAttribute(MODEL_KEY_COURSES,courseList);
-        model.addAttribute(MODEL_KEY_COURSE,courseList.get(0));
+        if(!CollectionUtils.isEmpty(courseList))
+            model.addAttribute(MODEL_KEY_COURSE,courseList.get(0));
+        else
+            model.addAttribute(MODEL_KEY_COURSE,null);
         model.addAttribute(MODEL_KEY_DIFFICULTYS,difficultyList);
 
         return "singleChoiceQuestion/list";
@@ -359,7 +364,10 @@ public class PageController {
 
         //保存到前台
         model.addAttribute(MODEL_KEY_COURSES,courseList);
-        model.addAttribute(MODEL_KEY_COURSE,courseList.get(0));
+        if(!CollectionUtils.isEmpty(courseList))
+            model.addAttribute(MODEL_KEY_COURSE,courseList.get(0));
+        else
+            model.addAttribute(MODEL_KEY_COURSE,null);
         model.addAttribute(MODEL_KEY_DIFFICULTYS,difficultyList);
 
         return "trueOrFalseQuestion/list";
@@ -426,7 +434,11 @@ public class PageController {
 
         //保存到前台
         model.addAttribute(MODEL_KEY_COURSES,courseList);
-        model.addAttribute(MODEL_KEY_COURSE,courseList.get(0));
+        if(!CollectionUtils.isEmpty(courseList))
+            model.addAttribute(MODEL_KEY_COURSE,courseList.get(0));
+        else
+            model.addAttribute(MODEL_KEY_COURSE,null);
+
         model.addAttribute(MODEL_KEY_DIFFICULTYS,difficultyList);
         model.addAttribute(MODEL_KEY_MATCHERS,matcherList);
 
@@ -506,7 +518,11 @@ public class PageController {
 
         //保存到前台
         model.addAttribute(MODEL_KEY_COURSES,courseList);
-        model.addAttribute(MODEL_KEY_COURSE,courseList.get(0));
+        if(!CollectionUtils.isEmpty(courseList))
+            model.addAttribute(MODEL_KEY_COURSE,courseList.get(0));
+        else
+            model.addAttribute(MODEL_KEY_COURSE,null);
+
         model.addAttribute(MODEL_KEY_DIFFICULTYS,difficultyList);
         model.addAttribute(MODEL_KEY_QUESTIONTYPES,questionTypeList);
         model.addAttribute(MODEL_KEY_SCHOOLYEARS,schoolYearList);
@@ -551,7 +567,11 @@ public class PageController {
 
         //保存到前台
         model.addAttribute(MODEL_KEY_COURSES,courseList);
-        model.addAttribute(MODEL_KEY_COURSE,courseList.get(0));
+        if(!CollectionUtils.isEmpty(courseList))
+            model.addAttribute(MODEL_KEY_COURSE,courseList.get(0));
+        else
+            model.addAttribute(MODEL_KEY_COURSE,null);
+
         model.addAttribute(MODEL_KEY_SCHOOLYEARS,schoolYearList);
 
         return "testPaper/list";
@@ -612,8 +632,11 @@ public class PageController {
         //构造查询条件
         TestPaperVo testPaperVo=new TestPaperVo();
         System.out.println(courseList);
-        String courseId=((Map<String,String>)courseList.get(0)).get("id");
-        testPaperVo.setCourseId(courseId);
+        if(!CollectionUtils.isEmpty(courseList)){
+            String courseId=((Map<String,String>)courseList.get(0)).get("id");
+            testPaperVo.setCourseId(courseId);
+        }
+
         //将查询参数构建在url后面
         JSONObject testPaperObj=new JSONObject(testPaperVo);
         String testPaperUrl = expandURL(REST_BASE_URL + TESTPAPER_URL+"?", testPaperObj);
@@ -641,7 +664,11 @@ public class PageController {
 
         //保存到前台
         model.addAttribute(MODEL_KEY_COURSES,courseList);
-        model.addAttribute(MODEL_KEY_COURSE,courseList.get(0));
+        if(!CollectionUtils.isEmpty(courseList))
+            model.addAttribute(MODEL_KEY_COURSE,courseList.get(0));
+        else
+            model.addAttribute(MODEL_KEY_COURSE,null);
+
         model.addAttribute(MODEL_KEY_SCHOOLYEARS,schoolYearList);
         model.addAttribute(MODEL_KEY_STATUSES,statusList);
         model.addAttribute(MODEL_KEY_TESTPAPERS,testPaperList);
@@ -697,7 +724,11 @@ public class PageController {
 
         //保存到前台
         model.addAttribute(MODEL_KEY_COURSES,courseList);
-        model.addAttribute(MODEL_KEY_COURSE,courseList.get(0));
+        if(!CollectionUtils.isEmpty(courseList))
+            model.addAttribute(MODEL_KEY_COURSE,courseList.get(0));
+        else
+            model.addAttribute(MODEL_KEY_COURSE,null);
+
         model.addAttribute(MODEL_KEY_SCHOOLYEARS,schoolYearList);
         model.addAttribute(MODEL_KEY_CLASSES,classList);
 
