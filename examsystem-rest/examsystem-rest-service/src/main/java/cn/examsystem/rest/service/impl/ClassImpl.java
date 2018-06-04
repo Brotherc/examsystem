@@ -114,6 +114,8 @@ public class ClassImpl implements ClassService {
             //名字不能重复
             ClassExample classExample=new ClassExample();
             ClassExample.Criteria classCriteria = classExample.createCriteria();
+            classCriteria.andMajorIdEqualTo(majorId);
+            classCriteria.andGradeIdEqualTo(gradeId);
             classCriteria.andNameEqualTo(i);
             List<Class> classList = classMapper.selectByExample(classExample);
 
