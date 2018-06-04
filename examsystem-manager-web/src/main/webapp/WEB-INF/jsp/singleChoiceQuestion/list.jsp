@@ -537,6 +537,11 @@
                                     delete items.录入题目;
                                     delete items.移除题目;
                                 }
+                                if(this.get_type(node)=="#"){
+                                    delete items.录入题目;
+                                    delete items.移除题目;
+                                }
+
                                 return items;
                             }
                         },
@@ -736,6 +741,10 @@
                                         }
                                     };
                                     if(!this.is_leaf(node)){
+                                        delete items.录入题目;
+                                        delete items.移除题目;
+                                    }
+                                    if(this.get_type(node)=="#"){
                                         delete items.录入题目;
                                         delete items.移除题目;
                                     }
@@ -1317,6 +1326,10 @@
                                         }
                                     };
                                     if(!this.is_leaf(node)){
+                                        delete items.录入题目;
+                                        delete items.移除题目;
+                                    }
+                                    if(this.get_type(node)=="#"){
                                         delete items.录入题目;
                                         delete items.移除题目;
                                     }
