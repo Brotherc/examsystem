@@ -829,8 +829,8 @@ public class ExamImpl implements ExamService {
                         errorMessage+=studentStudentId+":不存在该班级";
                     else
                         errorMessage+=",不存在该班级";
-                }
-                aClass = classList.get(0);
+                }else
+                    aClass = classList.get(0);
             }
 
             //学生所属专业必须存在该门考试的考试科目
