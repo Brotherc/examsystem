@@ -150,7 +150,9 @@ System.out.println(studentAnswer);
                         //查询判断题信息
                         TrueOrFalseQuestion trueOrFalseQuestion = trueOrFalseQuestionMapper.selectByPrimaryKey(testPaperQuestion.getQuestionId());
                         //判断题答案
-                        if(StringUtils.isBlank(studentAnswer)||!studentAnswer.trim().equals(trueOrFalseQuestion.getAnswer())){//答错
+                        String trueOrFalseuestionAnswer=trueOrFalseQuestion.getAnswer()?"1":"0";
+
+                        if(StringUtils.isBlank(studentAnswer)||!studentAnswer.trim().equals(trueOrFalseuestionAnswer)){//答错
                             examstudentAnswer.setIsGraded(true);
                             examstudentAnswer.setUpdatedTime(new Date());
                             examstudentAnswerMapper.updateByPrimaryKey(examstudentAnswer);
