@@ -1510,6 +1510,36 @@
 
         })();
 
+        $("#course").on('change',function () {
+            $.ajax({
+                type: "GET",
+                url: "/v1/testPaper",
+                data: {courseId:$(this).val()},
+                success: function(data){
+                    if(data.status == 200){
+                        $("#testPaper_update").children().remove();
+
+                        //构造
+                        var testPapers=data.data;
+                        var html="";
+                        $.each(testPapers,function(index,testPaper){
+                            html+='<option value="'+testPaper.id+'" hassubinfo="true">'+testPaper.name+'</option>';
+                        });
+                        $("#testPaper_update").append(html);
+                        $("#testPaper_update").trigger("chosen:updated");
+                    }
+                },
+                error:function(XMLHttpRequest, textStatus, errorThrown){
+                    var status=XMLHttpRequest.status;
+                    if(status==403){
+                        to403();
+                    }else if(status==500){
+                        to500();
+                    }
+                }
+            });
+        });
+
         $("#course_add").on('change',function () {
             $.ajax({
                 type: "GET",
@@ -1665,8 +1695,6 @@
             $(selector).chosen(config[selector]);
         }
     </script>
-    <script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
-    <!--统计代码，可删除-->
 
 </body>
 

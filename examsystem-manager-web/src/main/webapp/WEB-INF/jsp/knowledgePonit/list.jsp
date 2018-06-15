@@ -598,8 +598,6 @@
         $("#course").val("${course.id}").trigger("chosen:updated");
     </script>
 
-    <script type="text/javascript" src="http://tajs.qq.com/stats?sId=9051096" charset="UTF-8"></script>
-    <!--统计代码，可删除-->
 
 </body>
 
