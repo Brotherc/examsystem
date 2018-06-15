@@ -638,9 +638,11 @@ public class ExamImpl implements ExamService {
             ExamStudentRelationExample examStudentRelationExample=new ExamStudentRelationExample();
             ExamStudentRelationExample.Criteria examStudentRelationCriteria = examStudentRelationExample.createCriteria();
             examStudentRelationCriteria.andPartOrderEqualTo(i);
+            examStudentRelationCriteria.andExamIdEqualTo(id);
             List<ExamStudentRelation> examStudentRelationList = examStudentRelationMapper.selectByExample(examStudentRelationExample);
             partOrders.put(i,examStudentRelationList.size());
         }
+        System.out.println(partOrders);
 
         //如果该考试中不存在该学生，则将学生分配至考试中
         for(String studentId:studentIds){
@@ -662,8 +664,10 @@ public class ExamImpl implements ExamService {
                 //获得最小人数的场次
                 Map.Entry<Integer, Integer> mapMinEntry = MathUtils.getMapMinEntry(partOrders);
                 Integer key=mapMinEntry.getKey();
+                System.out.println(key);
                 examStudentRelation.setPartOrder(key);
                 partOrders.put(key,partOrders.get(key)+1);
+                System.out.println(partOrders);
 
                 examStudentRelation.setCreatedTime(new Date());
                 examStudentRelation.setUpdatedTime(new Date());
