@@ -1,16 +1,14 @@
 package cn.examsystem.student.controller;
 
 import cn.examsystem.common.pojo.ResultInfo;
-import cn.examsystem.common.utils.JsonUtils;
 import cn.examsystem.rest.pojo.dto.ExamStudentRelationDto;
 import cn.examsystem.rest.pojo.dto.TestPaperDto;
+import cn.examsystem.rest.service.ExamService;
+import cn.examsystem.rest.service.TestService;
 import cn.examsystem.security.pojo.dto.StudentDto;
-import cn.examsystem.student.service.TestService;
 import cn.examsystem.student.utils.CookieUtils;
-import cn.examsystem.student.utils.RestTemplateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,7 +19,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -62,6 +59,9 @@ public class ExamController {
     @Autowired
     private TestService testService;
 
+    @Autowired
+    private ExamService examService;
+
     @GetMapping("/v1/test/loginStudent")
     public ResultInfo getExam(HttpSession session, HttpServletRequest request) throws Exception{
 
@@ -73,30 +73,28 @@ public class ExamController {
         try{
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(REST_BASE_URL + EXAM_URL+EXAM_LOGIN_STUDENT_URL+"/{studentId}", HttpMethod.GET, ResultInfo.class,new Object[]{studentDto.getId()});
+            resultInfo = examService.getProceedExamByLoginStudentId(studentDto.getId());
 
             if(resultInfo.getStatus()==ResultInfo.STATUS_RESULT_OK){
-                LinkedHashMap examStudentMap=(LinkedHashMap)resultInfo.getData();
-                String examStudentJson = JsonUtils.objectToJson(examStudentMap);
-                ExamStudentRelationDto examStudentRelationDto = JsonUtils.jsonToPojo(examStudentJson, ExamStudentRelationDto.class);
+                ExamStudentRelationDto examStudentRelationDto=(ExamStudentRelationDto)resultInfo.getData();
 
-                System.out.println(examStudentRelationDto.getIsProceeded());
+                //System.out.println(examStudentRelationDto.getIsProceeded());
                 if(examStudentRelationDto.getIsProceeded()){
-                    System.out.println("考过试");
+                    //System.out.println("考过试");
                     if(CookieUtils.getCookValue(request,examStudentRelationDto.getId())!=null){
                         examStudentRelationDto.setIsLocal(true);
-System.out.println("本地");
+//System.out.println("本地");
                     }
                     else{
-                        System.out.println("不是本地");
+                        //System.out.println("不是本地");
                         examStudentRelationDto.setIsLocal(false);
                     }
                 }
                 else{
-                    System.out.println("没考过试");
+                    //System.out.println("没考过试");
                     examStudentRelationDto.setIsLocal(false);
                 }
-System.out.println(examStudentRelationDto.getIsLocal());
+//System.out.println(examStudentRelationDto.getIsLocal());
                 session.setAttribute(SESSION_KEY_EXAM_STUDENT,examStudentRelationDto);
 
                 resultInfo.setData(examStudentRelationDto);
@@ -116,7 +114,7 @@ System.out.println(examStudentRelationDto.getIsLocal());
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+TEST_URL,HttpMethod.POST,studentRelationDto,ResultInfo.class,new Object[]{});
+            resultInfo=examService.test(studentRelationDto);
 
             if(resultInfo.getStatus()==ResultInfo.STATUS_RESULT_CREATED){
                 //添加学生考试信息进入考试cookie，并保存本地
@@ -183,7 +181,7 @@ System.out.println(examStudentRelationDto.getIsLocal());
     }
 
     @PostMapping("/v1/test/testPaper/{testPaperId}")
-    public ResultInfo submitTestPape(HttpSession session, @PathVariable String testPaperId,HttpServletRequest request,HttpServletResponse response) throws Exception{
+    public ResultInfo submitTestPaper(HttpSession session, @PathVariable String testPaperId,HttpServletRequest request,HttpServletResponse response) throws Exception{
 
         ExamStudentRelationDto examStudentRelationDto = (ExamStudentRelationDto)session.getAttribute(SESSION_KEY_EXAM_STUDENT);
 
@@ -191,7 +189,7 @@ System.out.println(examStudentRelationDto.getIsLocal());
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+TEST_URL+TEST_TESTPAPER_URL+"/{testPaperId}",HttpMethod.POST,examStudentRelationDto,ResultInfo.class,new Object[]{testPaperId});
+            resultInfo=examService.submitTestPaper(examStudentRelationDto,testPaperId);
 
             if(resultInfo.getStatus()==ResultInfo.STATUS_RESULT_CREATED){
                 //将学生考试cookie删除

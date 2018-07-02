@@ -583,7 +583,7 @@ public class SingleChoiceQuestionImpl implements SingleChoiceQuestionService {
             singleChoiceQuestion.setOptionB(optionB);
             singleChoiceQuestion.setOptionC(optionC);
             singleChoiceQuestion.setOptionD(optionD);
-            System.out.println(answer);
+            //System.out.println(answer);
             singleChoiceQuestion.setAnswer(answer);
             singleChoiceQuestion.setType(new Integer(DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE));
             singleChoiceQuestion.setDifficulty(difficulty);
@@ -600,7 +600,7 @@ public class SingleChoiceQuestionImpl implements SingleChoiceQuestionService {
     }
 
     private List getSingleChoiceQuestionListFromExcel(Workbook book,Sheet sheet) throws Exception{
-        System.out.println("sheet名称是："+sheet.getSheetName());
+        //System.out.println("sheet名称是："+sheet.getSheetName());
 
         int lastRowNum = sheet.getLastRowNum();
 

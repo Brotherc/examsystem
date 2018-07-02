@@ -1,10 +1,10 @@
-package cn.examsystem.student.service.impl;
+package cn.examsystem.rest.service.impl;
 
 import cn.examsystem.common.jedis.JedisClient;
 import cn.examsystem.common.pojo.ResultInfo;
 import cn.examsystem.common.utils.JsonUtils;
 import cn.examsystem.rest.pojo.dto.TestPaperDto;
-import cn.examsystem.student.service.TestService;
+import cn.examsystem.rest.service.TestService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

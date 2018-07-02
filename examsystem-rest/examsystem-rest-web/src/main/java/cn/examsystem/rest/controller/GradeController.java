@@ -26,7 +26,7 @@ public class GradeController {
 
     @GetMapping("/v1/grade")
     public ResultInfo listGrade(GradeVo gradeVo) throws Exception{
-        System.out.print(gradeVo.getLessName());
+        //System.out.print(gradeVo.getLessName());
 
         List<Grade> gradeList = gradeService.listGrade(gradeVo);
         ResultInfo resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,gradeList);

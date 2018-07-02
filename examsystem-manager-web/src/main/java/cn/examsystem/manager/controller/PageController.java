@@ -1,20 +1,17 @@
 package cn.examsystem.manager.controller;
 
-import cn.examsystem.common.pojo.ResultInfo;
 import cn.examsystem.common.utils.DateUtil;
-import cn.examsystem.manager.utils.RestTemplateUtils;
 import cn.examsystem.rest.pojo.dto.ClassDto;
+import cn.examsystem.rest.pojo.dto.CourseDto;
+import cn.examsystem.rest.pojo.dto.MajorDto;
 import cn.examsystem.rest.pojo.po.*;
-import cn.examsystem.rest.pojo.vo.GradeVo;
-import cn.examsystem.rest.pojo.vo.SchoolYearVo;
-import cn.examsystem.rest.pojo.vo.SysuserVo;
-import cn.examsystem.rest.pojo.vo.TestPaperVo;
+import cn.examsystem.rest.pojo.vo.*;
+import cn.examsystem.rest.service.*;
 import cn.examsystem.security.pojo.dto.SysuserDto;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Controller;
@@ -22,9 +19,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpSession;
-import java.util.*;
-
-import static cn.examsystem.common.utils.UrlUtils.expandURL;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Administrator on 2018/1/25.
@@ -103,6 +100,27 @@ public class PageController {
     @Value("${MODEL_KEY_CLASSES}")
     private String MODEL_KEY_CLASSES;
 
+    @Autowired
+    private DepartmentService departmentService;
+    @Autowired
+    private MajorService majorService;
+    @Autowired
+    private SysuserService sysuserService;
+    @Autowired
+    private ClassService classService;
+    @Autowired
+    private GradeService gradeService;
+    @Autowired
+    private RoleService roleService;
+    @Autowired
+    private CourseService courseService;
+    @Autowired
+    private DictInfoService dictInfoService;
+    @Autowired
+    private SchoolYearService schoolYearService;
+    @Autowired
+    private TestPaperService testPaperService;
+
 
     @RequestMapping("/v1/department/list")
     public String toDepartmentPage() throws Exception{
@@ -115,8 +133,7 @@ public class PageController {
         List<Department> departmentList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+DEPARTMENT_URL, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            departmentList=(List<Department>) resultInfo.getData();
+            departmentList =departmentService.listDepartment(new DepartmentVo());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -127,28 +144,23 @@ public class PageController {
     @RequestMapping("/v1/course/list")
     public String toCoursePage(Model model) throws Exception{
         //前台搜索用到的条件（专业）
-        List<Major> majorList=null;
+        List<MajorDto> majorList=null;
         try {
-            //调用rest服务(查询可用的教师用户)
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+MAJOR_URL, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            majorList=(List<Major>) resultInfo.getData();
+            //调用rest服务
+            majorList=majorService.listMajor(new MajorVo());
         }catch (Exception e){
             e.printStackTrace();
         }
 
         //前台搜索用到的条件（教师）
-        List<Sysuser> teacherList=null;
+        List<cn.examsystem.rest.pojo.dto.SysuserDto> teacherList=null;
         //构造查询条件
         SysuserVo sysuserVo=new SysuserVo();;
         sysuserVo.setRoleId(ROLE_TEACHER_ID);
         sysuserVo.setStatus(1);
-        //将查询参数构建在url后面
-        JSONObject obj=new JSONObject(sysuserVo);
-        String url = expandURL(REST_BASE_URL + SYSUSER_URL+"?", obj);
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            teacherList=(List<Sysuser>) resultInfo.getData();
+            teacherList = sysuserService.listSysuser(sysuserVo);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -166,18 +178,16 @@ public class PageController {
         List<Department> departmentList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+DEPARTMENT_URL, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            departmentList=(List<Department>) resultInfo.getData();
+            departmentList = departmentService.listDepartment(new DepartmentVo());
         }catch (Exception e){
             e.printStackTrace();
         }
 
         //前台搜索用到的条件（专业）
-        List<Major> majorList=null;
+        List<MajorDto> majorList=null;
         try {
             //调用rest服务(查询可用的教师用户)
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+MAJOR_URL, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            majorList=(List<Major>) resultInfo.getData();
+            majorList = majorService.listMajor(new MajorVo());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -189,14 +199,10 @@ public class PageController {
         GradeVo gradeVo=new GradeVo();
         gradeVo.setLessName(String.valueOf(DateUtil.getYear(new Date())));
         System.out.println(String.valueOf(DateUtil.getYear(new Date())));
-        //将查询参数构建在url后面
-        JSONObject obj=new JSONObject(gradeVo);
-        String url = expandURL(REST_BASE_URL + GRADE_URL+"?", obj);
 
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            gradeList=(List<Grade>) resultInfo.getData();
+            gradeList = gradeService.listGrade(gradeVo);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -216,8 +222,7 @@ public class PageController {
         List<Department> departmentList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+DEPARTMENT_URL, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            departmentList=(List<Department>) resultInfo.getData();
+            departmentList=departmentService.listDepartment(new DepartmentVo());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -226,8 +231,7 @@ public class PageController {
         List<Role> roleList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+ROLE_URL, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            roleList=(List<Role>) resultInfo.getData();
+            roleList=roleService.listRole();
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -247,11 +251,10 @@ public class PageController {
         SysuserDto sysuserDto= (SysuserDto) securityContext.getAuthentication().getPrincipal();
 
         //前台搜索用到的条件（课程）
-        List<Course> courseList=null;
+        List<CourseDto> courseList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+COURSE_URL+"/teacher/{teacherId}", HttpMethod.GET, ResultInfo.class,new Object[]{sysuserDto.getId()});
-            courseList=(List<Course>) resultInfo.getData();
+            courseList = courseService.listCourse(new CourseVo());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -283,28 +286,19 @@ public class PageController {
         }
 
         //前台搜索用到的条件（课程）
-        List<Course> courseList=null;
+        List<CourseDto> courseList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+COURSE_URL+"/teacher/{teacherId}", HttpMethod.GET, ResultInfo.class,new Object[]{sysuserDto.getId()});
-            courseList=(List<Course>) resultInfo.getData();
+            courseList=courseService.listCourse(new CourseVo());
         }catch (Exception e){
             e.printStackTrace();
         }
-
-        //构造查询条件
-        DictInfo dictInfo=new DictInfo();
-        dictInfo.setDictTypeId(DICT_TYPE_DIFFICULTY_ID);
-        //将查询参数构建在url后面
-        JSONObject obj=new JSONObject(dictInfo);
-        String url = expandURL(REST_BASE_URL + DICTINFO_URL+"?", obj);
 
         //前台搜索用到的条件（难度）
         List<DictInfo> difficultyList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            difficultyList=(List<DictInfo>) resultInfo.getData();
+            difficultyList=dictInfoService.getDictInfoByDictTypeId(DICT_TYPE_DIFFICULTY_ID);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -336,28 +330,20 @@ public class PageController {
         }
 
         //前台搜索用到的条件（课程）
-        List<Course> courseList=null;
+        List<CourseDto> courseList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+COURSE_URL+"/teacher/{teacherId}", HttpMethod.GET, ResultInfo.class,new Object[]{sysuserDto.getId()});
-            courseList=(List<Course>) resultInfo.getData();
+            courseList = courseService.listCourse(new CourseVo());
         }catch (Exception e){
             e.printStackTrace();
         }
 
-        //构造查询条件
-        DictInfo dictInfo=new DictInfo();
-        dictInfo.setDictTypeId(DICT_TYPE_DIFFICULTY_ID);
-        //将查询参数构建在url后面
-        JSONObject obj=new JSONObject(dictInfo);
-        String url = expandURL(REST_BASE_URL + DICTINFO_URL+"?", obj);
 
         //前台搜索用到的条件（难度）
         List<DictInfo> difficultyList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            difficultyList=(List<DictInfo>) resultInfo.getData();
+            difficultyList=dictInfoService.getDictInfoByDictTypeId(DICT_TYPE_DIFFICULTY_ID);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -389,45 +375,29 @@ public class PageController {
         }
 
         //前台搜索用到的条件（课程）
-        List<Course> courseList=null;
+        List<CourseDto> courseList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+COURSE_URL+"/teacher/{teacherId}", HttpMethod.GET, ResultInfo.class,new Object[]{sysuserDto.getId()});
-            courseList=(List<Course>) resultInfo.getData();
+            courseList=courseService.listCourse(new CourseVo());
         }catch (Exception e){
             e.printStackTrace();
         }
 
-        //构造查询条件
-        DictInfo difficultyDictInfo=new DictInfo();
-        difficultyDictInfo.setDictTypeId(DICT_TYPE_DIFFICULTY_ID);
-        //将查询参数构建在url后面
-        JSONObject difficultyObj=new JSONObject(difficultyDictInfo);
-        String difficultyUrl = expandURL(REST_BASE_URL + DICTINFO_URL+"?", difficultyObj);
 
         //前台搜索用到的条件（难度）
         List<DictInfo> difficultyList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(difficultyUrl, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            difficultyList=(List<DictInfo>) resultInfo.getData();
+            difficultyList=dictInfoService.getDictInfoByDictTypeId(DICT_TYPE_DIFFICULTY_ID);
         }catch (Exception e){
             e.printStackTrace();
         }
-
-        //构造查询条件
-        DictInfo matcherDictInfo=new DictInfo();
-        matcherDictInfo.setDictTypeId(DICT_TYPE_MATCHER_ID);
-        //将查询参数构建在url后面
-        JSONObject matcherObj=new JSONObject(matcherDictInfo);
-        String matcherUrl = expandURL(REST_BASE_URL + DICTINFO_URL+"?", matcherObj);
 
         //前台搜索用到的条件（填空题答案匹配模式）
         List<DictInfo> matcherList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(matcherUrl, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            matcherList=(List<DictInfo>) resultInfo.getData();
+            matcherList=dictInfoService.getDictInfoByDictTypeId(DICT_TYPE_MATCHER_ID);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -453,46 +423,28 @@ public class PageController {
         SysuserDto sysuserDto= (SysuserDto) securityContext.getAuthentication().getPrincipal();
 
         //前台搜索用到的条件（课程）
-        List<Course> courseList=null;
+        List<CourseDto> courseList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+COURSE_URL+"/teacher/{teacherId}", HttpMethod.GET, ResultInfo.class,new Object[]{sysuserDto.getId()});
-            courseList=(List<Course>) resultInfo.getData();
+            courseList=courseService.listCourse(new CourseVo());
         }catch (Exception e){
             e.printStackTrace();
         }
-
-        //构造查询条件
-        DictInfo difficultyDictInfo=new DictInfo();
-        difficultyDictInfo.setDictTypeId(DICT_TYPE_DIFFICULTY_ID);
-        //将查询参数构建在url后面
-        JSONObject difficultyObj=new JSONObject(difficultyDictInfo);
-        String difficultyUrl = expandURL(REST_BASE_URL + DICTINFO_URL+"?", difficultyObj);
 
         //前台搜索用到的条件（难度）
         List<DictInfo> difficultyList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(difficultyUrl, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            difficultyList=(List<DictInfo>) resultInfo.getData();
+            difficultyList=dictInfoService.getDictInfoByDictTypeId(DICT_TYPE_DIFFICULTY_ID);
         }catch (Exception e){
             e.printStackTrace();
         }
-
-
-        //构造查询条件
-        DictInfo questionTypeDictInfo=new DictInfo();
-        questionTypeDictInfo.setDictTypeId(DICT_TYPE_QUESTIONTYPE_ID);
-        //将查询参数构建在url后面
-        JSONObject questionTypeObj=new JSONObject(questionTypeDictInfo);
-        String questionTypeUrl = expandURL(REST_BASE_URL + DICTINFO_URL+"?", questionTypeObj);
 
         //前台数据展示
         List<DictInfo> questionTypeList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(questionTypeUrl, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            questionTypeList=(List<DictInfo>) resultInfo.getData();
+            questionTypeList=dictInfoService.getDictInfoByDictTypeId(DICT_TYPE_QUESTIONTYPE_ID);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -501,16 +453,12 @@ public class PageController {
         SchoolYearVo schoolYearVo=new SchoolYearVo();
         int year=DateUtil.getYear(new Date());
         schoolYearVo.setLessName(year+"-"+(year+1));
-        //将查询参数构建在url后面
-        JSONObject obj=new JSONObject(schoolYearVo);
-        String url = expandURL(REST_BASE_URL + SCHOOL_YEAR_URL+"?", obj);
 
         //前台组卷用到的数据（学年）
         List<SchoolYear> schoolYearList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            schoolYearList=(List<SchoolYear>) resultInfo.getData();
+            schoolYearList=schoolYearService.listSchoolYear(schoolYearVo);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -538,11 +486,10 @@ public class PageController {
         SysuserDto sysuserDto= (SysuserDto) securityContext.getAuthentication().getPrincipal();
 
         //前台搜索用到的条件（课程）
-        List<Course> courseList=null;
+        List<CourseDto> courseList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+COURSE_URL+"/teacher/{teacherId}", HttpMethod.GET, ResultInfo.class,new Object[]{sysuserDto.getId()});
-            courseList=(List<Course>) resultInfo.getData();
+            courseList=courseService.listCourse(new CourseVo());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -551,16 +498,12 @@ public class PageController {
         SchoolYearVo schoolYearVo=new SchoolYearVo();
         int year=DateUtil.getYear(new Date());
         schoolYearVo.setLessName(year+"-"+(year+1));
-        //将查询参数构建在url后面
-        JSONObject obj=new JSONObject(schoolYearVo);
-        String url = expandURL(REST_BASE_URL + SCHOOL_YEAR_URL+"?", obj);
 
         //前台组卷用到的数据（学年）
         List<SchoolYear> schoolYearList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            schoolYearList=(List<SchoolYear>) resultInfo.getData();
+            schoolYearList=schoolYearService.listSchoolYear(schoolYearVo);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -585,11 +528,10 @@ public class PageController {
         SysuserDto sysuserDto= (SysuserDto) securityContext.getAuthentication().getPrincipal();
 
         //前台搜索用到的条件（课程）
-        List<Course> courseList=null;
+        List<CourseDto> courseList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+COURSE_URL+"/teacher/{teacherId}", HttpMethod.GET, ResultInfo.class,new Object[]{sysuserDto.getId()});
-            courseList=(List<Course>) resultInfo.getData();
+            courseList=courseService.listCourse(new CourseVo());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -598,33 +540,21 @@ public class PageController {
         SchoolYearVo schoolYearVo=new SchoolYearVo();
         int year=DateUtil.getYear(new Date());
         schoolYearVo.setLessName(year+"-"+(year+1));
-        //将查询参数构建在url后面
-        JSONObject obj=new JSONObject(schoolYearVo);
-        String url = expandURL(REST_BASE_URL + SCHOOL_YEAR_URL+"?", obj);
 
         //前台组卷用到的数据（学年）
         List<SchoolYear> schoolYearList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            schoolYearList=(List<SchoolYear>) resultInfo.getData();
+            schoolYearList=schoolYearService.listSchoolYear(schoolYearVo);
         }catch (Exception e){
             e.printStackTrace();
         }
-
-        //构造查询条件
-        DictInfo statusDictInfo=new DictInfo();
-        statusDictInfo.setDictTypeId(DICT_TYPE_STATUS_ID);
-        //将查询参数构建在url后面
-        JSONObject statusObj=new JSONObject(statusDictInfo);
-        String statusUrl = expandURL(REST_BASE_URL + DICTINFO_URL+"?", statusObj);
 
         //前台搜索用到的条件（考试状态）
         List<DictInfo> statusList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(statusUrl, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            statusList=(List<DictInfo>) resultInfo.getData();
+            statusList=dictInfoService.getDictInfoByDictTypeId(DICT_TYPE_STATUS_ID);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -633,20 +563,15 @@ public class PageController {
         TestPaperVo testPaperVo=new TestPaperVo();
         System.out.println(courseList);
         if(!CollectionUtils.isEmpty(courseList)){
-            String courseId=((Map<String,String>)courseList.get(0)).get("id");
+            String courseId=courseList.get(0).getId();
             testPaperVo.setCourseId(courseId);
         }
-
-        //将查询参数构建在url后面
-        JSONObject testPaperObj=new JSONObject(testPaperVo);
-        String testPaperUrl = expandURL(REST_BASE_URL + TESTPAPER_URL+"?", testPaperObj);
 
         //前台添加考试用到的数据（试卷）
         List<TestPaper> testPaperList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(testPaperUrl, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            testPaperList=(List<TestPaper>) resultInfo.getData();
+            testPaperList=testPaperService.listTestPaper(testPaperVo);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -655,8 +580,7 @@ public class PageController {
         List<ClassDto> classList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+CLASS_URL, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            classList=(List<ClassDto>) resultInfo.getData();
+            classList=classService.listClass(new ClassVo());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -685,11 +609,10 @@ public class PageController {
         SysuserDto sysuserDto= (SysuserDto) securityContext.getAuthentication().getPrincipal();
 
         //前台搜索用到的条件（课程）
-        List<Course> courseList=null;
+        List<CourseDto> courseList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+COURSE_URL+"/teacher/{teacherId}", HttpMethod.GET, ResultInfo.class,new Object[]{sysuserDto.getId()});
-            courseList=(List<Course>) resultInfo.getData();
+            courseList=courseService.listCourse(new CourseVo());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -698,16 +621,12 @@ public class PageController {
         SchoolYearVo schoolYearVo=new SchoolYearVo();
         int year=DateUtil.getYear(new Date());
         schoolYearVo.setLessName(year+"-"+(year+1));
-        //将查询参数构建在url后面
-        JSONObject obj=new JSONObject(schoolYearVo);
-        String url = expandURL(REST_BASE_URL + SCHOOL_YEAR_URL+"?", obj);
 
         //前台搜索用到的条件（学年）
         List<SchoolYear> schoolYearList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            schoolYearList=(List<SchoolYear>) resultInfo.getData();
+            schoolYearList=schoolYearService.listSchoolYear(schoolYearVo);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -716,8 +635,7 @@ public class PageController {
         List<ClassDto> classList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+CLASS_URL, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            classList=(List<ClassDto>) resultInfo.getData();
+            classList=classService.listClass(new ClassVo());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -742,8 +660,7 @@ public class PageController {
         List<ClassDto> classList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+CLASS_URL, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            classList=(List<ClassDto>) resultInfo.getData();
+            classList=classService.listClass(new ClassVo());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -761,11 +678,10 @@ public class PageController {
         SysuserDto sysuserDto= (SysuserDto) securityContext.getAuthentication().getPrincipal();
 
         //前台搜索用到的条件（课程）
-        List<Course> courseList=null;
+        List<CourseDto> courseList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+COURSE_URL+"/teacher/{teacherId}", HttpMethod.GET, ResultInfo.class,new Object[]{sysuserDto.getId()});
-            courseList=(List<Course>) resultInfo.getData();
+            courseList=courseService.listCourse(new CourseVo());
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -774,16 +690,12 @@ public class PageController {
         SchoolYearVo schoolYearVo=new SchoolYearVo();
         int year=DateUtil.getYear(new Date());
         schoolYearVo.setLessName(year+"-"+(year+1));
-        //将查询参数构建在url后面
-        JSONObject obj=new JSONObject(schoolYearVo);
-        String url = expandURL(REST_BASE_URL + SCHOOL_YEAR_URL+"?", obj);
 
         //前台搜索用到的条件（学年）
         List<SchoolYear> schoolYearList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            schoolYearList=(List<SchoolYear>) resultInfo.getData();
+            schoolYearList=schoolYearService.listSchoolYear(schoolYearVo);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -792,25 +704,16 @@ public class PageController {
         List<ClassDto> classList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+CLASS_URL, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            classList=(List<ClassDto>) resultInfo.getData();
+            classList=classService.listClass(new ClassVo());
         }catch (Exception e){
             e.printStackTrace();
         }
-
-        //构造查询条件
-        DictInfo statusDictInfo=new DictInfo();
-        statusDictInfo.setDictTypeId(DICT_TYPE_EXAMSTUDENT_STATUS_ID);
-        //将查询参数构建在url后面
-        JSONObject statusObj=new JSONObject(statusDictInfo);
-        String statusUrl = expandURL(REST_BASE_URL + DICTINFO_URL+"?", statusObj);
 
         //前台搜索用到的条件（学生考试状态）
         List<DictInfo> statusList=null;
         try {
             //调用rest服务
-            ResultInfo resultInfo = RestTemplateUtils.exchange(statusUrl, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            statusList=(List<DictInfo>) resultInfo.getData();
+            statusList=dictInfoService.getDictInfoByDictTypeId(DICT_TYPE_EXAMSTUDENT_STATUS_ID);
         }catch (Exception e){
             e.printStackTrace();
         }

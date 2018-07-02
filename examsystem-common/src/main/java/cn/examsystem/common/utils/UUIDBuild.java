@@ -84,12 +84,12 @@ public class UUIDBuild {
 	public static void main(String[] str) {
 
 		// 得到一个序号
-		System.out.println(getUUID());
+		//System.out.println(getUUID());
 
 		// 一次得到多个序号
 		String[] UUID_s = getUUID(10);
 		for (int i = 0; i < UUID_s.length; i++) {
-			System.out.println(UUID_s[i]);
+			//System.out.println(UUID_s[i]);
 		}
 	}
 

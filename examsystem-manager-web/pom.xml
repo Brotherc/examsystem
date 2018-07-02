@@ -18,6 +18,12 @@
 
         <dependency>
             <groupId>cn.examsystem</groupId>
+            <artifactId>examsystem-rest-service</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.examsystem</groupId>
             <artifactId>examsystem-security</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
@@ -91,7 +97,7 @@
                     <url>http://172.16.16.221:8087/manager/text</url>
                     <username>tomcat</username>
                     <password>tomcat</password>
-<!--                    <update>true</update>-->
+                    <!--                    <update>true</update>-->
                 </configuration>
             </plugin>
         </plugins>

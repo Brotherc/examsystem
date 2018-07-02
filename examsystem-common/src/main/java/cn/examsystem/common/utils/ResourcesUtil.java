@@ -108,7 +108,7 @@ public class ResourcesUtil implements Serializable {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(getValue("resources.messages", "101",new Object[]{100,200}));
+		//System.out.println(getValue("resources.messages", "101",new Object[]{100,200}));
 		
 		
 		//根据操作系统环境获取语言环境

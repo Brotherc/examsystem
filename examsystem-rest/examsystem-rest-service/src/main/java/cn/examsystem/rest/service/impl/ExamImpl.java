@@ -136,6 +136,9 @@ public class ExamImpl implements ExamService {
     private String MESSAGE_STUDENT_EXAM_STATUS_ILLEGAL;
     @Value("${MESSAGE_STUDENT_EXAM_IS_MAKE_UP}")
     private String MESSAGE_STUDENT_EXAM_IS_MAKE_UP;
+    @Value("${MESSAGE_STUDENT_EXAM_PARTORDER_IS_END}")
+    private String MESSAGE_STUDENT_EXAM_PARTORDER_IS_END;
+
 
 
     @Value("${DICTINFO_EXAM_NOT_START_CODE}")
@@ -254,7 +257,7 @@ public class ExamImpl implements ExamService {
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_START_TIME_NOT_NULL,null);
         }
 
-        System.out.println(startTime);
+        //System.out.println(startTime);
         Date endTime = exam.getEndTime();
         if(endTime==null){
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_END_TIME_NOT_NULL,null);
@@ -356,7 +359,7 @@ public class ExamImpl implements ExamService {
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_START_TIME_NOT_NULL,null);
         }
 
-        System.out.println(startTime);
+        //System.out.println(startTime);
         Date endTime = exam.getEndTime();
         if(endTime==null){
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_END_TIME_NOT_NULL,null);
@@ -642,7 +645,7 @@ public class ExamImpl implements ExamService {
             List<ExamStudentRelation> examStudentRelationList = examStudentRelationMapper.selectByExample(examStudentRelationExample);
             partOrders.put(i,examStudentRelationList.size());
         }
-        System.out.println(partOrders);
+        //System.out.println(partOrders);
 
         //如果该考试中不存在该学生，则将学生分配至考试中
         for(String studentId:studentIds){
@@ -664,10 +667,10 @@ public class ExamImpl implements ExamService {
                 //获得最小人数的场次
                 Map.Entry<Integer, Integer> mapMinEntry = MathUtils.getMapMinEntry(partOrders);
                 Integer key=mapMinEntry.getKey();
-                System.out.println(key);
+                //System.out.println(key);
                 examStudentRelation.setPartOrder(key);
                 partOrders.put(key,partOrders.get(key)+1);
-                System.out.println(partOrders);
+                //System.out.println(partOrders);
 
                 examStudentRelation.setCreatedTime(new Date());
                 examStudentRelation.setUpdatedTime(new Date());
@@ -938,7 +941,7 @@ public class ExamImpl implements ExamService {
     }
 
     private List getStudentListFromExcel(Workbook book,Sheet sheet) throws Exception{
-        System.out.println("sheet名称是："+sheet.getSheetName());
+        //System.out.println("sheet名称是："+sheet.getSheetName());
 
         int lastRowNum = sheet.getLastRowNum();
 
@@ -1000,7 +1003,7 @@ public class ExamImpl implements ExamService {
 
     @Override
     public List<ExamStudentRelationDto> listExamStudent(ExamStudentRelationVo examStudentRelationVo) throws Exception {
-        System.out.print("考试id"+examStudentRelationVo.getExamId());
+        //System.out.print("考试id"+examStudentRelationVo.getExamId());
         return examMapperCustom.listExamStudent(examStudentRelationVo);
     }
 
@@ -1141,7 +1144,7 @@ public class ExamImpl implements ExamService {
 
         //如果考试的状态不是未开启，则不允许启动
         Integer status = examDb.getStatus();
-        System.out.println(status+"------------"+examDb.getStatus());
+        //System.out.println(status+"------------"+examDb.getStatus());
         if(!status.equals(new Integer(DICTINFO_EXAM_NOT_START_CODE)))
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_IS_STARTED,null);
 
@@ -1217,7 +1220,7 @@ public class ExamImpl implements ExamService {
         //查询该学生所有考试中正在进行的考试
         for(ExamStudentRelation relation:examStudentRelationList){
             Exam examDb = examMapper.selectByPrimaryKey(relation.getExamId());
-            System.out.println(examDb.getStatus());
+            //System.out.println(examDb.getStatus());
             if(examDb.getStatus().equals(new Integer(DICTINFO_EXAM_IS_PROCEED_CODE))){
                 exam=examDb;
                 examStudentRelation=new ExamStudentRelationDto();
@@ -1229,6 +1232,13 @@ public class ExamImpl implements ExamService {
         //如果没有该学生任何正在进行的考试信息，说明考试未启动
         if(exam==null||examStudentRelation==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_NOT_FOUND,MESSAGE_EXAM_IS_NOT_STARTED,null);
+
+        //当前时间>学生考试场次结束时间，说明学生该场次考试已结束
+
+        Date endTime = DateUtil.getDateAfterSeconds(exam.getEndTime(), (long) (examStudentRelation.getPartOrder() - 1) * exam.getIntervalTime());
+        //System.out.println("学生考试结束时间"+endTime);
+        if(new Date().compareTo(endTime)==1)
+            return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_STUDENT_EXAM_PARTORDER_IS_END,null);
 
         //如果存在正在进行的考试，但学生已考完
         if(examStudentRelation!=null&&examStudentRelation.getStatus().equals(new Integer(DICTINFO_STUDENT_EXAM_IS_END_CODE)))
@@ -1288,7 +1298,7 @@ public class ExamImpl implements ExamService {
             //查询该学生是否进行过考试
             Boolean exists = jedisClient.exists(examStudentRelation.getId());
             examStudentRelation.setIsProceeded(exists);
-            System.out.println(examStudentRelation.getIsProceeded());
+            //System.out.println(examStudentRelation.getIsProceeded());
         }
 
         return new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,examStudentRelation);
@@ -1314,7 +1324,7 @@ public class ExamImpl implements ExamService {
         Boolean proceeded = examStudentRelationDto.getIsProceeded();
         Boolean local = examStudentRelationDto.getIsLocal();
 
-        System.out.println(local);
+        //System.out.println(local);
         if(proceeded==null&&local==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_STUDENT_PROCEED_AND_LOCAL_NOT_NULL,null);
 
@@ -1356,7 +1366,7 @@ public class ExamImpl implements ExamService {
         //当前时间<学生考试场次开始时间，则不允许开始考试
 
         Date startTime = DateUtil.getDateAfterSeconds(exam.getStartTime(), (long) (examStudentRelation.getPartOrder() - 1) * exam.getIntervalTime());
-        System.out.println("学生考试开始时间"+startTime);
+        //System.out.println("学生考试开始时间"+startTime);
         if(new Date().compareTo(startTime)==-1)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_NOT_STARTTIME,null);
 
@@ -1390,7 +1400,7 @@ public class ExamImpl implements ExamService {
     }
 
     @Override
-    public ResultInfo submitTestPape(ExamStudentRelationDto examStudentRelationDto, String testPaperId) throws Exception {
+    public ResultInfo submitTestPaper(ExamStudentRelationDto examStudentRelationDto, String testPaperId) throws Exception {
 
         if(examStudentRelationDto==null)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_EXAM_STUDENT_NOT_EXIST,null);
@@ -1576,14 +1586,14 @@ public class ExamImpl implements ExamService {
                     //去除所有空格
                     String s=questionAnswerList.get(j).replaceAll(" ", "");
                     questionAnswerList.set(j, s);
-                    System.out.println(s);
+                    //System.out.println(s);
                 }
 
                 //设置答案
                 String json = JsonUtils.objectToJson(questionAnswerList);
                 examstudentAnswer.setStudentAnswer(json);
 
-                System.out.println(examstudentAnswer.getTestpaperQuestionId());
+                //System.out.println(examstudentAnswer.getTestpaperQuestionId());
 
                 examstudentAnswerMapper.insert(examstudentAnswer);
                 index++;
@@ -1602,7 +1612,7 @@ public class ExamImpl implements ExamService {
                 //设置考试学生id
                 examstudentAnswer.setExamStudentId(examStudentRelationId);
                 //设置答案
-                System.out.println("程序题答案"+programQuestionAnswer.get(index));
+                //System.out.println("程序题答案"+programQuestionAnswer.get(index));
                 if(programQuestionAnswer==null||StringUtils.isBlank(programQuestionAnswer.get(index)))
                     examstudentAnswer.setStudentAnswer("");
                 else

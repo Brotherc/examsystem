@@ -20,7 +20,7 @@ public class CheckerController {
 
     @PutMapping("/v1/checker/question/{questionType}")
     public ResultInfo checkQuestion(@PathVariable String questionType,@RequestBody String[] questionIds) throws Exception{
-        System.out.println(questionType);
+        //System.out.println(questionType);
         return checkerService.checkQuestion(questionIds,questionType);
     }
 }

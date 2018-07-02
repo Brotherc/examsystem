@@ -64,7 +64,7 @@ public class SysuserImpl implements SysuserService {
 
     @Override
     public List<SysuserDto> listSysuser(SysuserVo sysuserVo) throws Exception {
-        System.out.println(sysuserVo.getStatus());
+        //System.out.println(sysuserVo.getStatus());
         return sysuserMapperCustom.listSysuser(sysuserVo);
     }
 

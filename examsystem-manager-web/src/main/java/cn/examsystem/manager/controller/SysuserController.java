@@ -1,15 +1,14 @@
 package cn.examsystem.manager.controller;
 
 import cn.examsystem.common.pojo.ResultInfo;
-import cn.examsystem.manager.utils.RestTemplateUtils;
 import cn.examsystem.rest.pojo.dto.SysuserDto;
 import cn.examsystem.rest.pojo.vo.SysuserVo;
-import org.json.JSONObject;
+import cn.examsystem.rest.service.SysuserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.*;
 
-import static cn.examsystem.common.utils.UrlUtils.expandURL;
+import java.util.List;
 
 /**
  * Created by Administrator on 2018/1/28.
@@ -31,21 +30,23 @@ public class SysuserController {
     private String MESSAGE_SAVE_FAIL;
     @Value("${MESSAGE_UPDATE_FAIL}")
     private String MESSAGE_UPDATE_FAIL;
+    @Value("${MESSAGE_GET_SUCCESS}")
+    private String MESSAGE_GET_SUCCESS;
+    @Value("${MESSAGE_DELETE_SUCCESS}")
+    private String MESSAGE_DELETE_SUCCESS;
+
+    @Autowired
+    private SysuserService sysuserService;
 
     @GetMapping("/v1/sysuser")
     public ResultInfo listSysuser(SysuserVo sysuserVo) throws Exception{
 
         ResultInfo resultInfo;
         try{
-            //将查询参数构建在url后面
-            JSONObject obj=new JSONObject(sysuserVo);
-            String url = expandURL(REST_BASE_URL + SYSUSER_URL+"?", obj);
-
-            System.out.print(url);
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            System.out.println("---------"+resultInfo);
+            List<SysuserDto> sysuserList = sysuserService.listSysuser(sysuserVo);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,sysuserList);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
@@ -60,7 +61,7 @@ public class SysuserController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+SYSUSER_URL,HttpMethod.DELETE,ids,ResultInfo.class,new Object[]{});
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_DELETE_SUCCESS,null);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_DELETE_FAIL,null);
@@ -75,7 +76,7 @@ public class SysuserController {
         System.out.println(sysuserDto);
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+SYSUSER_URL,HttpMethod.POST,sysuserDto,ResultInfo.class,new Object[]{});
+            resultInfo=sysuserService.saveSysuser(sysuserDto);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_SAVE_FAIL,null);
@@ -89,7 +90,7 @@ public class SysuserController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+SYSUSER_URL+"/{id}",HttpMethod.PUT,sysuserDto,ResultInfo.class,new Object[]{id});
+            resultInfo=sysuserService.updateSysuser(id,sysuserDto);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);

@@ -1,19 +1,17 @@
 package cn.examsystem.manager.controller;
 
 import cn.examsystem.common.pojo.ResultInfo;
-import cn.examsystem.manager.utils.RestTemplateUtils;
 import cn.examsystem.rest.pojo.dto.FillInBlankQuestionDto;
 import cn.examsystem.rest.pojo.vo.FillInBlankQuestionVo;
+import cn.examsystem.rest.service.FillInBlankQuestionService;
 import cn.examsystem.security.pojo.dto.SysuserDto;
-import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-
-import static cn.examsystem.common.utils.UrlUtils.expandURL;
+import java.util.List;
 
 /**
  * Created by Administrator on 2018/1/28.
@@ -35,6 +33,13 @@ public class FillInBlankQuestionController {
     private String MESSAGE_SAVE_FAIL;
     @Value("${MESSAGE_UPDATE_FAIL}")
     private String MESSAGE_UPDATE_FAIL;
+    @Value("${MESSAGE_GET_SUCCESS}")
+    private String MESSAGE_GET_SUCCESS;
+    @Value("${MESSAGE_DELETE_SUCCESS}")
+    private String MESSAGE_DELETE_SUCCESS;
+
+    @Autowired
+    private FillInBlankQuestionService fillInBlankQuestionService;
 
     @GetMapping("/v1/fillInBlankQuestion/{id}")
     public ResultInfo getFillInBlankQuestion(@PathVariable String id) throws Exception{
@@ -43,8 +48,8 @@ public class FillInBlankQuestionController {
         try{
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+FILLINBLANKQUESTION_URL+"/{id}", HttpMethod.GET, ResultInfo.class,new Object[]{id});
-            System.out.println("---------"+resultInfo);
+            FillInBlankQuestionDto fillInBlankQuestionDto = fillInBlankQuestionService.getFillInBlankQuestion(id);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,fillInBlankQuestionDto);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
@@ -58,15 +63,10 @@ public class FillInBlankQuestionController {
 
         ResultInfo resultInfo;
         try{
-            //将查询参数构建在url后面
-            JSONObject obj=new JSONObject(fillInBlankQuestionVo);
-            String url = expandURL(REST_BASE_URL + FILLINBLANKQUESTION_URL+"?", obj);
-
-            System.out.print(url);
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            System.out.println("---------"+resultInfo);
+            List<FillInBlankQuestionDto> fillInBlankQuestionDtoList = fillInBlankQuestionService.listFillInBlankQuestion(fillInBlankQuestionVo);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,fillInBlankQuestionDtoList);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
@@ -76,12 +76,12 @@ public class FillInBlankQuestionController {
     }
 
     @DeleteMapping("/v1/fillInBlankQuestion")
-    public ResultInfo btchFillInBlankQuestion(@RequestParam(value = "ids[]") String[] ids) throws Exception{
+    public ResultInfo btchDeleteFillInBlankQuestion(@RequestParam(value = "ids[]") String[] ids) throws Exception{
 
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+FILLINBLANKQUESTION_URL,HttpMethod.DELETE,ids,ResultInfo.class,new Object[]{});
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_DELETE_SUCCESS,null);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_DELETE_FAIL,null);
@@ -102,7 +102,7 @@ public class FillInBlankQuestionController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+FILLINBLANKQUESTION_URL,HttpMethod.POST,fillInBlankQuestionDto,ResultInfo.class,new Object[]{});
+            resultInfo=fillInBlankQuestionService.saveFillInBlankQuestion(fillInBlankQuestionDto);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_SAVE_FAIL,null);
@@ -122,7 +122,7 @@ public class FillInBlankQuestionController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+FILLINBLANKQUESTION_URL+"/{id}",HttpMethod.PUT,fillInBlankQuestionDto,ResultInfo.class,new Object[]{id});
+            resultInfo=fillInBlankQuestionService.updateFillInBlankQuestion(id,fillInBlankQuestionDto);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);

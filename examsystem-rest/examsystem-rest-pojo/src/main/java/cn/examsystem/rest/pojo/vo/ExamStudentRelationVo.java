@@ -10,7 +10,7 @@ public class ExamStudentRelationVo extends ExamStudentRelationDto{
     @Override
     public void setStudentName(String studentName) {
         try {
-            System.out.println("初始------"+studentName);
+            //System.out.println("初始------"+studentName);
             super.setStudentName(new String(studentName.getBytes("iso8859-1"), "utf-8"));
         }catch (Exception e){
         }

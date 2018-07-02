@@ -42,10 +42,10 @@ public class TestPaperController {
 
     @PostMapping("/v1/testPaper")
     public ResultInfo saveTestPaper(@RequestBody TestPaperDto testPaperDto) throws Exception{
-        System.out.println(testPaperDto.getSingleChoiceQuestionIds());
-        System.out.println(testPaperDto.getFillInBlankQuestionIds());
-        System.out.println(testPaperDto.getSingleChoiceQuestionScore());
-        System.out.println(testPaperDto.getFillInBlankQuestionScore());
+        //System.out.println(testPaperDto.getSingleChoiceQuestionIds());
+        //System.out.println(testPaperDto.getFillInBlankQuestionIds());
+        //System.out.println(testPaperDto.getSingleChoiceQuestionScore());
+        //System.out.println(testPaperDto.getFillInBlankQuestionScore());
         return testPaperService.saveTestPaper(testPaperDto);
     }
     @PutMapping("/v1/testPaper/{id}")
@@ -55,7 +55,7 @@ public class TestPaperController {
 
     @GetMapping("/v1/test/testPaper/{testPaperId}")
     public ResultInfo getTestPaperAndQuestionsByIdForLoginStudent(@PathVariable String testPaperId,String examStudentId) throws Exception{
-        System.out.println("------------------------------------------");
+        //System.out.println("------------------------------------------");
         TestPaperDto testPaperDto = testPaperService.getTestPaperAndQuestionsByIdForLoginStudent(testPaperId,examStudentId);
         ResultInfo resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,testPaperDto);
         return resultInfo;

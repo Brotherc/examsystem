@@ -124,7 +124,7 @@ public class RandomUtils {
 	            System.out.println(i);  
 	        }*/
 	        //System.out.println(JsonUtils.objectToJson(list));
-	    	System.out.println(FourPwd());
+	    	//System.out.println(FourPwd());
 	    }
 	    
 	    /**

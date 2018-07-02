@@ -97,7 +97,7 @@ public class DepartmentImpl implements DepartmentService{
     }
 
     @Override
-    public ResultInfo updateDapartment(String id, Department department) throws Exception {
+    public ResultInfo updateDepartment(String id, Department department) throws Exception {
 
         //id不允许为空
         if(StringUtils.isBlank(id))

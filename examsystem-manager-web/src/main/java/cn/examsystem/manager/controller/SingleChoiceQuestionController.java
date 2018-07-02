@@ -1,20 +1,18 @@
 package cn.examsystem.manager.controller;
 
 import cn.examsystem.common.pojo.ResultInfo;
-import cn.examsystem.manager.utils.RestTemplateUtils;
 import cn.examsystem.rest.pojo.dto.SingleChoiceQuestionDto;
 import cn.examsystem.rest.pojo.vo.SingleChoiceQuestionVo;
+import cn.examsystem.rest.service.SingleChoiceQuestionService;
 import cn.examsystem.security.pojo.dto.SysuserDto;
-import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
-
-import static cn.examsystem.common.utils.UrlUtils.expandURL;
+import java.util.List;
 
 /**
  * Created by Administrator on 2018/1/28.
@@ -38,6 +36,13 @@ public class SingleChoiceQuestionController {
     private String MESSAGE_SAVE_FAIL;
     @Value("${MESSAGE_UPDATE_FAIL}")
     private String MESSAGE_UPDATE_FAIL;
+    @Value("${MESSAGE_GET_SUCCESS}")
+    private String MESSAGE_GET_SUCCESS;
+    @Value("${MESSAGE_DELETE_SUCCESS}")
+    private String MESSAGE_DELETE_SUCCESS;
+
+    @Autowired
+    private SingleChoiceQuestionService singleChoiceQuestionService;
 
     @GetMapping("/v1/singleChoiceQuestion/{id}")
     public ResultInfo getSingleChoiceQuestion(@PathVariable String id) throws Exception{
@@ -46,8 +51,8 @@ public class SingleChoiceQuestionController {
         try{
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+SINGLECHOICEQUESTION_URL+"/{id}", HttpMethod.GET, ResultInfo.class,new Object[]{id});
-            System.out.println("---------"+resultInfo);
+            SingleChoiceQuestionDto singleChoiceQuestionDto = singleChoiceQuestionService.getSingleChoiceQuestion(id);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,singleChoiceQuestionDto);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
@@ -61,15 +66,10 @@ public class SingleChoiceQuestionController {
 
         ResultInfo resultInfo;
         try{
-            //将查询参数构建在url后面
-            JSONObject obj=new JSONObject(singleChoiceQuestionVo);
-            String url = expandURL(REST_BASE_URL + SINGLECHOICEQUESTION_URL+"?", obj);
-
-            System.out.print(url);
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            System.out.println("---------"+resultInfo);
+            List<SingleChoiceQuestionDto> singleChoiceQuestionList = singleChoiceQuestionService.listSingleChoiceQuestion(singleChoiceQuestionVo);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,singleChoiceQuestionList);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
@@ -79,12 +79,12 @@ public class SingleChoiceQuestionController {
     }
 
     @DeleteMapping("/v1/singleChoiceQuestion")
-    public ResultInfo btchSingleChoiceQuestion(@RequestParam(value = "ids[]") String[] ids) throws Exception{
+    public ResultInfo btchDeleteSingleChoiceQuestion(@RequestParam(value = "ids[]") String[] ids) throws Exception{
 
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+SINGLECHOICEQUESTION_URL,HttpMethod.DELETE,ids,ResultInfo.class,new Object[]{});
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_DELETE_SUCCESS,null);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_DELETE_FAIL,null);
@@ -104,7 +104,7 @@ public class SingleChoiceQuestionController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+SINGLECHOICEQUESTION_URL,HttpMethod.POST,singleChoiceQuestionDto,ResultInfo.class,new Object[]{});
+            resultInfo=singleChoiceQuestionService.saveSingleChoiceQuestion(singleChoiceQuestionDto);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_SAVE_FAIL,null);
@@ -124,7 +124,7 @@ public class SingleChoiceQuestionController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+SINGLECHOICEQUESTION_URL+"/{id}",HttpMethod.PUT,singleChoiceQuestionDto,ResultInfo.class,new Object[]{id});
+            resultInfo=singleChoiceQuestionService.updateSingleChoiceQuestion(id,singleChoiceQuestionDto);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
@@ -144,7 +144,7 @@ public class SingleChoiceQuestionController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+SINGLECHOICEQUESTION_URL+QUESTION_FILE_URL+"?fileName="+upload.getOriginalFilename()+"&createdTeacherId="+sysuserDto.getId(),HttpMethod.POST,upload.getBytes(),ResultInfo.class,new Object[]{});
+            resultInfo=singleChoiceQuestionService.addSingleChoiceQuestionByExcel(sysuserDto.getId(),upload.getOriginalFilename(),upload.getBytes());
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_SAVE_FAIL,null);

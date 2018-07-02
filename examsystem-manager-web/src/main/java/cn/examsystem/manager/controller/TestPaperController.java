@@ -1,19 +1,18 @@
 package cn.examsystem.manager.controller;
 
 import cn.examsystem.common.pojo.ResultInfo;
-import cn.examsystem.manager.utils.RestTemplateUtils;
 import cn.examsystem.rest.pojo.dto.TestPaperDto;
+import cn.examsystem.rest.pojo.po.TestPaper;
 import cn.examsystem.rest.pojo.vo.TestPaperVo;
+import cn.examsystem.rest.service.TestPaperService;
 import cn.examsystem.security.pojo.dto.SysuserDto;
-import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-
-import static cn.examsystem.common.utils.UrlUtils.expandURL;
+import java.util.List;
 
 /**
  * Created by Administrator on 2018/1/28.
@@ -38,6 +37,13 @@ public class TestPaperController {
     private String MESSAGE_SAVE_FAIL;
     @Value("${MESSAGE_UPDATE_FAIL}")
     private String MESSAGE_UPDATE_FAIL;
+    @Value("${MESSAGE_GET_SUCCESS}")
+    private String MESSAGE_GET_SUCCESS;
+    @Value("${MESSAGE_DELETE_SUCCESS}")
+    private String MESSAGE_DELETE_SUCCESS;
+
+    @Autowired
+    private TestPaperService testPaperService;
 
 
     @GetMapping("/v1/testPaper/{id}")
@@ -47,8 +53,8 @@ public class TestPaperController {
         try{
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+TESTPAPER_URL+"/{id}", HttpMethod.GET, ResultInfo.class,new Object[]{id});
-            System.out.println("---------"+resultInfo);
+            TestPaperDto testPaperDto = testPaperService.getTestPaper(id);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,testPaperDto);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
@@ -68,15 +74,10 @@ public class TestPaperController {
 
         ResultInfo resultInfo;
         try{
-            //将查询参数构建在url后面
-            JSONObject obj=new JSONObject(testPaperVo);
-            String url = expandURL(REST_BASE_URL + TESTPAPER_URL+"?", obj);
-
-            System.out.print(url);
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            System.out.println("---------"+resultInfo);
+            List<TestPaper> testPaperList = testPaperService.listTestPaper(testPaperVo);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,testPaperList);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
@@ -102,7 +103,7 @@ public class TestPaperController {
 
         try {
             //调用rest服务
-            resultInfo= RestTemplateUtils.exchange(REST_BASE_URL+TESTPAPER_URL, HttpMethod.POST,testPaperDto,ResultInfo.class,new Object[]{});
+            resultInfo= testPaperService.saveTestPaper(testPaperDto);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_SAVE_FAIL,null);
@@ -122,7 +123,7 @@ public class TestPaperController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+TESTPAPER_URL+"/{id}",HttpMethod.PUT,testPaperDto,ResultInfo.class,new Object[]{id});
+            resultInfo=testPaperService.updateTestPaper(id,testPaperDto);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
@@ -137,8 +138,8 @@ public class TestPaperController {
         try{
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+TESTPAPER_URL+"/{id}"+TESTPAPER_QUESTION_URL, HttpMethod.GET, ResultInfo.class,new Object[]{id});
-            System.out.println("---------"+resultInfo);
+            TestPaperDto testPaperDto = testPaperService.listTestPaperQuestionByTestPaperId(id);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,testPaperDto);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
@@ -153,7 +154,7 @@ public class TestPaperController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+TESTPAPER_URL+"/{testPaperId}"+TESTPAPER_QUESTION_URL,HttpMethod.DELETE,ids,ResultInfo.class,new Object[]{testPaperId});
+            resultInfo=testPaperService.removeQuestionFromTestPaper(testPaperId,ids);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_DELETE_FAIL,null);
@@ -167,7 +168,7 @@ public class TestPaperController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+TESTPAPER_URL+"/{id}"+TESTPAPER_QUESTION_URL+"/{questionId}",HttpMethod.PUT,order,ResultInfo.class,new Object[]{id,questionId});
+            resultInfo=testPaperService.updateTestPaperQuestionOrder(id,questionId,order);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);

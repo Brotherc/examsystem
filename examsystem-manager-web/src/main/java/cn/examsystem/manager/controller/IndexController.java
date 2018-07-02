@@ -1,11 +1,11 @@
 package cn.examsystem.manager.controller;
 
 import cn.examsystem.common.pojo.ResultInfo;
-import cn.examsystem.manager.utils.RestTemplateUtils;
+import cn.examsystem.rest.service.UserService;
 import cn.examsystem.security.pojo.dto.SysuserDto;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -29,6 +29,9 @@ public class IndexController {
     private String MESSAGE_GET_SUCCESS;
     @Value("${MESSAGE_UPDATE_FAIL}")
     private String MESSAGE_UPDATE_FAIL;
+
+    @Autowired
+    private UserService userService;
 
 
     @GetMapping("/v1/user/details")
@@ -58,7 +61,7 @@ public class IndexController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo= RestTemplateUtils.exchange(REST_BASE_URL+USER_URL+"/details/{id}", HttpMethod.PUT,sysuserDto,ResultInfo.class,new Object[]{user.getId()});
+            resultInfo= userService.updateUser(user.getId(),sysuserDto);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);

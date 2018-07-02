@@ -46,7 +46,7 @@ public class MajorController {
 
     @PutMapping("/v1/major/{id}")
     public ResultInfo updateMajor(@PathVariable String id,@RequestBody Major major) throws Exception{
-        System.out.println(major.getName());
+        //System.out.println(major.getName());
         return majorService.updateMajor(id,major);
     }
 }

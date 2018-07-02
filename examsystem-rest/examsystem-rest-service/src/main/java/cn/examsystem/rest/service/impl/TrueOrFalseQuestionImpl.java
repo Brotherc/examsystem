@@ -447,7 +447,7 @@ public class TrueOrFalseQuestionImpl implements TrueOrFalseQuestionService {
             String questionId = UUIDBuild.getUUID();
             trueOrFalseQuestion.setId(questionId);
             trueOrFalseQuestion.setContent(content);
-            System.out.println(answer);
+            //System.out.println(answer);
             trueOrFalseQuestion.setAnswer(answer);
             trueOrFalseQuestion.setType(new Integer(DICTINFO_TRUEORFALSEQUESTION_TYPE_CODE));
             trueOrFalseQuestion.setDifficulty(difficulty);
@@ -464,7 +464,7 @@ public class TrueOrFalseQuestionImpl implements TrueOrFalseQuestionService {
     }
 
     private List getTrueOrFalseQuestionListFromExcel(Workbook book,Sheet sheet) throws Exception{
-        System.out.println("sheet名称是："+sheet.getSheetName());
+        //System.out.println("sheet名称是："+sheet.getSheetName());
 
         int lastRowNum = sheet.getLastRowNum();
 

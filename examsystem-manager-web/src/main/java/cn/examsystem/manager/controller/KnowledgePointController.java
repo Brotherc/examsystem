@@ -1,12 +1,12 @@
 package cn.examsystem.manager.controller;
 
 import cn.examsystem.common.pojo.ResultInfo;
-import cn.examsystem.common.utils.JsonUtils;
-import cn.examsystem.manager.utils.RestTemplateUtils;
 import cn.examsystem.rest.pojo.po.Course;
 import cn.examsystem.rest.pojo.po.KnowledgePoint;
+import cn.examsystem.rest.service.CourseService;
+import cn.examsystem.rest.service.KnowledgePointService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -36,20 +36,18 @@ public class KnowledgePointController {
     @Value("${MESSAGE_UPDATE_FAIL}")
     private String MESSAGE_UPDATE_FAIL;
 
+    @Autowired
+    private KnowledgePointService knowledgePointService;
+    @Autowired
+    private CourseService courseService;
+
     @GetMapping("/v1/knowledgePoint/course/{courseId}")
     public ResultInfo getKnowledgePoint(@PathVariable String courseId) throws Exception{
 
         ResultInfo resultInfo;
         try{
             //调用rest服务，查询对应id课程
-            resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+COURSE_URL+"/{courseId}", HttpMethod.GET, ResultInfo.class,new Object[]{courseId});
-
-            System.out.println(resultInfo.getStatus()+"----------"+resultInfo.getMessage());
-
-            String jsonResultInfo = JsonUtils.objectToJson(resultInfo);
-            resultInfo = ResultInfo.formatToPojo(jsonResultInfo, Course.class);
-            Course course=(Course)(resultInfo.getData());
-            System.out.println(course.getKnowledgePointId());
+            Course course = courseService.getCourse(courseId);
 
             if(course==null)
                 return new ResultInfo(ResultInfo.STATUS_RESULT_GONE,MESSAGE_COURSE_ID_NOT_NULL,null);
@@ -58,11 +56,9 @@ public class KnowledgePointController {
             String knowledgePointId = course.getKnowledgePointId();
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+KNOWLEDGEPOINT_URL+"/{id}", HttpMethod.GET, ResultInfo.class,new Object[]{knowledgePointId});
-            System.out.println("---------"+resultInfo);
+            resultInfo = knowledgePointService.getKnowledgePoint(knowledgePointId);
         }catch (Exception e){
             e.printStackTrace();
-            System.out.println("---------"+"失败");
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_GET_FAIL,null);
         }
         return resultInfo;
@@ -76,7 +72,7 @@ public class KnowledgePointController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+KNOWLEDGEPOINT_URL+"/{id}",HttpMethod.DELETE,knowledgePoint,ResultInfo.class,new Object[]{id});
+            resultInfo=knowledgePointService.deleteKnowledgePoint(id,knowledgePoint);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_DELETE_FAIL,null);
@@ -90,7 +86,7 @@ public class KnowledgePointController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+KNOWLEDGEPOINT_URL,HttpMethod.POST,knowledgePoint,ResultInfo.class,new Object[]{});
+            resultInfo=knowledgePointService.saveKnowledgePoint(knowledgePoint);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_SAVE_FAIL,null);
@@ -104,7 +100,7 @@ public class KnowledgePointController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+KNOWLEDGEPOINT_URL+"/{id}",HttpMethod.PUT,knowledgePoint,ResultInfo.class,new Object[]{id});
+            resultInfo=knowledgePointService.updateKnowlesgePoint(id,knowledgePoint);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);

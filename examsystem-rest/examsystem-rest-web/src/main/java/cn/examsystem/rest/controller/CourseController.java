@@ -55,14 +55,14 @@ public class CourseController {
 
     @PostMapping("/v1/course")
     public ResultInfo saveCourse(@RequestBody CourseDto courseDto) throws Exception{
-        System.out.println(courseDto.getMajorsId());
+        //System.out.println(courseDto.getMajorsId());
         return courseService.saveCourse(courseDto);
     }
 
     @PutMapping("/v1/course/{id}")
     public ResultInfo updateCourse(@PathVariable String id,@RequestBody CourseDto courseDto) throws Exception{
-        System.out.println(courseDto.getMajorsId());
-        System.out.println(courseDto.getTeachersId());
+        //System.out.println(courseDto.getMajorsId());
+        //System.out.println(courseDto.getTeachersId());
         return courseService.updateCourse(id,courseDto);
     }
 }

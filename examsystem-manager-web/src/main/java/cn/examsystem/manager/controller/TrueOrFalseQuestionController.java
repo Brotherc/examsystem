@@ -1,20 +1,18 @@
 package cn.examsystem.manager.controller;
 
 import cn.examsystem.common.pojo.ResultInfo;
-import cn.examsystem.manager.utils.RestTemplateUtils;
 import cn.examsystem.rest.pojo.dto.TrueOrFalseQuestionDto;
 import cn.examsystem.rest.pojo.vo.TrueOrFalseQuestionVo;
+import cn.examsystem.rest.service.TrueOrFalseQuestionService;
 import cn.examsystem.security.pojo.dto.SysuserDto;
-import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
-
-import static cn.examsystem.common.utils.UrlUtils.expandURL;
+import java.util.List;
 
 /**
  * Created by Administrator on 2018/1/28.
@@ -39,6 +37,13 @@ public class TrueOrFalseQuestionController {
     private String MESSAGE_SAVE_FAIL;
     @Value("${MESSAGE_UPDATE_FAIL}")
     private String MESSAGE_UPDATE_FAIL;
+    @Value("${MESSAGE_GET_SUCCESS}")
+    private String MESSAGE_GET_SUCCESS;
+    @Value("${MESSAGE_DELETE_SUCCESS}")
+    private String MESSAGE_DELETE_SUCCESS;
+
+    @Autowired
+    private TrueOrFalseQuestionService trueOrFalseQuestionService;
 
     @GetMapping("/v1/trueOrFalseQuestion/{id}")
     public ResultInfo getTrueOrFalseQuestion(@PathVariable String id) throws Exception{
@@ -47,8 +52,8 @@ public class TrueOrFalseQuestionController {
         try{
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+TRUEORFALSEQUESTION_URL+"/{id}", HttpMethod.GET, ResultInfo.class,new Object[]{id});
-            System.out.println("---------"+resultInfo);
+            TrueOrFalseQuestionDto trueOrFalseQuestionDto = trueOrFalseQuestionService.getTrueOrFalseQuestion(id);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,trueOrFalseQuestionDto);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
@@ -62,15 +67,10 @@ public class TrueOrFalseQuestionController {
 
         ResultInfo resultInfo;
         try{
-            //将查询参数构建在url后面
-            JSONObject obj=new JSONObject(trueOrFalseQuestionVo);
-            String url = expandURL(REST_BASE_URL + TRUEORFALSEQUESTION_URL+"?", obj);
-
-            System.out.print(url);
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            System.out.println("---------"+resultInfo);
+            List<TrueOrFalseQuestionDto> trueOrFalseQuestionDtoList = trueOrFalseQuestionService.listTrueOrFalseQuestion(trueOrFalseQuestionVo);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,trueOrFalseQuestionDtoList);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
@@ -80,12 +80,12 @@ public class TrueOrFalseQuestionController {
     }
 
     @DeleteMapping("/v1/trueOrFalseQuestion")
-    public ResultInfo btchTrueOrFalseQuestion(@RequestParam(value = "ids[]") String[] ids) throws Exception{
+    public ResultInfo btchDeleteTrueOrFalseQuestion(@RequestParam(value = "ids[]") String[] ids) throws Exception{
 
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+TRUEORFALSEQUESTION_URL,HttpMethod.DELETE,ids,ResultInfo.class,new Object[]{});
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_DELETE_SUCCESS,null);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_DELETE_FAIL,null);
@@ -105,7 +105,7 @@ public class TrueOrFalseQuestionController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+TRUEORFALSEQUESTION_URL,HttpMethod.POST,trueOrFalseQuestionDto,ResultInfo.class,new Object[]{});
+            resultInfo=trueOrFalseQuestionService.saveTrueOrFalseQuestion(trueOrFalseQuestionDto);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_SAVE_FAIL,null);
@@ -125,7 +125,7 @@ public class TrueOrFalseQuestionController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+TRUEORFALSEQUESTION_URL+"/{id}",HttpMethod.PUT,trueOrFalseQuestionDto,ResultInfo.class,new Object[]{id});
+            resultInfo= trueOrFalseQuestionService.updateTrueOrFalseQuestion(id,trueOrFalseQuestionDto);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
@@ -145,7 +145,7 @@ public class TrueOrFalseQuestionController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+TRUEORFALSEQUESTION_URL+QUESTION_FILE_URL+"?fileName="+upload.getOriginalFilename()+"&createdTeacherId="+sysuserDto.getId(),HttpMethod.POST,upload.getBytes(),ResultInfo.class,new Object[]{});
+            resultInfo=trueOrFalseQuestionService.addTrueOrFalseQuestionByExcel(sysuserDto.getId(),upload.getOriginalFilename(),upload.getBytes());
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_SAVE_FAIL,null);

@@ -72,6 +72,6 @@ public interface ExamService {
     public ResultInfo test(ExamStudentRelationDto examStudentRelationDto) throws Exception;
 
     //提交试卷
-    public ResultInfo submitTestPape(ExamStudentRelationDto examStudentRelationDto,String testPaperId) throws Exception;
+    public ResultInfo submitTestPaper(ExamStudentRelationDto examStudentRelationDto,String testPaperId) throws Exception;
 
 }

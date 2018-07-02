@@ -119,14 +119,14 @@ public class ScoreImpl implements ScoreService {
                 for(ExamstudentAnswer examstudentAnswer:examstudentAnswerList){//考试学生答题信息
                     //学生答案
                     String studentAnswer=examstudentAnswer.getStudentAnswer();
-System.out.println(studentAnswer);
+//System.out.println(studentAnswer);
                     //查询对应试卷题目
                     TestpaperQuestionRelation testPaperQuestion = testpaperQuestionRelationMapper.selectByPrimaryKey(examstudentAnswer.getTestpaperQuestionId());
 
-                    System.out.println(testPaperQuestion.getQuestionType()+""+new Integer(DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE));
+                    //System.out.println(testPaperQuestion.getQuestionType()+""+new Integer(DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE));
 
                     if(testPaperQuestion.getQuestionType().equals(new Integer(DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE))){//单选题
-                        System.out.println("单选题");
+                        //System.out.println("单选题");
                         //查询单选题信息
                         SingleChoiceQuestion singleChoiceQuestion = singleChoiceQuestionMapper.selectByPrimaryKey(testPaperQuestion.getQuestionId());
                         //单选题答案
@@ -146,7 +146,7 @@ System.out.println(studentAnswer);
                         }
                     }
                     else if(testPaperQuestion.getQuestionType().equals(new Integer(DICTINFO_TRUEORFALSEQUESTION_TYPE_CODE))){//判断题
-                        System.out.println("判断题");
+                        //System.out.println("判断题");
                         //查询判断题信息
                         TrueOrFalseQuestion trueOrFalseQuestion = trueOrFalseQuestionMapper.selectByPrimaryKey(testPaperQuestion.getQuestionId());
                         //判断题答案
@@ -169,7 +169,7 @@ System.out.println(studentAnswer);
                         }
                     }
                     else if(testPaperQuestion.getQuestionType().equals(new Integer(DICTINFO_FILLINBLANKQUESTION_TYPE_CODE))){
-                        System.out.println("填空题");
+                        //System.out.println("填空题");
                         //查询填空题信息
                         FillInBlankQuestionWithBLOBs fillInBlankQuestion = fillInBlankQuestionMapper.selectByPrimaryKey(testPaperQuestion.getQuestionId());
                         //填空题答案
@@ -233,7 +233,7 @@ System.out.println(studentAnswer);
                                 List list = entry.getValue();
                                 allAnswerlist.addAll(list);
                             }
-                            System.out.println(studentAnswerList+"-------------"+allAnswerlist);
+                            //System.out.println(studentAnswerList+"-------------"+allAnswerlist);
 
                             //遍历去除重复后的答案，只要出现在答案里面，就能得分
                             for(int i=0;i<studentAnswerList.size();i++){
@@ -365,7 +365,7 @@ System.out.println(studentAnswer);
                     testPaperFillInBlankQuestionExample.setOrderByClause("question_order");
                     List<TestpaperQuestionRelation> testPaperFillInBlankQuestionList = testpaperQuestionRelationMapper.selectByExample(testPaperFillInBlankQuestionExample);
 
-                    System.out.println(testPaperFillInBlankQuestionList.size());
+                    //System.out.println(testPaperFillInBlankQuestionList.size());
 
                     if(!CollectionUtils.isEmpty(testPaperFillInBlankQuestionList)){
                         for(int i=0;i<testPaperFillInBlankQuestionList.size();i++){
@@ -422,7 +422,7 @@ System.out.println(studentAnswer);
 
 
 
-System.out.println(testPaperDto.getFillInBlankQuestions().get(0));
+//System.out.println(testPaperDto.getFillInBlankQuestions().get(0));
 
                     //加载学生试卷中题目答案
                     ExamstudentAnswerExample examstudentAnswerExample=new ExamstudentAnswerExample();
@@ -445,7 +445,7 @@ System.out.println(testPaperDto.getFillInBlankQuestions().get(0));
                         //获取试卷题目
                         TestpaperQuestionRelation testPaperQuestion = testpaperQuestionRelationMapper.selectByPrimaryKey(studentAnswer.getTestpaperQuestionId());
 
-                        System.out.println(studentAnswer.getStudentAnswer());
+                        //System.out.println(studentAnswer.getStudentAnswer());
 
                         if(testPaperQuestion.getQuestionType().equals(new Integer(DICTINFO_SINGLECHOICEQUESTION_TYPE_CODE))){//单选题
                             singleChoiceQuestionAnswer.put(testPaperQuestion.getQuestionOrder(),studentAnswer.getStudentAnswer());
@@ -477,9 +477,9 @@ System.out.println(testPaperDto.getFillInBlankQuestions().get(0));
                     testPaperDto.setFillInBlankQuestionAnswerScore(fillInBlankQuestionAnswerScore);
                     testPaperDto.setProgramQuestionAnswerScore(programQuestionAnswerScore);
 
-                    System.out.println(testPaperDto.getSingleChoiceQuestionAnswer());
-                    System.out.println(testPaperDto.getTrueOrFalseQuestionAnswer());
-                    System.out.println(testPaperDto.getFillInBlankQuestionAnswer());
+                    //System.out.println(testPaperDto.getSingleChoiceQuestionAnswer());
+                    //System.out.println(testPaperDto.getTrueOrFalseQuestionAnswer());
+                    //System.out.println(testPaperDto.getFillInBlankQuestionAnswer());
 
                 }
             }

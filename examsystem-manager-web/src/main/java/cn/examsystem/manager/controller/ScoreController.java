@@ -1,19 +1,20 @@
 package cn.examsystem.manager.controller;
 
 import cn.examsystem.common.pojo.ResultInfo;
-import cn.examsystem.manager.utils.RestTemplateUtils;
+import cn.examsystem.rest.pojo.dto.ExamStudentRelationDto;
+import cn.examsystem.rest.pojo.dto.TestPaperDto;
 import cn.examsystem.rest.pojo.po.ExamstudentAnswer;
 import cn.examsystem.rest.pojo.vo.ExamStudentRelationVo;
-import org.json.JSONObject;
+import cn.examsystem.rest.service.ScoreService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static cn.examsystem.common.utils.UrlUtils.expandURL;
+import java.util.List;
 
 /**
  * Created by Administrator on 2018/1/28.
@@ -40,6 +41,8 @@ public class ScoreController {
     private String MESSAGE_GET_FAIL;
     @Value("${MESSAGE_UPDATE_FAIL}")
     private String MESSAGE_UPDATE_FAIL;
+    @Value("${MESSAGE_GET_SUCCESS}")
+    private String MESSAGE_GET_SUCCESS;
 
     @Value("${MODEL_KEY_SINGLECHOICEQUESTIONS}")
     private String MODEL_KEY_SINGLECHOICEQUESTIONS;
@@ -56,20 +59,19 @@ public class ScoreController {
     @Value("${MODEL_KEY_TESTPAPER}")
     private String MODEL_KEY_TESTPAPER;
 
+    @Autowired
+    private ScoreService scoreService;
+
     @GetMapping("/v1/score/exam/{examId}")
     public ResultInfo listStudentScore(@PathVariable String examId, ExamStudentRelationVo examStudentRelationVo) throws Exception{
 
         ResultInfo resultInfo;
         try{
-            //将查询参数构建在url后面
-            JSONObject obj=new JSONObject(examStudentRelationVo);
-            String url = expandURL(REST_BASE_URL + SCORE_URL+SCORE_EXAM_URL+"/{examId}"+"?", obj);
 
-            System.out.print(url);
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{examId});
-            System.out.println("---------"+resultInfo);
+            List<ExamStudentRelationDto> examStudentRelationDtoList = scoreService.listStudentScore(examId,examStudentRelationVo);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,examStudentRelationDtoList);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
@@ -84,7 +86,7 @@ public class ScoreController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+SCORE_URL+SCORE_EXAM_URL+"/{examId}",HttpMethod.PUT,ResultInfo.class,new Object[]{examId});
+            resultInfo=scoreService.autoGradeForExam(examId);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
@@ -98,7 +100,8 @@ public class ScoreController {
         try{
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(REST_BASE_URL + SCORE_URL+SCORE_EXAM_URL+SCORE_STUDENT_URL+"/{examStudentId}"+SCORE_TESTPAPER_URL, HttpMethod.GET, ResultInfo.class,new Object[]{examStudentId});
+            TestPaperDto testPaperDto = scoreService.getTestPaperByExamStudent(examStudentId);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,testPaperDto);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
@@ -114,7 +117,7 @@ public class ScoreController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(REST_BASE_URL + SCORE_URL+SCORE_EXAM_URL+SCORE_STUDENT_URL+"/{examStudentId}"+SCORE_TESTPAPERQUESTION_URL+"/{testPaperQuestionId}", HttpMethod.PUT,examstudentAnswer, ResultInfo.class,new Object[]{examStudentId,testPaperQuestionId});
+            resultInfo = scoreService.updateTestPaperQuestionScore(examStudentId,testPaperQuestionId,examstudentAnswer.getScore());
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);

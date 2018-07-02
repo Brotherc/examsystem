@@ -10,7 +10,7 @@ public class StudentVo extends Student{
     @Override
     public void setName(String name) {
         try {
-            System.out.println("初始------"+name);
+            //System.out.println("初始------"+name);
             super.setName(new String(name.getBytes("iso8859-1"), "utf-8"));
         }catch (Exception e){
         }

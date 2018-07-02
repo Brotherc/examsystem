@@ -1,11 +1,14 @@
 package cn.examsystem.manager.controller;
 
 import cn.examsystem.common.pojo.ResultInfo;
-import cn.examsystem.manager.utils.RestTemplateUtils;
 import cn.examsystem.rest.pojo.dto.QuestionKnowledgePointRelationDto;
+import cn.examsystem.rest.service.QuestionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created by Administrator on 2018/1/28.
@@ -28,13 +31,16 @@ public class QuesitonController {
     @Value("${MESSAGE_UPDATE_FAIL}")
     private String MESSAGE_UPDATE_FAIL;
 
+    @Autowired
+    private QuestionService questionService;
+
     @DeleteMapping("/v1/question/{id}/knowledgePoint/{knowledgePointId}")
     public ResultInfo removeKnowledgePointForQuestion(@PathVariable String id,@PathVariable String knowledgePointId,QuestionKnowledgePointRelationDto questionKnowledgePointRelationDto) throws Exception{
 
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+QUESTION_URL+"/{id}"+QUESTION_KNOWLEDGEPOINT_URL+"/{knowledgePointId}",HttpMethod.DELETE,questionKnowledgePointRelationDto,ResultInfo.class,new Object[]{id,knowledgePointId});
+            resultInfo=questionService.removeKnowledgePointForQuestion(id,knowledgePointId,questionKnowledgePointRelationDto);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_DELETE_FAIL,null);
@@ -48,7 +54,7 @@ public class QuesitonController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+QUESTION_URL+"/{id}"+QUESTION_KNOWLEDGEPOINT_URL+"/{knowledgePointId}",HttpMethod.POST,questionKnowledgePointRelationDto,ResultInfo.class,new Object[]{id,knowledgePointId});
+            resultInfo=questionService.addKnowledgePointToQuestion(id,knowledgePointId,questionKnowledgePointRelationDto);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_SAVE_FAIL,null);

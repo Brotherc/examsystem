@@ -344,7 +344,7 @@ public class FillInBlankQuestionImpl implements FillInBlankQuestionService {
 
         //答案不能为空
         List<String> answerList = fillInBlankQuestionDto.getAnswerList();
-        System.out.println(answerList);
+        //System.out.println(answerList);
 
         Map<String,List<String>> answerMap=new HashMap<>();
 
@@ -462,7 +462,7 @@ public class FillInBlankQuestionImpl implements FillInBlankQuestionService {
 
         //解析答案
         String answerJson = JsonUtils.objectToJson(answerMap);
-        System.out.println(answerJson);
+        //System.out.println(answerJson);
         fillInBlankQuestionDb.setAnswer(answerJson);
 
         fillInBlankQuestionDb.setUpdatedTime(new Date());

@@ -29,7 +29,7 @@ public class KnowledgePointController {
 
     @DeleteMapping(value = "/v1/knowledgePoint/{id}")
     public ResultInfo deleteKnowledgePoint(@PathVariable String id,@RequestBody KnowledgePoint knowledgePoint) throws Exception{
-        System.out.println(knowledgePoint.getParentId());
+        //System.out.println(knowledgePoint.getParentId());
         return knowledgePointService.deleteKnowledgePoint(id,knowledgePoint);
     }
 

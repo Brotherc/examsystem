@@ -27,10 +27,10 @@ public class DepartmentController {
 
     @GetMapping("/v1/department")
     public ResultInfo listDepartment(DepartmentVo departmentVo) throws Exception{
-        System.out.println(departmentVo.getName());
+        //System.out.println(departmentVo.getName());
         List<Department> departmentList = departmentService.listDepartment(departmentVo);
         ResultInfo resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,departmentList);
-        System.out.println("rest调用成功，返回manager");
+        //System.out.println("rest调用成功，返回manager");
 
         return resultInfo;
     }
@@ -39,20 +39,20 @@ public class DepartmentController {
     public ResultInfo btchDeleteDepartment(@RequestBody String[] ids) throws Exception{
 
         for(String s:ids){
-            System.out.println(s);
+            //System.out.println(s);
         }
 
         return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_DELETE_SUCCESS,null);
     }
 
     @PostMapping("/v1/department")
-    public ResultInfo saveDepatment(@RequestBody Department department) throws Exception{
+    public ResultInfo saveDepartment(@RequestBody Department department) throws Exception{
         return departmentService.saveDepartment(department);
     }
 
     @PutMapping("/v1/department/{id}")
-    public ResultInfo updateDepatment(@PathVariable String id,@RequestBody Department department) throws Exception{
-        System.out.println(department.getName());
-        return departmentService.updateDapartment(id,department);
+    public ResultInfo updateDepartment(@PathVariable String id,@RequestBody Department department) throws Exception{
+        //System.out.println(department.getName());
+        return departmentService.updateDepartment(id,department);
     }
 }

@@ -194,7 +194,7 @@ public class TestPaperImpl implements TestPaperService {
                 //查询出该填空题
                 FillInBlankQuestion fillInBlankQuestion = fillInBlankQuestionMapper.selectByPrimaryKey(questionId);
                 testPaperDto.setFillInBlankQuestionScore(testpaperQuestionRelation.getQuestionScore().divide(new BigDecimal(fillInBlankQuestion.getBlankNum()),1,BigDecimal.ROUND_DOWN));
-                System.out.println(testPaperDto.getFillInBlankQuestionScore());
+                //System.out.println(testPaperDto.getFillInBlankQuestionScore());
 
                 Integer questionNum=0;
                 for(TestpaperQuestionRelation relation:fillInBlankQuestionRelationList){
@@ -323,14 +323,14 @@ public class TestPaperImpl implements TestPaperService {
         List<String> programIdsListCustom = new ArrayList<>();
         if(!StringUtils.isBlank(programQuestionIds)){
             String[] programIdsArr=programQuestionIds.split(",");
-            System.out.println("--------------------------"+programIdsArr);
+            //System.out.println("--------------------------"+programIdsArr);
             for(String id:programIdsArr){
                 if(!StringUtils.isBlank(id))
                     programIdsListCustom.add(id.trim());
             }
         }
         for(String s:programIdsListCustom){
-            System.out.println(s);
+            //System.out.println(s);
         }
 
         if(CollectionUtils.isEmpty(singleIdsListCustom)&&CollectionUtils.isEmpty(trueOrFalseIdsListCustom)&&CollectionUtils.isEmpty(fillIdsListCustom)&&CollectionUtils.isEmpty(programIdsListCustom))
@@ -391,7 +391,7 @@ public class TestPaperImpl implements TestPaperService {
 
             //添加的题目必须存在（课程id与试卷课程id一致）
             for(String id:fillIdsListCustom){
-                System.out.println(id);
+                //System.out.println(id);
                 FillInBlankQuestion fillInBlankQuestion = fillInBlankQuestionMapper.selectByPrimaryKey(id);
                 if(fillInBlankQuestion==null)
                     return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_QUESTION_NOT_EXIST,null);
@@ -444,8 +444,8 @@ public class TestPaperImpl implements TestPaperService {
 
         //试卷总分与题目分数总分一样
         BigDecimal questionSumScore=singleChoiceQuestionSumScore.add(trueOrFalseQuestionSumScore).add(fillInblankQuestionSumScore).add(programQuestionSumScore);
-        System.out.println("试卷："+testPaperDtoScore);
-        System.out.println("题目："+questionSumScore);
+        //System.out.println("试卷："+testPaperDtoScore);
+        //System.out.println("题目："+questionSumScore);
         if(testPaperDtoScore.compareTo(questionSumScore)!=0)
             return new ResultInfo(ResultInfo.STATUS_RESULT_UNPROCESABLE_ENTITY,MESSAGE_SCORE_NOT_SAME,null);
 
@@ -476,7 +476,7 @@ public class TestPaperImpl implements TestPaperService {
             testpaperQuestionRelation.setCreatedTime(new Date());
             testpaperQuestionRelation.setUpdatedTime(new Date());
 
-            System.out.println(testpaperQuestionRelation.getQuestionId()+"-----"+(i+1));
+            //System.out.println(testpaperQuestionRelation.getQuestionId()+"-----"+(i+1));
 
             testpaperQuestionRelationMapper.insert(testpaperQuestionRelation);
         }
@@ -694,7 +694,7 @@ public class TestPaperImpl implements TestPaperService {
             testpaperQuestionRelation.setCreatedTime(new Date());
             testpaperQuestionRelation.setUpdatedTime(new Date());
 
-            System.out.println(questionIds.get(i)+"-----"+(i+1));
+            //System.out.println(questionIds.get(i)+"-----"+(i+1));
 
             testpaperQuestionRelationMapper.insert(testpaperQuestionRelation);
         }

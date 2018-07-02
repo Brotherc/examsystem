@@ -21,7 +21,7 @@ public class UserController {
 
     @PutMapping("/v1/user/details/{id}")
     public ResultInfo updateSysuser(@PathVariable String id,@RequestBody SysuserDto sysuserDto) throws Exception{
-        System.out.println("修改user");
+        //System.out.println("修改user");
         return userService.updateUser(id,sysuserDto);
     }
 }

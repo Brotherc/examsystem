@@ -13,7 +13,7 @@
         <module>examsystem-rest-pojo</module>
         <module>examsystem-rest-mapper</module>
         <module>examsystem-rest-service</module>
-        <module>examsystem-rest-web</module>
+        <!--<module>examsystem-rest-web</module>-->
     </modules>
     <artifactId>examsystem-rest</artifactId>
 

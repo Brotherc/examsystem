@@ -1,24 +1,25 @@
 package cn.examsystem.manager.controller;
 
 import cn.examsystem.common.pojo.ResultInfo;
-import cn.examsystem.manager.utils.RestTemplateUtils;
+import cn.examsystem.rest.pojo.dto.ExamDto;
+import cn.examsystem.rest.pojo.dto.ExamStudentRelationDto;
 import cn.examsystem.rest.pojo.dto.StudentDto;
 import cn.examsystem.rest.pojo.po.Exam;
 import cn.examsystem.rest.pojo.po.ExamStudentRelation;
 import cn.examsystem.rest.pojo.po.Student;
 import cn.examsystem.rest.pojo.vo.ExamStudentRelationVo;
 import cn.examsystem.rest.pojo.vo.StudentVo;
+import cn.examsystem.rest.service.ExamService;
+import cn.examsystem.rest.service.StudentService;
 import cn.examsystem.security.pojo.dto.SysuserDto;
-import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
-
-import static cn.examsystem.common.utils.UrlUtils.expandURL;
+import java.util.List;
 
 /**
  * Created by Administrator on 2018/1/28.
@@ -44,7 +45,6 @@ public class ExamController {
     @Value("${EXAM_INVIGILATION_URL}")
     private String EXAM_INVIGILATION_URL;
 
-
     @Value("${MESSAGE_GET_FAIL}")
     private String MESSAGE_GET_FAIL;
     @Value("${MESSAGE_DELETE_FAIL}")
@@ -53,21 +53,25 @@ public class ExamController {
     private String MESSAGE_SAVE_FAIL;
     @Value("${MESSAGE_UPDATE_FAIL}")
     private String MESSAGE_UPDATE_FAIL;
+    @Value("${MESSAGE_GET_SUCCESS}")
+    private String MESSAGE_GET_SUCCESS;
+    @Value("${MESSAGE_DELETE_SUCCESS}")
+    private String MESSAGE_DELETE_SUCCESS;
+
+    @Autowired
+    private ExamService examService;
+    @Autowired
+    private StudentService studentService;
 
     @GetMapping("/v1/exam")
     public ResultInfo listExam(Exam exam) throws Exception{
 
         ResultInfo resultInfo;
         try{
-            //将查询参数构建在url后面
-            JSONObject obj=new JSONObject(exam);
-            String url = expandURL(REST_BASE_URL + EXAM_URL+"?", obj);
-
-            System.out.print(url);
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            System.out.println("---------"+resultInfo);
+            List<ExamDto> examDtoList = examService.listExam(exam);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,examDtoList);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
@@ -83,8 +87,8 @@ public class ExamController {
         try{
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+EXAM_URL+"/{id}", HttpMethod.GET, ResultInfo.class,new Object[]{id});
-            System.out.println("---------"+resultInfo);
+            ExamDto exam = examService.getExam(id);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,exam);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
@@ -99,7 +103,7 @@ public class ExamController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+EXAM_URL,HttpMethod.DELETE,ids,ResultInfo.class,new Object[]{});
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_DELETE_SUCCESS,null);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_DELETE_FAIL,null);
@@ -120,7 +124,7 @@ public class ExamController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+EXAM_URL,HttpMethod.POST,exam,ResultInfo.class,new Object[]{});
+            resultInfo=examService.saveExam(exam);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_SAVE_FAIL,null);
@@ -134,7 +138,7 @@ public class ExamController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+EXAM_URL+"/{id}",HttpMethod.PUT,exam,ResultInfo.class,new Object[]{id});
+            resultInfo=examService.updateExam(id,exam);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
@@ -148,7 +152,7 @@ public class ExamController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+EXAM_URL+"/{id}"+EXAM_STUDENT_URL,HttpMethod.POST,studentDto,ResultInfo.class,new Object[]{id});
+            resultInfo=examService.addStudentForExam(id,studentDto);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_SAVE_FAIL,null);
@@ -162,7 +166,7 @@ public class ExamController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+EXAM_URL+"/{id}"+EXAM_STUDENT_URL+"s",HttpMethod.POST,studentIds,ResultInfo.class,new Object[]{id});
+            resultInfo=examService.addStudentsForExam(id,studentIds);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_SAVE_FAIL,null);
@@ -178,7 +182,7 @@ public class ExamController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+EXAM_URL+"/{id}"+EXAM_STUDENT_URL+EXAM_FILE_URL+"?fileName="+upload.getOriginalFilename(),HttpMethod.POST,upload.getBytes(),ResultInfo.class,new Object[]{id});
+            resultInfo=examService.addStudentForExamByExcel(id,upload.getOriginalFilename(),upload.getBytes());
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_SAVE_FAIL,null);
@@ -192,15 +196,14 @@ public class ExamController {
 
         ResultInfo resultInfo;
         try{
-            //将查询参数构建在url后面
-            JSONObject obj=new JSONObject(examStudentRelationVo);
-            String url = expandURL(REST_BASE_URL + EXAM_URL+"/{id}"+EXAM_STUDENT_URL+"?", obj);
 
-            System.out.print(url);
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{id});
-            System.out.println("---------"+resultInfo);
+            examStudentRelationVo=examStudentRelationVo==null?new ExamStudentRelationVo() : examStudentRelationVo;
+            examStudentRelationVo.setExamId(id);
+
+            List<ExamStudentRelationDto> examStudentRelationDtoList = examService.listExamStudent(examStudentRelationVo);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,examStudentRelationDtoList);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
@@ -215,7 +218,7 @@ public class ExamController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+EXAM_URL+EXAM_STUDENT_URL+"/{examStudentRelationId}",HttpMethod.DELETE,ResultInfo.class,new Object[]{examStudentRelationId});
+            resultInfo=examService.removeStudentFromExam(examStudentRelationId);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_DELETE_FAIL,null);
@@ -229,7 +232,7 @@ public class ExamController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+EXAM_URL+EXAM_STUDENT_URL+"/{examStudentRelationId}/partOrder",HttpMethod.PUT,examStudentRelation,ResultInfo.class,new Object[]{examStudentRelationId});
+            resultInfo=examService.updateExamStudentPartOrder(examStudentRelationId,examStudentRelation.getPartOrder());
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
@@ -243,7 +246,7 @@ public class ExamController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+EXAM_URL+EXAM_STUDENT_URL+"/{examStudentRelationId}/status",HttpMethod.PUT,examStudentRelation,ResultInfo.class,new Object[]{examStudentRelationId});
+            resultInfo=examService.updateExamStudentStatus(examStudentRelationId,examStudentRelation.getStatus());
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
@@ -257,7 +260,7 @@ public class ExamController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+EXAM_URL+"/{examId}"+EXAM_STUDENT_URL+"/{studentId}",HttpMethod.PUT,student,ResultInfo.class,new Object[]{examId,studentId});
+            resultInfo=examService.updateExamStudent(examId,studentId,student);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
@@ -271,15 +274,10 @@ public class ExamController {
 
         ResultInfo resultInfo;
         try{
-            //将查询参数构建在url后面
-            JSONObject obj=new JSONObject(studentVo);
-            String url = expandURL(REST_BASE_URL+EXAMSTUDENT_URL+EXAMSTUDENT_EXAM_URL+"/{id}"+"?", obj);
-
-            System.out.print(url);
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{id});
-            System.out.println("---------"+resultInfo);
+            List<Student> studentList = examService.listStudentNoExistExam(id,studentVo);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,studentList);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
@@ -294,7 +292,7 @@ public class ExamController {
         ResultInfo resultInfo;
         try {
             //调用rest服务
-            resultInfo=RestTemplateUtils.exchange(REST_BASE_URL+EXAM_URL+"/{id}"+EXAM_STATUS_URL,HttpMethod.PUT,ResultInfo.class,new Object[]{id});
+            resultInfo=examService.startExam(id);
         }catch (Exception e){
             e.printStackTrace();
             return new ResultInfo(ResultInfo.STATUS_RESULT_INTERANL_SERVER_ERROR,MESSAGE_UPDATE_FAIL,null);
@@ -308,13 +306,11 @@ public class ExamController {
         ResultInfo resultInfo;
         try{
 
-            //将查询参数构建在url后面
-            JSONObject obj=new JSONObject(examStudentRelationVo);
-            String url = expandURL(REST_BASE_URL+EXAM_URL+"/{examId}"+EXAM_INVIGILATION_URL+"?", obj);
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{examId});
-            System.out.println("---------"+resultInfo);
+            List<ExamStudentRelationDto> examStudentRelationDtoList = examService.listInvigilationExamStudent(examId, examStudentRelationVo);
+
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,examStudentRelationDtoList);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");

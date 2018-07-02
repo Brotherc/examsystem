@@ -38,7 +38,7 @@ public class ExamController {
     public ResultInfo listExam(Exam exam) throws Exception{
         List<ExamDto> examDtoList = examService.listExam(exam);
         ResultInfo resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,examDtoList);
-        System.out.println("rest调用成功，返回manager");
+        //System.out.println("rest调用成功，返回manager");
 
         return resultInfo;
     }
@@ -46,7 +46,7 @@ public class ExamController {
     public ResultInfo getExam(@PathVariable String id) throws Exception{
         ExamDto exam = examService.getExam(id);
         ResultInfo resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,exam);
-        System.out.println("rest调用成功，返回manager");
+        //System.out.println("rest调用成功，返回manager");
 
         return resultInfo;
     }
@@ -55,7 +55,7 @@ public class ExamController {
     public ResultInfo btchDeleteExam(@RequestBody String[] ids) throws Exception{
 
         for(String s:ids){
-            System.out.println(s);
+            //System.out.println(s);
         }
 
         return new ResultInfo(ResultInfo.STATUS_RESULT_CREATED,MESSAGE_DELETE_SUCCESS,null);
@@ -63,7 +63,7 @@ public class ExamController {
 
     @PostMapping("/v1/exam")
     public ResultInfo saveExam(@RequestBody Exam exam) throws Exception{
-        System.out.println(exam.getStartTime());
+        //System.out.println(exam.getStartTime());
         return examService.saveExam(exam);
     }
 
@@ -94,7 +94,7 @@ public class ExamController {
 
         List<ExamStudentRelationDto> examStudentRelationDtoList = examService.listExamStudent(examStudentRelationVo);
         ResultInfo resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,examStudentRelationDtoList);
-        System.out.println("rest调用成功，返回manager");
+        //System.out.println("rest调用成功，返回manager");
 
         return resultInfo;
     }
@@ -143,8 +143,8 @@ public class ExamController {
     }
 
     @PostMapping("/v1/test/testPaper/{testPaperId}")
-    public ResultInfo submitTestPape(@RequestBody ExamStudentRelationDto examStudentRelationDto,@PathVariable String testPaperId) throws Exception{
-        return examService.submitTestPape(examStudentRelationDto,testPaperId);
+    public ResultInfo submitTestPaper(@RequestBody ExamStudentRelationDto examStudentRelationDto,@PathVariable String testPaperId) throws Exception{
+        return examService.submitTestPaper(examStudentRelationDto,testPaperId);
     }
 
     @GetMapping("/v1/exam/{examId}/invigilation")

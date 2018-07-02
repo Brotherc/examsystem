@@ -29,13 +29,13 @@ public class SysuserController {
     public ResultInfo listSysuser(SysuserVo sysuserVo) throws Exception{
         List<SysuserDto> sysuserList = sysuserService.listSysuser(sysuserVo);
         ResultInfo resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,sysuserList);
-        System.out.println("rest调用成功，返回manager");
+        //System.out.println("rest调用成功，返回manager");
 
         return resultInfo;
     }
 
     @DeleteMapping(value = "/v1/sysuser")
-    public ResultInfo btchDeleteDepartment(@RequestBody String[] ids) throws Exception{
+    public ResultInfo btchDeleteSysuser(@RequestBody String[] ids) throws Exception{
 /*
         for(String s:ids){
             System.out.println(s);

@@ -10,9 +10,9 @@
         http://www.springframework.org/schema/context 
         http://www.springframework.org/schema/context/spring-context-4.2.xsd">
 
-	<context:component-scan base-package="cn.examsystem.*" />
+	<context:component-scan base-package="cn.examsystem.manager.controller" />
 	<!-- 加载配置文件 -->
-	<context:property-placeholder location="classpath:conf/*.properties" />
+	<context:property-placeholder location="classpath*:conf/*.properties" />
 
 
 	<bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">

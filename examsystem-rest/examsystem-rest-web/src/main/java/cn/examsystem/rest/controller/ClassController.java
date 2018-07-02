@@ -40,9 +40,9 @@ public class ClassController {
 
     @PostMapping("/v1/class")
     public ResultInfo btchSaveClass(@RequestBody ClassDto classDto) throws Exception{
-        System.out.println(classDto.getNames());
-        System.out.println(classDto.getMajorId());
-        System.out.println(classDto.getGradeId());
+        //System.out.println(classDto.getNames());
+        //System.out.println(classDto.getMajorId());
+        //System.out.println(classDto.getGradeId());
         return classService.btchSaveClass(classDto);
     }
 }

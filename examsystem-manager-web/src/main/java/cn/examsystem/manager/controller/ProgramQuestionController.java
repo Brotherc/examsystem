@@ -1,16 +1,17 @@
 package cn.examsystem.manager.controller;
 
 import cn.examsystem.common.pojo.ResultInfo;
-import cn.examsystem.manager.utils.RestTemplateUtils;
+import cn.examsystem.rest.pojo.dto.ProgramQuestionDto;
 import cn.examsystem.rest.pojo.po.ProgramQuestion;
-import org.json.JSONObject;
+import cn.examsystem.rest.pojo.po.ProgramQuestionWithBLOBs;
+import cn.examsystem.rest.service.ProgramQuestionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import static cn.examsystem.common.utils.UrlUtils.expandURL;
+import java.util.List;
 
 /**
  * Created by Administrator on 2018/1/28.
@@ -26,6 +27,13 @@ public class ProgramQuestionController {
 
     @Value("${MESSAGE_GET_FAIL}")
     private String MESSAGE_GET_FAIL;
+    @Value("${MESSAGE_GET_SUCCESS}")
+    private String MESSAGE_GET_SUCCESS;
+    @Value("${MESSAGE_DELETE_SUCCESS}")
+    private String MESSAGE_DELETE_SUCCESS;
+
+    @Autowired
+    private ProgramQuestionService programQuestionService;
 
     @GetMapping("/v1/programQuestion/{id}")
     public ResultInfo getProgramQuestion(@PathVariable String id) throws Exception{
@@ -34,8 +42,8 @@ public class ProgramQuestionController {
         try{
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(REST_BASE_URL+PROGRAMQUESTION_URL+"/{id}", HttpMethod.GET, ResultInfo.class,new Object[]{id});
-            System.out.println("---------"+resultInfo);
+            ProgramQuestionDto programQuestion = programQuestionService.getProgramQuestion(id);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,programQuestion);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");
@@ -49,15 +57,11 @@ public class ProgramQuestionController {
 
         ResultInfo resultInfo;
         try{
-            //将查询参数构建在url后面
-            JSONObject obj=new JSONObject(programQuestion);
-            String url = expandURL(REST_BASE_URL + PROGRAMQUESTION_URL+"?", obj);
 
-            System.out.print(url);
 
             //调用rest服务
-            resultInfo = RestTemplateUtils.exchange(url, HttpMethod.GET, ResultInfo.class,new Object[]{});
-            System.out.println("---------"+resultInfo);
+            List<ProgramQuestionWithBLOBs> programQuestionList = programQuestionService.listProgramQuestion(programQuestion);
+            resultInfo=new ResultInfo(ResultInfo.STATUS_RESULT_OK,MESSAGE_GET_SUCCESS,programQuestionList);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("---------"+"失败");

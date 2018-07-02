@@ -19,5 +19,5 @@ public interface DepartmentService {
     public ResultInfo saveDepartment(Department department) throws Exception;
 
     //更新系
-    public ResultInfo updateDapartment(String id,Department department) throws Exception;
+    public ResultInfo updateDepartment(String id,Department department) throws Exception;
 }
